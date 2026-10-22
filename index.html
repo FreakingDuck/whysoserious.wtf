@@ -126,9 +126,9 @@
   /* not */
   .not { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px 28px; }
   @media (max-width: 640px) { .not { grid-template-columns: 1fr; } }
-  .not div { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-2); font-size: 15px; }
-  .not div i { font-style: normal; color: var(--pink); font-weight: 700; }
-  .not div b { color: var(--ink); }
+  .not > div { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--ink-2); font-size: 15px; }
+  .not > div > i { font-style: normal; color: var(--pink); font-weight: 700; }
+  .not b { color: var(--ink); }
 
   /* footer */
   footer { padding: 40px 0 60px; border-top: 1px solid var(--line); color: var(--ink-3); font-size: 14px; }
