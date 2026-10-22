@@ -63,12 +63,12 @@
   /* header */
   header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
     background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--line); }
-  .nav { display: flex; align-items: center; justify-content: space-between; height: 60px; gap: 16px; }
+  .nav { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 16px; flex-wrap: wrap; padding: 8px 0; }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; color: var(--ink); }
   .mark { width: 22px; height: 22px; border-radius: 50%; background: var(--mark); box-shadow: 0 0 0 3px var(--surface), 0 0 0 4px var(--line-2); }
-  .nav nav { display: flex; gap: 18px; font-size: 15px; color: var(--ink-2); }
-  .nav nav a { color: var(--ink-2); }
-  @media (max-width: 640px) { .nav nav { display: none; } }
+  .nav nav { display: flex; gap: 14px 18px; font-size: 15px; color: var(--ink-2); flex-wrap: wrap; }
+  .nav nav a { color: var(--ink-2); white-space: nowrap; }
+  @media (max-width: 640px) { .nav nav { font-size: 14px; gap: 8px 14px; width: 100%; } }
 
   /* hero */
   .hero { padding: 72px 0 48px; display: grid; grid-template-columns: 1.15fr .85fr; gap: 40px; align-items: center; }
@@ -154,9 +154,9 @@
       <a href="#how">How it works</a>
       <a href="#app">The app</a>
       <a href="#mail">The mailbox</a>
-      <a href="#agent">The agent</a>
       <a href="#rules">The rules</a>
       <a href="#not">What it is not</a>
+      <a href="#agent">The agent</a>
     </nav>
   </div>
 </header>
