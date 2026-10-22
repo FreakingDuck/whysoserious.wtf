@@ -8,6 +8,8 @@ page answers at https://whysoserious.wtf.
 
 Edit `index.html`, push, done. The app it describes is `FreakingDuck/cakeBoard`.
 
+French is the default, at `/` (`index.html`); English is at `/en/` (`en/index.html`), same page, same CSS, one file each.
+
 ## Made with AI, read as such
 
 Everything here is written by AI agents (Claude, through Claude Code). The owner reviews

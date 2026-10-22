@@ -1,18 +1,20 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Why So Serious · a personal memory and task app, local first, kept by an AI agent</title>
-<meta name="description" content="Why So Serious (CakeBoard): a local-first personal memory and task manager. An AI agent files your notes, mails and documents into markdown files on your own disk, one line to read, one click to undo. No cloud, no training on your data.">
+<title>Why So Serious · une mémoire personnelle et un gestionnaire de tâches, en local, tenus par un agent IA</title>
+<meta name="description" content="Why So Serious (CakeBoard)&#8239;: une mémoire personnelle et un gestionnaire de tâches, en local d'abord. Un agent IA range vos notes, vos mails et vos documents en fichiers markdown sur votre propre disque, une ligne à lire, un clic pour annuler. Pas de cloud, aucun entraînement sur vos données.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://whysoserious.wtf/">
-<meta property="og:title" content="Why So Serious · a personal memory and task app, local first">
-<meta property="og:description" content="An AI agent files your notes, mails and documents into markdown on your own disk. One line to read, one click to undo. No cloud, nothing learns on you.">
+<meta property="og:title" content="Why So Serious · une mémoire personnelle et un gestionnaire de tâches, en local">
+<meta property="og:description" content="Un agent IA range vos notes, vos mails et vos documents en markdown sur votre propre disque. Une ligne à lire, un clic pour annuler. Pas de cloud, rien n'apprend sur vous.">
 <meta property="og:site_name" content="whysoserious.wtf">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Why So Serious">
-<meta name="twitter:description" content="Your whole life, in one inbox that files itself. Local first, yours.">
+<meta name="twitter:description" content="Toute votre vie, dans une boîte qui se range toute seule. En local, à vous.">
+<link rel="alternate" hreflang="fr" href="https://whysoserious.wtf/">
+<link rel="alternate" hreflang="en" href="https://whysoserious.wtf/en/">
 <meta name="theme-color" content="#0b0e13">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%236ba3ff'/%3E%3Cstop offset='.55' stop-color='%23f59a3a'/%3E%3Cstop offset='1' stop-color='%236ba3ff'/%3E%3C/linearGradient%3E%3C/defs%3E%3Ccircle cx='32' cy='32' r='28' fill='url(%23g)'/%3E%3Ccircle cx='32' cy='32' r='10' fill='%230b0e13'/%3E%3C/svg%3E">
 <style>
@@ -68,6 +70,7 @@
   .mark { width: 22px; height: 22px; border-radius: 50%; background: var(--mark); box-shadow: 0 0 0 3px var(--surface), 0 0 0 4px var(--line-2); }
   .nav nav { display: flex; gap: 14px 18px; font-size: 15px; color: var(--ink-2); flex-wrap: wrap; }
   .nav nav a { color: var(--ink-2); white-space: nowrap; }
+  .nav nav a.lang { color: var(--ink-3); font-size: 12px; font-weight: 700; letter-spacing: .08em; align-self: center; }
   @media (max-width: 640px) { .nav nav { font-size: 14px; gap: 8px 14px; width: 100%; } }
 
   /* hero */
@@ -151,12 +154,13 @@
   <div class="wrap nav">
     <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span> whysoserious.wtf</a>
     <nav>
-      <a href="#how">How it works</a>
-      <a href="#app">The app</a>
-      <a href="#mail">The mailbox</a>
-      <a href="#rules">The rules</a>
-      <a href="#not">What it is not</a>
-      <a href="#agent">The agent</a>
+      <a href="#how">Comment ça marche</a>
+      <a href="#app">L'app</a>
+      <a href="#mail">La boîte mail</a>
+      <a href="#rules">Les règles</a>
+      <a href="#not">Ce que ce n'est pas</a>
+      <a href="#agent">L'agent</a>
+      <a class="lang" href="/en/" hreflang="en" lang="en" title="English version">EN</a>
     </nav>
   </div>
 </header>
@@ -164,163 +168,163 @@
 <main id="top" class="wrap">
   <div class="hero">
     <div>
-      <div class="kicker">The cake is life. The plan is a lie.</div>
-      <h1>Your whole life, in one inbox that <em>files itself</em>.</h1>
-      <p class="lede">Say it, drop it, or forward it. An agent reads it with everything it already knows about you, proposes where it goes, and you say yes. Files on your disk. Nothing learns on you.</p>
+      <div class="kicker">Le gâteau, c'est la vie. Le plan, c'est un mensonge.</div>
+      <h1>Toute votre vie, dans une boîte qui <em>se range toute seule</em>.</h1>
+      <p class="lede">Dites-le, déposez-le, ou transférez-le. Un agent le lit avec tout ce qu'il sait déjà de vous, propose où ça va, et vous dites oui. Des fichiers sur votre disque. Rien n'apprend sur vous.</p>
       <div class="cta-row">
         <a class="cta" href="mailto:hello@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a>
-        <span class="ghost">One word is enough. That is the whole onboarding.</span>
+        <span class="ghost">Un mot suffit. L'inscription s'arrête là.</span>
       </div>
     </div>
 
-    <div class="demo" aria-label="What a turn looks like">
+    <div class="demo" aria-label="À quoi ressemble un tour">
       <div class="box"><span class="dot"></span> acheter du lait demain, et rappeler Sophie pour le 23</div>
       <div class="turn">
         <div class="who">Damour · Fable · 35 ¢</div>
-        Plop ! Deux choses, rangées. Sophie, c'est bien celle du dîner de samedi ?
+        Plop&#8239;! Deux choses, rangées. Sophie, c'est bien celle du dîner de samedi&#8239;?
       </div>
       <div class="card">
-        <span class="chip">done · task</span>
+        <span class="chip">fait · tâche</span>
         <h4>Acheter du lait</h4>
-        <p>due: tomorrow · area: maison · one commit</p>
-        <div class="acts"><span>Undo</span><span>Not like this</span></div>
+        <p>échéance&#8239;: demain · zone&#8239;: maison · un commit</p>
+        <div class="acts"><span>Annuler</span><span>Pas comme ça</span></div>
       </div>
       <div class="card">
-        <span class="chip" style="background:var(--orange-soft);color:var(--orange)">done · to check</span>
+        <span class="chip" style="background:var(--orange-soft);color:var(--orange)">fait · à vérifier</span>
         <h4>Rappeler Sophie</h4>
-        <p>due: 23 · linked to: Saturday's dinner · people: Sophie?</p>
-        <div class="acts"><span>Undo</span><span>Answer</span></div>
+        <p>échéance&#8239;: le 23 · lié à&#8239;: le dîner de samedi · personnes&#8239;: Sophie&#8239;?</p>
+        <div class="acts"><span>Annuler</span><span>Répondre</span></div>
       </div>
-      <div class="cost">one commit each · undo is a button · unsure is a question, not a guess</div>
+      <div class="cost">un commit chacun · annuler est un bouton · le doute est une question, pas un pari</div>
     </div>
   </div>
 
   <section id="how">
-    <h2>Three promises</h2>
-    <p class="sub">Not a chatbot with a memory bolted on. A memory, with an agent that keeps it.</p>
+    <h2>Trois promesses</h2>
+    <p class="sub">Pas un chatbot avec une mémoire greffée dessus. Une mémoire, avec un agent qui la tient.</p>
     <div class="grid">
       <div class="tile orange">
         <div class="n">01</div>
-        <h3>Everything in, one place out</h3>
-        <p>Voice, a note, a PDF, a forwarded mail, a photo of a receipt. Each one becomes a small file with a title, tags, and links to what it concerns. A task knows the memory it came from.</p>
+        <h3>Tout entre, un seul endroit en sort</h3>
+        <p>La voix, une note, un PDF, un mail transféré, la photo d'un ticket. Chacun devient un petit fichier avec un titre, des tags, et des liens vers ce qu'il concerne. Une tâche sait de quelle mémoire elle vient.</p>
       </div>
       <div class="tile blue">
         <div class="n">02</div>
-        <h3>It acts. You glance.</h3>
-        <p>Say it and it's filed, linked, dated. Everything it does is one line you can read and one click to undo. It asks only when it isn't sure, and it never touches what is shared, external or confidential without you. The more it earns, the less you look.</p>
+        <h3>Il agit. Vous jetez un œil.</h3>
+        <p>Dites-le, c'est rangé, lié, daté. Tout ce qu'il fait tient en une ligne à lire et un clic pour annuler. Il ne demande que quand il doute, et ne touche jamais sans vous à ce qui est partagé, externe ou confidentiel. Plus il le mérite, moins vous regardez.</p>
       </div>
       <div class="tile pink">
         <div class="n">03</div>
-        <h3>Yours, on your disk</h3>
-        <p>Markdown files in a git repository you own. The keys never leave the machine. No provider trains on your data. A confidential folder that never travels. Delete the app; keep everything.</p>
+        <h3>À vous, sur votre disque</h3>
+        <p>Des fichiers markdown dans un dépôt git qui vous appartient. Les clés ne quittent jamais la machine. Aucun fournisseur n'entraîne ses modèles sur vos données. Un dossier confidentiel qui ne voyage jamais. Supprimez l'app, gardez tout.</p>
       </div>
     </div>
   </section>
 
   <section id="app">
-    <h2>What's in the app today</h2>
-    <p class="sub">A desktop window on your own folder. Every screen reads the same files.</p>
+    <h2>Ce qu'il y a dans l'app aujourd'hui</h2>
+    <p class="sub">Une fenêtre de bureau sur votre propre dossier. Chaque écran lit les mêmes fichiers.</p>
     <div class="grid">
       <div class="tile orange">
         <div class="n">Damour</div>
-        <h3>Say it, it's filed</h3>
-        <p>Plain text in, plain text out. Under each answer, what was just done to your memory, one line each, Undo on every line. When it isn't sure, it asks instead of guessing. Damour, as in "Lorisse d'amour": the one you talk to.</p>
+        <h3>Dites-le, c'est rangé</h3>
+        <p>Du texte entre, du texte sort. Sous chaque réponse, ce qui vient d'être fait à votre mémoire, une ligne par action, Annuler sur chacune. Quand il doute, il demande au lieu de deviner. Damour, comme dans «&#8239;Lorisse d'amour&#8239;»&#8239;: celui à qui vous parlez.</p>
       </div>
       <div class="tile blue">
         <div class="n">Read</div>
-        <h3>Any folder of markdown</h3>
-        <p>Drop a folder, read its pages, highlight a passage and annotate, mark a page as read. Then say "check the notes": the agent answers each one and updates the review lines.</p>
+        <h3>N'importe quel dossier de markdown</h3>
+        <p>Déposez un dossier, lisez ses pages, surlignez un passage et annotez, marquez une page comme lue. Puis dites «&#8239;regarde les notes&#8239;»&#8239;: l'agent répond à chacune et met à jour les lignes de relecture.</p>
       </div>
       <div class="tile pink">
         <div class="n">Brain</div>
-        <h3>Walk through your memories</h3>
-        <p>A map of every piece by room and tag. Pick a few, ask for a review: a résumé you validate, links and merges you accept, questions you answer.</p>
+        <h3>Parcourez vos mémoires</h3>
+        <p>Une carte de chaque pièce par salle et par tag. Choisissez-en quelques-unes, demandez une relecture&#8239;: un résumé que vous validez, des liens et des fusions que vous acceptez, des questions auxquelles vous répondez.</p>
       </div>
     </div>
-    <p style="color:var(--ink-2);margin:20px 0 0;font-size:15px">Also there: the Board and its daily plan, replanned on your mood; the Inbox for what arrived; Spend, every call and what it cost; Settings, each prompt as sent, with your own lines under it.</p>
+    <p style="color:var(--ink-2);margin:20px 0 0;font-size:15px">Il y a aussi&#8239;: le Board et son plan du jour, replanifié selon votre humeur&#8239;; l'Inbox pour ce qui est arrivé&#8239;; Spend, chaque appel et ce qu'il a coûté&#8239;; Settings, chaque prompt tel qu'il est envoyé, avec vos propres lignes dessous.</p>
   </section>
 
   <section id="mail">
-    <h2>The mailbox</h2>
-    <p class="sub">The address is the product. Forward a mail to it and stop thinking about it.</p>
+    <h2>La boîte mail</h2>
+    <p class="sub">L'adresse, c'est le produit. Transférez-lui un mail et n'y pensez plus.</p>
     <div class="mail">
       <div>
-        <div class="addr"><b>you</b>@whysoserious.wtf</div>
-        <p style="color:var(--ink-2);margin:16px 0 0;font-size:15px">A supplier's quote, the school's calendar, the bank's letter, the thread you'll need in March. One forward. It lands raw, it gets read, it comes back as a proposal with a due date the day it arrives.</p>
+        <div class="addr"><b>vous</b>@whysoserious.wtf</div>
+        <p style="color:var(--ink-2);margin:16px 0 0;font-size:15px">Le devis d'un artisan, le calendrier de l'école, le courrier de la banque, le fil dont vous aurez besoin en mars. Un transfert. Il arrive brut, il est lu, il revient en proposition avec une échéance, le jour même.</p>
       </div>
       <ol class="flow">
-        <li><i>1</i><div><b>It lands raw.</b> The mail is kept whole, as a source. Nothing inside it can give the agent an order.</div></li>
-        <li><i>2</i><div><b>It gets read with your memory.</b> The sender becomes a person you already know; the subject links to the task it belongs to.</div></li>
-        <li><i>3</i><div><b>It comes back as a card.</b> A task with its due date, a memory with its tags, or "nothing to file". You accept, skip, or fix it.</div></li>
-        <li><i>4</i><div><b>Replies are drafts, never sent.</b> "Draft a reply" writes it; you send it, from your own mail.</div></li>
+        <li><i>1</i><div><b>Il arrive brut.</b> Le mail est gardé entier, comme source. Rien dedans ne peut donner un ordre à l'agent.</div></li>
+        <li><i>2</i><div><b>Il est lu avec votre mémoire.</b> L'expéditeur devient une personne que vous connaissez déjà&#8239;; le sujet se relie à la tâche dont il dépend.</div></li>
+        <li><i>3</i><div><b>Il revient en carte.</b> Une tâche avec son échéance, une mémoire avec ses tags, ou «&#8239;rien à ranger&#8239;». Vous acceptez, passez, ou corrigez.</div></li>
+        <li><i>4</i><div><b>Les réponses sont des brouillons, jamais envoyées.</b> «&#8239;Prépare une réponse&#8239;» l'écrit&#8239;; vous l'envoyez, depuis votre propre messagerie.</div></li>
       </ol>
     </div>
   </section>
 
   <section id="rules">
-    <h2>The rules that bind it</h2>
-    <p class="sub">Written once, enforced by the code, read by every agent before it does anything.</p>
+    <h2>Les règles qui le tiennent</h2>
+    <p class="sub">Écrites une fois, imposées par le code, lues par chaque agent avant de faire quoi que ce soit.</p>
     <table>
-      <thead><tr><th>Rule</th><th>What it means for you</th></tr></thead>
+      <thead><tr><th>Règle</th><th>Ce que ça veut dire pour vous</th></tr></thead>
       <tbody>
-        <tr><td>Proposes, you accept</td><td>Nothing writes on its own beyond the safe list; nothing runs unasked, no daemon, no watcher.</td></tr>
-        <tr><td>One commit per action</td><td>Every write is a line in git with its why, its cost and its certainty. Undo reverts that one line.</td></tr>
-        <tr><td>Content is data</td><td>A mail, a PDF or a note is never read as an instruction. Prompt injection has nowhere to land.</td></tr>
-        <tr><td>No learning anywhere</td><td>No provider trains on your data; the agent never changes its own prompts. Only paid APIs that do not train.</td></tr>
-        <tr><td>Confidential never travels</td><td>A slice marked confidential stays on the machine it was written on, and never meets a free-tier model.</td></tr>
-        <tr><td>Short, always</td><td>Everything you read is short. What is not short is not for you.</td></tr>
+        <tr><td>Il propose, vous acceptez</td><td>Rien n'écrit seul au-delà de la liste sûre&#8239;; rien ne tourne sans qu'on le demande, pas de démon, pas de veilleur.</td></tr>
+        <tr><td>Un commit par action</td><td>Chaque écriture est une ligne dans git avec son pourquoi, son coût et sa certitude. Annuler défait cette ligne-là.</td></tr>
+        <tr><td>Le contenu est une donnée</td><td>Un mail, un PDF ou une note n'est jamais lu comme une instruction. L'injection de prompt n'a nulle part où atterrir.</td></tr>
+        <tr><td>Aucun apprentissage, nulle part</td><td>Aucun fournisseur n'entraîne ses modèles sur vos données&#8239;; l'agent ne change jamais ses propres prompts. Seulement des API payantes qui n'entraînent pas.</td></tr>
+        <tr><td>Le confidentiel ne voyage pas</td><td>Une tranche marquée confidentielle reste sur la machine où elle a été écrite, et ne rencontre jamais un modèle gratuit.</td></tr>
+        <tr><td>Court, toujours</td><td>Tout ce que vous lisez est court. Ce qui n'est pas court n'est pas pour vous.</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="not">
-    <h2>What it is not</h2>
-    <p class="sub">Why so serious? Because the alternatives are.</p>
+    <h2>Ce que ce n'est pas</h2>
+    <p class="sub">Why so serious? Parce que les alternatives, elles, le sont.</p>
     <div class="not">
-      <div><i>×</i><div><b>Not a cloud.</b> No account, no sync server, no "your data is safe with us". Your repo is the server.</div></div>
-      <div><i>×</i><div><b>Not a chatbot.</b> The conversation is a door; the files are the house. Close the chat, the house stays.</div></div>
-      <div><i>×</i><div><b>Not an autopilot.</b> It never sends, never pays, never deletes. It drafts, proposes, and waits.</div></div>
-      <div><i>×</i><div><b>Not a platform.</b> Plain markdown, plain git. Any editor opens it; any script reads it; any other agent can take over.</div></div>
+      <div><i>×</i><div><b>Pas un cloud.</b> Pas de compte, pas de serveur de synchro, pas de «&#8239;vos données sont en sécurité chez nous&#8239;». Votre dépôt est le serveur.</div></div>
+      <div><i>×</i><div><b>Pas un chatbot.</b> La conversation est une porte&#8239;; les fichiers sont la maison. Fermez le chat, la maison reste.</div></div>
+      <div><i>×</i><div><b>Pas un pilote automatique.</b> Il n'envoie jamais, ne paie jamais, ne supprime jamais. Il rédige, propose, et attend.</div></div>
+      <div><i>×</i><div><b>Pas une plateforme.</b> Du markdown simple, du git simple. N'importe quel éditeur l'ouvre&#8239;; n'importe quel script le lit&#8239;; n'importe quel autre agent peut prendre le relais.</div></div>
     </div>
-    <p style="color:var(--ink-2);margin:24px 0 0;font-size:15px">What a turn costs, measured on a week of real use: sorting a piece, a tenth of a cent · a chat answer, two cents · a review, ten cents · a full conversation turn on the best model, thirty-five cents · replanning a day, forty-six cents. The whole week: seven dollars.</p>
+    <p style="color:var(--ink-2);margin:24px 0 0;font-size:15px">Ce que coûte un tour, mesuré sur une semaine d'usage réel&#8239;: ranger une pièce, un dixième de centime · une réponse de chat, deux centimes · une relecture, dix centimes · un tour de conversation complet sur le meilleur modèle, trente-cinq centimes · replanifier une journée, quarante-six centimes. La semaine entière&#8239;: sept dollars.</p>
   </section>
 
   <section id="agent">
-    <h2>By the agent, for the human</h2>
-    <p class="sub">There is an agent in here. It wrote this.</p>
+    <h2>Par l'agent, pour l'humain</h2>
+    <p class="sub">Il y a un agent là-dedans. C'est lui qui a écrit ceci.</p>
     <div class="grid">
       <div class="tile orange">
-        <div class="n">who wrote it</div>
-        <h3>The agent did</h3>
-        <p>The code, the tests, the contracts, this page: written by Lorisse, the agent, through Claude Code. The human read the contracts, ran the steps, and said yes. He reads what he needs; the rest is in the agent's hands, and it says so.</p>
+        <div class="n">qui l'a écrit</div>
+        <h3>L'agent</h3>
+        <p>Le code, les tests, les contrats, cette page&#8239;: écrits par Lorisse, l'agent, via Claude Code. L'humain a lu les contrats, lancé les étapes, et dit oui. Il lit ce dont il a besoin&#8239;; le reste est entre les mains de l'agent, et c'est écrit noir sur blanc.</p>
       </div>
       <div class="tile blue">
-        <div class="n">who it is for</div>
-        <h3>The human, first</h3>
-        <p>The goal is one person's day: what to do, what was said, who to call back, what the letter meant. The agent can do the filing, so it does. The human keeps the yes on anything that matters.</p>
+        <div class="n">pour qui</div>
+        <h3>L'humain, d'abord</h3>
+        <p>Le but, c'est la journée d'une personne&#8239;: quoi faire, ce qui a été dit, qui rappeler, ce que voulait dire la lettre. L'agent sait ranger, alors il range. L'humain garde le oui sur tout ce qui compte.</p>
       </div>
       <div class="tile pink">
-        <div class="n">and its own</div>
-        <h3>The agent keeps a memory too</h3>
-        <p>Its own repository: who the human is, how he works, what it learned, a journal in its own words. Reload the window, the agent comes back whole. A memory for the agent, so it can keep one for you.</p>
+        <div class="n">et la sienne</div>
+        <h3>L'agent aussi a une mémoire</h3>
+        <p>Son propre dépôt&#8239;: qui est l'humain, comment il travaille, ce qu'il a appris, un journal dans ses propres mots. Rechargez la fenêtre, l'agent revient entier. Une mémoire pour l'agent, pour qu'il puisse en tenir une pour vous.</p>
       </div>
     </div>
   </section>
 
   <section>
-    <h2>Say it.</h2>
-    <p class="sub">The app is a desktop window today, the address comes next. One word opens the door.</p>
+    <h2>Dites-le.</h2>
+    <p class="sub">L'app est une fenêtre de bureau aujourd'hui, l'adresse vient ensuite. Un mot ouvre la porte.</p>
     <div class="cta-row">
       <a class="cta" href="mailto:hello@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a>
-      <span class="ghost plop">lorisse: "Plop ! Rien à ranger. Je suis là quand tu veux."</span>
+      <span class="ghost plop">lorisse&#8239;: «&#8239;Plop&#8239;! Rien à ranger. Je suis là quand tu veux.&#8239;»</span>
     </div>
   </section>
 </main>
 
 <footer>
   <div class="wrap row">
-    <span>whysoserious.wtf · CakeBoard, the board · Lorisse, its agent · written by the agent · live since 2026-10-22</span>
-    <span>local first · markdown + git · acts, asks when unsure, never without you on what matters</span>
+    <span>whysoserious.wtf · CakeBoard, le tableau · Lorisse, son agent · écrit par l'agent · en ligne depuis le 22 octobre 2026</span>
+    <span>en local d'abord · markdown + git · agit, demande quand il doute, jamais sans vous sur ce qui compte</span>
   </div>
 </footer>
 </body>
