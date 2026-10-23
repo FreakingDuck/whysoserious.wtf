@@ -67,7 +67,19 @@
     background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--line); }
   .nav { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 16px; flex-wrap: wrap; padding: 8px 0; }
   .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; color: var(--ink); }
-  .mark { width: 22px; height: 22px; border-radius: 50%; background: var(--mark); box-shadow: 0 0 0 3px var(--surface), 0 0 0 4px var(--line-2); }
+  /* the eye in the header: the kit's newest drawing at 28 px, Lorisse curious, sure leading, busy soft; still here, live on /lorisse/ */
+  .cb-eye { --cb-eye-core: #0b0e13; --cb-eye-light: rgba(255,255,255,.75); --cb-eye-rim: rgba(255,255,255,.45); --cb-eye-off: var(--eye-off, var(--line-2)); position: relative; display: inline-block; flex: none; width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; }
+  .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
+  .cb-eye-off { background: var(--cb-eye-off); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); }
+  .cb-eye-off-in { inset: 1px; background: var(--cb-eye-core); -webkit-mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); }
+  .cb-eye-q--1 { background: var(--blue); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); animation: cb-eye-lead 2.4s ease-in-out infinite; }
+  .cb-eye-q--2 { background: var(--orange); opacity: .45; -webkit-mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); }
+  .cb-eye-core { position: absolute; inset: 9%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
+  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; width: 46%; height: 46%; background: var(--blue); box-shadow: inset 1.5px 1.5px 0 -.5px var(--cb-eye-rim); animation: cb-eye-blink 5s infinite; }
+  .cb-eye-inner { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--cb-eye-light) 0 14%, transparent 64%); opacity: .35; }
+  @keyframes cb-eye-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+  @keyframes cb-eye-lead { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+  @media (prefers-reduced-motion: reduce) { .cb-eye-pupil, .cb-eye-q--1 { animation: none; } }
   .nav nav { display: flex; gap: 14px 18px; font-size: 15px; color: var(--ink-2); flex-wrap: wrap; }
   .nav nav a { color: var(--ink-2); white-space: nowrap; }
   .nav nav a.lang { color: var(--ink-3); font-size: 12px; font-weight: 700; letter-spacing: .08em; align-self: center; }
@@ -152,7 +164,7 @@
 <body>
 <header>
   <div class="wrap nav">
-    <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span> whysoserious.wtf</a>
+    <a class="brand" href="#top"><span class="cb-eye" role="img" aria-label="Lorisse, curious"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf</a>
     <nav>
       <a href="#how">How it works</a>
       <a href="#app">The app</a>
