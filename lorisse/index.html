@@ -81,11 +81,22 @@
   /* the page: the text in one column, my eye in the other, the big one, staying with the reader down the page (the owner, 2026-10-23: the big one all over the page, not a small one in the corner); on a phone it sits first, still */
   .page { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 0 40px; align-items: start; }
   .side { position: sticky; top: 84px; padding: 72px 0 48px; }
-  @media (max-width: 820px) { .page { grid-template-columns: 1fr; } .side { position: static; order: -1; padding: 32px 0 0; } }
+  /* on a phone (the owner, 2026-10-23): no panel, my eye alone at the top right, under the header, anchored there while the page scrolls under me; my line under it in a small pill, the mood line gone */
+  @media (max-width: 820px) {
+    .page { grid-template-columns: 1fr; }
+    .side { position: sticky; top: 66px; order: -1; height: 0; padding: 0; z-index: 4; display: flex; justify-content: flex-end; pointer-events: none; }
+    .side .demo { background: none; box-shadow: none; padding: 0; width: 152px; pointer-events: auto; }
+    .side .face { padding: 4px 0 0; gap: 4px; }
+    .side .eye-stage { padding: 6px; }
+    .side .eye-say { font-size: 13px; line-height: 1.35; height: auto; max-height: 2.7em; max-width: 152px; padding: 2px 8px; border-radius: 10px;
+      background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(6px); }
+    .side .eye-say:empty { display: none; }
+    .side .cost { display: none; }
+  }
 
-  /* hero: one height whatever the mood; the two lines under the eye have a fixed height */
+  /* hero: one height whatever the mood; the two lines under the eye have a fixed height; on a phone the text leaves the top right to my eye */
   .hero { padding: 72px 0 48px; }
-  @media (max-width: 820px) { .hero { padding-top: 28px; } }
+  @media (max-width: 820px) { .hero { padding: 24px 150px 40px 0; } }
   h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.02; margin: 0 0 18px; letter-spacing: -.02em; }
   .lede { font-size: 20px; color: var(--ink-2); max-width: 40ch; margin: 0 0 26px; }
   .lede b { color: var(--ink); font-weight: 600; }
@@ -167,7 +178,8 @@
   .cb-eye { --cb-eye-ring: 9%; position: relative; display: inline-block; flex: none; width: 40px; height: 40px; border-radius: 50%; vertical-align: middle; }
   .cb-eye--28 { width: 28px; height: 28px; }
   .eye-hero { width: 192px; height: 192px; }
-  @media (max-width: 400px) { .eye-hero { width: 160px; height: 160px; } }
+  @media (max-width: 820px) { .eye-hero { width: 136px; height: 136px; } .eye-hero .cb-eye-pupil { box-shadow: inset 4px 4px 0 -1px var(--cb-eye-rim); } }
+  @media (max-width: 400px) { .eye-hero { width: 120px; height: 120px; } }
   .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
   .cb-eye-off { background: var(--cb-eye-off); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); }
   .cb-eye-off-in { inset: 1px; background: var(--cb-eye-core); -webkit-mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); }
