@@ -31,7 +31,22 @@ body{margin:0;background:var(--bg)}
 .top nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-left:auto;font-size:15px}
 .top nav a{color:var(--ink2);text-decoration:none}
 .top nav a.lang{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink3)}
-.hero{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:40px;align-items:center;padding:72px 0 56px}
+.page{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:0 48px;align-items:start}
+.side{position:sticky;top:84px;padding:72px 0 48px}
+.hero{padding:72px 0 56px}
+.stage{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
+#eye:focus-visible{outline:2px solid var(--b);outline-offset:8px}
+@media (max-width:1000px){.page{grid-template-columns:minmax(0,1fr) 300px;gap:0 32px}.cb-eye.big{width:200px;height:200px}}
+@media (max-width:820px){
+.page{grid-template-columns:1fr}
+.side{position:sticky;top:66px;order:-1;height:0;padding:0;z-index:4;display:flex;justify-content:flex-end;pointer-events:none}
+.side .stage{pointer-events:auto;gap:4px;width:152px}
+.cb-eye.big{width:136px;height:136px}.big .cb-eye-pupil{box-shadow:inset 4px 4px 0 -1px rgba(255,255,255,.45)}
+.side .say{font-size:13px;line-height:1.35;min-height:0;max-width:152px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px)}
+.side .say:empty{display:none}
+.hero{padding:24px 150px 40px 0}
+}
+@media (max-width:400px){.cb-eye.big{width:120px;height:120px}}
 h1{font-size:clamp(44px,7vw,76px);line-height:1;margin:0 0 18px;letter-spacing:-.025em;font-weight:800}
 .lede{font-size:21px;color:var(--ink2);max-width:34ch;margin:0 0 28px}
 .lede b{color:var(--ink);font-weight:700}
@@ -120,16 +135,13 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 </div>
 </header>
 
-<main class="wrap">
+<main class="wrap page">
+<div class="col">
 <div class="hero">
 <div>
 <h1>Lorisse</h1>
 <p class="lede">I keep the memory of your life, and I keep it tidy for you. <b>This is my face: my eye says how I am.</b></p>
-<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><a class="cta" href="mailto:hello@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a><span class="ghost">Hover my eye, or just wait.</span></div>
-</div>
-<div class="stage" id="stage">
-<span id="eye" class="cb-eye big m-curious" role="img" aria-label="Lorisse, curious"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--orange is-soft"></span><span class="cb-eye-core"><span class="cb-eye-pupil pc-b"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
-<p class="say" id="say" aria-live="polite"></p>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><a class="cta" href="mailto:hello@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a><span class="ghost">Click my eye, hover it, or just wait.</span></div>
 </div>
 </div>
 
@@ -182,6 +194,13 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 <p class="sub">One word opens the door.</p>
 <div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><a class="cta" href="mailto:hello@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a><span class="mono" style="color: var(--o); font-size: 14px">lorisse: "Plop! I'm here when you want."</span></div>
 </section>
+</div>
+<aside class="side" aria-label="Lorisse's eye">
+<div class="stage" id="stage">
+<span id="eye" class="cb-eye big m-curious" role="img" aria-label="Lorisse, curious"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--orange is-soft"></span><span class="cb-eye-core"><span class="cb-eye-pupil pc-b"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+<p class="say" id="say" aria-live="polite"></p>
+</div>
+</aside>
 </main>
 <footer><div class="wrap" style="display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px"><span>whysoserious.wtf · Lorisse · written by me</span><span>my mood is my own · <a href="/" hreflang="fr" lang="fr">Français</a></span></div></footer>
 </div>
@@ -308,13 +327,19 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
   function aim(e) {
     var r = eye.getBoundingClientRect(), s = r.width || 1;
     var dx = e.clientX - (r.left + s / 2), dy = e.clientY - (r.top + s / 2), d = Math.hypot(dx, dy) || 1;
-    var reach = 240 * 0.1 * Math.min(1, d / 480);
+    var reach = s * 0.1 * Math.min(1, d / 480);
     set({ gx: +(dx / d * reach).toFixed(1), gy: +(dy / d * reach).toFixed(1) });
   }
 
   faces.forEach(function (b) {
     b.addEventListener("click", function () { pick(b.getAttribute("data-m")); });
   });
+  /* a click, a tap, Enter or Space on my eye: the next face, in the row's order */
+  var ORDER = faces.map(function (b) { return b.getAttribute("data-m"); });
+  function next() { var i = ORDER.indexOf(st.pick); pick(ORDER[(i + 1) % ORDER.length]); }
+  eye.setAttribute("role", "button"); eye.setAttribute("tabindex", "0");
+  stage.addEventListener("click", next);
+  eye.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); } });
   stage.addEventListener("mouseenter", function () {
     set({ notice: true, wink: true });
     setTimeout(function () { set({ wink: false }); }, WINK_MS);
