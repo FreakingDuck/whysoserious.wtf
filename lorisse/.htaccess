@@ -1,0 +1,8 @@
+# /lorisse/ stays open. The rest of the site is under the password the owner set in
+# hPanel (Advanced, Password Protect Directories, on the site's root folder): that tool
+# writes the root .htaccess and the password file itself, nothing of it is in this repo.
+# This file lifts that protection for this one folder.
+Satisfy Any
+Order allow,deny
+Allow from all
+Require all granted

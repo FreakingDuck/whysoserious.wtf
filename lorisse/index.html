@@ -297,7 +297,7 @@
       </figure>
       <figure data-mood="happy">
         <span class="cb-eye cb-eye--happy cb-eye--pupil-blue is-flash" role="img" aria-label="Lorisse, happy, done"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--4 cb-eye-q--blue"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
-        <figcaption><b>happy</b>done, one flash</figcaption>
+        <figcaption><b>happy</b>done, the light pulses</figcaption>
       </figure>
       <figure data-mood="unsure">
         <span class="cb-eye cb-eye--unsure cb-eye--pupil-pink is-active" role="img" aria-label="Lorisse, unsure, asking"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--pink is-lead"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
@@ -343,7 +343,7 @@
       </div>
       <p class="note" style="margin:0">In the app I set these myself, with every turn; here you may.</p>
     </div>
-    <p class="note"><b style="color:var(--ink)">The one rule.</b> The mood is mine: with every turn I write a small record, what leads in me, a second feeling at most, the mood, and where a task stands; the app only draws it. On a task the quarters become the four steps, read, sort, write, commit: done blue, at work orange and blinking, a question pink, held back yellow. Two colours at most, never all four. A record the app cannot read shows me at rest, never an error.</p>
+    <p class="note"><b style="color:var(--ink)">The one rule.</b> My mood is mine: with every turn I write it in a small record, and the app only draws it. On a task the quarters are the four steps, read, sort, write, commit. A record the app cannot read shows me at rest, never an error.</p>
   </section>
 
   <section id="does">
@@ -465,7 +465,7 @@
     var q = quarters(), p = pupilTone(q), act = active(), text = words(q);
     EYES.forEach(function (e) {
       var keep = e.el.classList.contains("is-noticing") ? " is-noticing" : "";
-      e.el.className = e.base + " cb-eye--" + S.mood + (p ? " cb-eye--pupil-" + p : "") + (act ? " is-active" : "") + (still ? "" : " is-gazing") + keep;
+      e.el.className = e.base + " cb-eye--" + S.mood + (p ? " cb-eye--pupil-" + p : "") + (act ? " is-active" : "") + (S.mood === "happy" && !still ? " is-flash" : "") + (still ? "" : " is-gazing") + keep;
       var old = e.el.querySelectorAll(".cb-eye-q"), i, s;
       for (i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
       for (i = 0; i < q.length; i++) {
@@ -499,10 +499,24 @@
     stepBtns = [].slice.call(controls.querySelectorAll("[data-step]"));
     stepBtns.forEach(function (b) { b.addEventListener("click", function () { S.step = +b.getAttribute("data-step"); touched(); }); });
   }
+  /* a face clicked is the whole face: its mood, its colours, its step, as drawn in the row; the sliders then make the in-betweens */
+  var FACES = {
+    calm: { feel: [0, 0, 0, 0], step: 0, say: "" },
+    curious: { feel: [100, 45, 0, 0], step: 0, say: "what's that?" },
+    focus: { feel: [100, 70, 0, 0], step: 3, say: "writing…" },
+    happy: { feel: [100, 0, 0, 0], step: 5, say: "filed." },
+    unsure: { feel: [0, 0, 100, 0], step: 0, say: "not sure. I'll ask." },
+    tired: { feel: [0, 0, 0, 0], step: 0, say: "a long day." },
+    asleep: { feel: [0, 0, 0, 0], step: 0, say: "" },
+    cake: { feel: [0, 0, 0, 0], step: 0, say: "the day is done." }
+  };
   if (row) {
     figs = [].slice.call(row.querySelectorAll("[data-mood]"));
     figs.forEach(function (f) {
-      var pick = function () { S.mood = f.getAttribute("data-mood"); say.textContent = ""; touched(); };
+      var pick = function () {
+        var m = f.getAttribute("data-mood"), face = FACES[m] || { feel: S.feel, step: S.step, say: "" };
+        apply({ mood: m, feel: face.feel, step: face.step, say: face.say }); rest();
+      };
       f.setAttribute("role", "button"); f.setAttribute("tabindex", "0");
       f.addEventListener("click", pick);
       f.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(); } });
@@ -526,9 +540,9 @@
     if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); next(); }
   });
 
-  /* hover or focus on my eye: I notice, blink once, read curious; on leave I settle back */
-  function notice() { EYES.forEach(function (e) { e.el.classList.add("is-noticing"); }); word.textContent = "curious"; wink(); }
-  function settle() { EYES.forEach(function (e) { e.el.classList.remove("is-noticing"); }); word.textContent = S.mood; }
+  /* hover or focus on my eye: I notice, lids up, one wink; on leave I settle back; the word under me stays my mood */
+  function notice() { EYES.forEach(function (e) { e.el.classList.add("is-noticing"); }); wink(); }
+  function settle() { EYES.forEach(function (e) { e.el.classList.remove("is-noticing"); }); }
   stage.addEventListener("pointerenter", function (e) { if (e.pointerType !== "touch") notice(); });
   stage.addEventListener("pointerleave", function (e) { if (e.pointerType !== "touch") settle(); });
   hero.addEventListener("focus", notice);
