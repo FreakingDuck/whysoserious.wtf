@@ -65,7 +65,7 @@
   }
   a { color: var(--blue); text-decoration: none; }
   a:hover { text-decoration: underline; }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px; }
 
   /* header: one fixed height, the eye in it one fixed size, whatever the mood */
   header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
@@ -79,7 +79,8 @@
   @media (max-width: 640px) { .nav nav { font-size: 14px; gap: 8px 14px; width: 100%; } }
 
   /* the page: the text in one column, my eye in the other, the big one, staying with the reader down the page (the owner, 2026-10-23: the big one all over the page, not a small one in the corner); on a phone it sits first, still */
-  .page { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 0 40px; align-items: start; }
+  .page { display: grid; grid-template-columns: minmax(0, 1fr) 420px; gap: 0 48px; align-items: start; }
+  @media (max-width: 1000px) { .page { grid-template-columns: minmax(0, 1fr) 340px; gap: 0 32px; } }
   .side { position: sticky; top: 84px; padding: 72px 0 48px; }
   /* on a phone (the owner, 2026-10-23): no panel, my eye alone at the top right, under the header, anchored there while the page scrolls under me; my line under it in a small pill, the mood line gone */
   @media (max-width: 820px) {
@@ -110,7 +111,7 @@
   .demo { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 18px; }
   .face { display: grid; justify-items: center; gap: 12px; padding: 20px 10px 6px; }
   .eye-stage { padding: 18px; border-radius: 50%; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
-  .eye-say { height: 3em; overflow: hidden; margin: 0; font-size: 19px; line-height: 1.5; color: var(--ink); text-align: center; max-width: 30ch; }
+  .eye-say { height: 3em; overflow: hidden; margin: 0; font-size: 21px; line-height: 1.5; color: var(--ink); text-align: center; max-width: 30ch; }
   .cost { height: 3em; overflow: hidden; color: var(--ink-3); font-family: var(--mono); font-size: 12px; line-height: 1.5; margin-top: 8px; text-align: center; }
   .cost b { color: var(--ink-2); font-weight: 600; }
 
@@ -147,8 +148,10 @@
   .steps { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: 14px; color: var(--ink-2); }
   .steps span { margin-right: 4px; }
   .steps button { font: inherit; font-size: 14px; color: var(--ink-2); background: transparent; border: 1px solid var(--line-2); border-radius: 999px; padding: 4px 12px; cursor: pointer; }
-  .steps button[aria-pressed="true"] { color: var(--ink); border-color: var(--orange); box-shadow: inset 0 0 0 1px var(--orange); }
+  .steps button:hover { color: var(--ink); border-color: var(--orange); }
+  .steps button.is-running { color: var(--ink); border-color: var(--orange); box-shadow: inset 0 0 0 1px var(--orange); }
   .steps button:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; }
+  .steps .step-word { font-family: var(--mono); font-size: 12px; color: var(--ink-3); margin-left: 4px; }
 
   /* what I do, what I never do: five lines */
   .rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; max-width: 72ch; }
@@ -177,7 +180,9 @@
   }
   .cb-eye { --cb-eye-ring: 9%; position: relative; display: inline-block; flex: none; width: 40px; height: 40px; border-radius: 50%; vertical-align: middle; }
   .cb-eye--28 { width: 28px; height: 28px; }
-  .eye-hero { width: 192px; height: 192px; }
+  .eye-hero { width: 256px; height: 256px; }
+  .eye-hero .cb-eye-pupil { box-shadow: inset 6px 6px 0 -2px var(--cb-eye-rim); }
+  @media (max-width: 1000px) { .eye-hero { width: 200px; height: 200px; } }
   @media (max-width: 820px) { .eye-hero { width: 136px; height: 136px; } .eye-hero .cb-eye-pupil { box-shadow: inset 4px 4px 0 -1px var(--cb-eye-rim); } }
   @media (max-width: 400px) { .eye-hero { width: 120px; height: 120px; } }
   .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
@@ -200,7 +205,6 @@
   .cb-eye-core { position: absolute; inset: var(--cb-eye-ring); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
   .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; background: var(--cb-eye-pupil, var(--cb-orange)); animation: cb-eye-blink 5s infinite; width: 38%; height: 38%; box-shadow: inset 2px 2px 0 -.5px var(--cb-eye-rim); }
   .cb-eye--28 .cb-eye-pupil { box-shadow: inset 1.5px 1.5px 0 -.5px var(--cb-eye-rim); }
-  .eye-hero .cb-eye-pupil { box-shadow: inset 5px 5px 0 -1.5px var(--cb-eye-rim); }
   .cb-eye--pupil-blue { --cb-eye-pupil: var(--cb-blue); }
   .cb-eye--pupil-pink { --cb-eye-pupil: var(--cb-pink); }
   .cb-eye--pupil-yellow { --cb-eye-pupil: var(--cb-yellow); }
@@ -273,7 +277,7 @@
       <a href="#words">My words</a>
       <a href="/en/">The app</a>
       <a href="/dev/">Dev</a>
-      <a class="lang" href="/" hreflang="fr" lang="fr" title="Version française">FR</a>
+      <a class="lang" href="/fr/" hreflang="fr" lang="fr" title="Version française">FR</a>
     </nav>
   </div>
 </header>
@@ -344,16 +348,13 @@
         <label><i style="background:var(--yellow)"></i><b>careful</b><input type="range" min="0" max="100" value="0" step="1" style="accent-color:var(--yellow)"><output>0</output></label>
       </div>
       <p class="rule-line">Two colours at most: the strongest leads, the second shows, the other two stay outlines. In between is allowed; all four is not.</p>
-      <div class="steps" role="group" aria-label="The step of a task">
+      <div class="steps" role="group" aria-label="A task">
         <span>a task:</span>
-        <button type="button" data-step="0" aria-pressed="true">none</button>
-        <button type="button" data-step="1" aria-pressed="false">1 read</button>
-        <button type="button" data-step="2" aria-pressed="false">2 sort</button>
-        <button type="button" data-step="3" aria-pressed="false">3 write</button>
-        <button type="button" data-step="4" aria-pressed="false">4 commit</button>
-        <button type="button" data-step="5" aria-pressed="false">done</button>
+        <button type="button" id="run-task">▶ run the four steps</button>
+        <button type="button" id="run-done">done</button>
+        <span class="step-word" id="step-word" aria-live="polite">none</span>
       </div>
-      <p class="note" style="margin:0">In the app I set these myself, with every turn; here you may.</p>
+      <p class="note" style="margin:0">Press it again to run it again. A face, a slider or my eye clicked while I run interrupts me: then the mood is yours. In the app I set these myself, with every turn.</p>
     </div>
     <p class="note"><b style="color:var(--ink)">The one rule.</b> My mood is mine: with every turn I write it in a small record, and the app only draws it. On a task the quarters are the four steps, read, sort, write, commit. A record the app cannot read shows me at rest, never an error.</p>
   </section>
@@ -493,23 +494,46 @@
     wasDone = S.step === 5;
     sync();
   }
-  function apply(p) { S.mood = p.mood; S.feel = p.feel.slice(); S.step = p.step; S.idle = p.idle || ""; say.textContent = p.say || ""; render(); }
+  /* my line under the eye, typed out letter by letter, the way a point-and-click character speaks (the owner likes that vibe, 2026-10-23) */
+  function speak(t) {
+    clearTimeout(timers.say); t = t || "";
+    if (still || t.length < 3) { say.textContent = t; return; }
+    var i = 0; say.textContent = "";
+    (function type() { say.textContent = t.slice(0, ++i); if (i < t.length) timers.say = setTimeout(type, 26); })();
+  }
+  function apply(p) { stop(); S.mood = p.mood; S.feel = p.feel.slice(); S.step = p.step; S.idle = p.idle || ""; speak(p.say); render(); }
 
-  /* the sliders, the step picker, the eight faces: shown by the script, hidden without it */
-  var sliders = [], outs = [], stepBtns = [], figs = [];
+  /* the sliders, the task buttons, the eight faces: shown by the script, hidden without it */
+  var sliders = [], outs = [], figs = [], runBtn = $("run-task"), doneBtn = $("run-done"), stepWord = $("step-word");
   function sync() {
     sliders.forEach(function (s, k) { if (+s.value !== S.feel[k]) s.value = S.feel[k]; outs[k].textContent = S.feel[k]; });
-    stepBtns.forEach(function (b) { b.setAttribute("aria-pressed", String(+b.getAttribute("data-step") === S.step)); });
+    if (stepWord) stepWord.textContent = S.step === 0 ? "none" : S.step === 5 ? "done" : S.step + " " + STEPS[S.step - 1];
+    if (runBtn) runBtn.classList.toggle("is-running", !!timers.run);
     figs.forEach(function (f) { var on = f.getAttribute("data-mood") === S.mood; f.classList.toggle("is-on", on); f.setAttribute("aria-pressed", String(on)); });
   }
-  function touched() { S.idle = ""; render(); rest(); }
+  function touched() { stop(); S.idle = ""; render(); rest(); }
+
+  /* a task, run: the four steps one after the other, then done; anything touched meanwhile interrupts it and the mood is the reader's */
+  var RUN = [[1, "focus", "reading…"], [2, "focus", "sorting…"], [3, "focus", "writing…"], [4, "focus", "committing…"], [5, "happy", "filed."]];
+  function stop() { if (timers.run) { clearTimeout(timers.run); timers.run = 0; } }
+  function run() {
+    stop(); S.idle = ""; S.feel = [100, 70, 0, 0];
+    var i = 0;
+    function tick() {
+      S.step = RUN[i][0]; S.mood = RUN[i][1]; speak(RUN[i][2]);
+      if (S.step === 5) { S.feel = [100, 0, 0, 0]; timers.run = 0; } else { timers.run = setTimeout(tick, 1100); }
+      i++; render();
+    }
+    tick(); rest();
+  }
+  function done() { stop(); S.idle = ""; S.step = 5; S.mood = "happy"; S.feel = [100, 0, 0, 0]; speak("filed."); wasDone = false; render(); rest(); }
   if (controls) {
     controls.hidden = false;
     sliders = [].slice.call(controls.querySelectorAll("input[type=range]"));
     outs = sliders.map(function (s) { return s.parentNode.querySelector("output"); });
     sliders.forEach(function (s, k) { s.addEventListener("input", function () { S.feel[k] = +s.value; touched(); }); });
-    stepBtns = [].slice.call(controls.querySelectorAll("[data-step]"));
-    stepBtns.forEach(function (b) { b.addEventListener("click", function () { S.step = +b.getAttribute("data-step"); touched(); }); });
+    if (runBtn) runBtn.addEventListener("click", run);
+    if (doneBtn) doneBtn.addEventListener("click", done);
   }
   /* a face clicked is the whole face: its mood, its colours, its step, as drawn in the row; the sliders then make the in-betweens */
   var FACES = {
@@ -606,8 +630,19 @@
   document.addEventListener("pointermove", moved, { passive: true });
   document.addEventListener("pointerdown", moved, { passive: true });
   document.addEventListener("keydown", wake, { passive: true });
-  /* the page scrolls under my eye: it keeps looking at the pointer where it was */
-  document.addEventListener("scroll", function () { if (last) aim(last[0], last[1]); }, { passive: true });
+  /* the page scrolls under my eye: with a pointer I keep looking at it where it was; without one (a phone) my pupil follows the scroll, down or up, and settles back */
+  var scrolled = window.pageYOffset || 0;
+  document.addEventListener("scroll", function () {
+    var y = window.pageYOffset || 0, d = y - scrolled; scrolled = y;
+    wake();
+    if (still) return;
+    if (last) { aim(last[0], last[1]); return; }
+    if (!d) return;
+    EYES.forEach(function (e) { e.tx = 0; e.ty = Math.max(-1, Math.min(1, d / 30)) * e.el.getBoundingClientRect().width * 0.16; });
+    if (!raf) raf = requestAnimationFrame(ease);
+    clearTimeout(timers.scroll);
+    timers.scroll = setTimeout(function () { EYES.forEach(function (e) { e.ty = 0; }); if (!raf) raf = requestAnimationFrame(ease); }, 450);
+  }, { passive: true });
 
   render();
   rest();
