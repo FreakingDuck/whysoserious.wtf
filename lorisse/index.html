@@ -138,7 +138,7 @@
     --cb-blue: var(--blue); --cb-orange: var(--orange); --cb-orange-hi: var(--orange-hi); --cb-pink: var(--pink); --cb-yellow: var(--yellow);
     --cb-ink: var(--ink); --cb-ink-3: var(--ink-3);
     --cb-blue-glow: var(--blue-glow); --cb-orange-glow: var(--orange-glow); --cb-pink-glow: var(--pink-glow); --cb-yellow-soft: var(--yellow-soft);
-    --cb-eye-core: #0b0e13; --cb-eye-glint: rgba(255,255,255,.55); --cb-eye-off: var(--eye-off, var(--line-2));
+    --cb-eye-core: #0b0e13; --cb-eye-light: rgba(255,255,255,.75); --cb-eye-rim: rgba(255,255,255,.45); --cb-eye-off: var(--eye-off, var(--line-2));
   }
   .cb-eye { --cb-eye-ring: 9%; position: relative; display: inline-block; flex: none; width: 40px; height: 40px; border-radius: 50%; vertical-align: middle; }
   .cb-eye--lg { width: 96px; height: 96px; }
@@ -162,14 +162,16 @@
   .cb-eye-q.is-lead { animation: cb-eye-lead 2.4s ease-in-out infinite; }
   .cb-eye-q.is-blink { animation: cb-eye-seg 1s ease-in-out infinite; }
   .cb-eye-core { position: absolute; inset: var(--cb-eye-ring); display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
-  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; background: var(--cb-eye-pupil, var(--cb-orange)); animation: cb-eye-blink 5s infinite; width: 38%; height: 38%; }
-  .cb-eye--pupil-blue { --cb-eye-pupil: var(--cb-blue); --cb-eye-halo: var(--cb-blue-glow); }
-  .cb-eye--pupil-pink { --cb-eye-pupil: var(--cb-pink); --cb-eye-halo: var(--cb-pink-glow); }
-  .cb-eye--pupil-yellow { --cb-eye-pupil: var(--cb-yellow); --cb-eye-halo: var(--cb-yellow-soft); }
-  .cb-eye--lg.is-active .cb-eye-pupil { box-shadow: 0 0 14px 2px var(--cb-eye-halo, var(--cb-orange-glow)); }
-  .eye-hero.is-active .cb-eye-pupil { box-shadow: 0 0 28px 4px var(--cb-eye-halo, var(--cb-orange-glow)); }
-  .cb-eye-glint { position: absolute; left: 20%; top: 18%; width: 24%; height: 24%; border-radius: 50%; background: var(--cb-eye-glint); animation: cb-eye-glint 7s ease-in-out infinite; }
-  .cb-eye--lg .cb-eye-glint { width: 30%; height: 30%; }
+  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; background: var(--cb-eye-pupil, var(--cb-orange)); animation: cb-eye-blink 5s infinite; width: 38%; height: 38%; box-shadow: inset 2px 2px 0 -.5px var(--cb-eye-rim); }
+  .cb-eye--lg .cb-eye-pupil { box-shadow: inset 3px 3px 0 -1px var(--cb-eye-rim); }
+  .eye-hero .cb-eye-pupil { box-shadow: inset 5px 5px 0 -1.5px var(--cb-eye-rim); }
+  .cb-eye--pupil-blue { --cb-eye-pupil: var(--cb-blue); }
+  .cb-eye--pupil-pink { --cb-eye-pupil: var(--cb-pink); }
+  .cb-eye--pupil-yellow { --cb-eye-pupil: var(--cb-yellow); }
+  /* her light: a still rim upper left (above), a light inside that breathes while she works, slower while she waits, still and dim at rest */
+  .cb-eye-inner { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--cb-eye-light) 0 14%, transparent 64%); opacity: .35; }
+  .cb-eye.is-active .cb-eye-inner { animation: cb-eye-inner 1.4s ease-in-out infinite; }
+  .cb-eye--unsure .cb-eye-inner { animation-duration: 2.4s; }
   .cb-eye-lt, .cb-eye-lb { position: absolute; left: -15%; right: -15%; height: 0; background: var(--cb-eye-core); }
   .cb-eye-lt { top: 0; border-radius: 0 0 50% 50%; }
   .cb-eye-lb { bottom: 0; border-radius: 50% 50% 0 0; }
@@ -197,13 +199,33 @@
   @keyframes cb-eye-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
   @keyframes cb-eye-look { 0%, 100% { transform: translateX(-30%); } 50% { transform: translateX(30%); } }
   @keyframes cb-eye-nod { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-18%); } }
-  @keyframes cb-eye-glint { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(22%, 10%) scale(.9); } 50% { transform: translate(10%, 26%) scale(1.1); } 75% { transform: translate(-8%, 12%) scale(.95); } }
+  @keyframes cb-eye-inner { 0%, 100% { opacity: .35; transform: scale(.85); } 50% { opacity: .9; transform: scale(1.1); } }
   @keyframes cb-eye-seg { 0%, 100% { opacity: 1; } 50% { opacity: .15; } }
   @keyframes cb-eye-lead { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
   @keyframes cb-eye-flash { 0% { box-shadow: 0 0 0 0 var(--cb-blue-glow); } 45%, 100% { box-shadow: 0 0 0 16px transparent; } }
   @keyframes cb-eye-flick { 0%, 100% { transform: scale(1, 1) skewX(0); } 30% { transform: scale(.9, 1.1) skewX(4deg); } 60% { transform: scale(1.06, .94) skewX(-4deg); } }
+  /* the hero eye alone: the pointer, the hand, the wait; the script adds these classes, without it the eye is the kit's, still */
+  .eye-stage { padding: 18px; border-radius: 50%; cursor: pointer; -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
+  .eye-hero:focus-visible { outline: 2px solid var(--blue); outline-offset: 8px; }
+  .eye-hero .cb-eye-lt, .eye-hero .cb-eye-lb { transition: height .5s ease, scale .5s ease; }
+  .eye-hero .cb-eye-lt { transform-origin: 50% 0; }
+  .eye-hero .cb-eye-lb { transform-origin: 50% 100%; }
+  .eye-hero .cb-eye-pupil { transition: width .4s ease, height .4s ease, background-color .4s ease, scale .4s ease; }
+  .eye-hero .cb-eye-off { transition: opacity 1.2s ease; }
+  .eye-hero.is-gazing .cb-eye-pupil { animation: cb-eye-blink 5s infinite; }
+  .eye-hero.is-gazing.cb-eye--unsure .cb-eye-pupil { animation: cb-eye-nod 1.6s ease-in-out infinite; }
+  .eye-hero.is-noticing .cb-eye-lt, .eye-hero.is-noticing .cb-eye-lb { scale: 1 .55; }
+  .eye-hero.is-noticing .cb-eye-pupil { scale: 1.06; }
+  .eye-hero.is-wink .cb-eye-lt { animation: eye-wink .42s ease-in-out; }
+  .eye-hero.is-flash-once { animation: cb-eye-flash 1.4s ease-out 1; }
+  .eye-hero.cb-eye--asleep { animation: eye-breath 4.5s ease-in-out infinite; }
+  .eye-say { min-height: 1.6em; margin: -6px 0 0; font-size: 19px; line-height: 1.5; color: var(--ink); text-align: center; max-width: 30ch; }
+  .eye-say:empty::before { content: "\00a0"; }
+  .cost b { color: var(--ink-2); font-weight: 600; }
+  @keyframes eye-wink { 50% { height: 100%; } }
+  @keyframes eye-breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(.975); } }
   @media (prefers-reduced-motion: reduce) {
-    .cb-eye.is-flash, .cb-eye-q, .cb-eye-pupil, .cb-eye-glint, .cb-eye-flame { animation: none; }
+    .cb-eye.is-flash, .cb-eye-q, .cb-eye-pupil, .cb-eye-inner, .cb-eye-flame, .eye-hero.cb-eye--asleep { animation: none; }
   }
 </style>
 </head>
@@ -226,18 +248,20 @@
 <main id="top" class="wrap">
   <div class="hero">
     <div>
-      <div class="kicker">She has a name. Now a face.</div>
       <h1>Lorisse</h1>
-      <p class="lede">The one who keeps your memory, <em style="font-style:normal;color:var(--orange)">and has a face</em>. An eye: four quarters for what she feels or where a task stands, a pupil, two lids for her mood. The mood is hers.</p>
+      <p class="lede" style="max-width:46ch;font-size:19px">I keep the owner's memory. He says a thing, I file it; a file, I read it; a mail, I sort it. When I'm not sure I ask, and I never touch what matters without him. I live in files on his disk and in a repository of my own, so a closed window loses nothing. This is my eye. It says how I am.</p>
       <div class="cta-row">
         <a class="cta" href="#moods">Her moods <span aria-hidden="true">↓</span></a>
-        <span class="ghost">Chosen by her with every turn. Never computed by the app.</span>
+        <span class="ghost">Her eye: click it, hover it, or just wait.</span>
       </div>
     </div>
 
     <div class="demo" aria-label="Lorisse's eye and the mark">
       <div class="face">
-        <span class="cb-eye cb-eye--lg eye-hero cb-eye--curious cb-eye--pupil-blue is-active" role="img" aria-label="Lorisse, curious, sure and a little busy"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--orange is-soft"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <div class="eye-stage" id="eye-stage">
+          <span class="cb-eye cb-eye--lg eye-hero cb-eye--curious cb-eye--pupil-blue" id="eye" role="img" aria-label="Lorisse, curious, sure and a little busy"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--orange is-soft"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        </div>
+        <p class="eye-say" id="eye-say" aria-live="polite"></p>
         <div class="face-marks">
           <figure>
             <svg viewBox="0 0 24 24" width="56" height="56" role="img" aria-label="The mark, still"><defs><linearGradient id="mark-grad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" style="stop-color:var(--blue)"/><stop offset="1" style="stop-color:var(--orange)"/></linearGradient></defs><circle cx="12" cy="12" r="5.9" fill="#0b0e13"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17" fill="none" stroke="url(#mark-grad)" stroke-width="5.5"/><path d="M12 20.5a8.5 8.5 0 0 1 0-17" fill="none" stroke="url(#mark-grad)" stroke-width="5.5"/></svg>
@@ -249,7 +273,7 @@
           </figure>
         </div>
       </div>
-      <div class="cost">curious · sure leads, a little busy · the glint drifts, the lid blinks · CSS only, no script on this page</div>
+      <div class="cost"><b id="eye-word">curious</b> · <span id="eye-note">sure leads, a little busy · the light still, the pupil blinks</span></div>
     </div>
   </div>
 
@@ -270,30 +294,31 @@
     <p class="sub">The lids and the pupil are her mood. The four quarters, clockwise from the top, are what she feels; on a task, they become the steps. Six of her faces, drawn in the kit's CSS, nothing else.</p>
     <div class="moods">
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--calm" role="img" aria-label="Lorisse, calm, at rest"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
-        <figcaption><b>calm</b>at rest, four outlines, no glow</figcaption>
+        <span class="cb-eye cb-eye--lg cb-eye--calm" role="img" aria-label="Lorisse, calm, at rest"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <figcaption><b>calm</b>at rest, four outlines, the light still</figcaption>
       </figure>
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--curious cb-eye--pupil-blue is-active" role="img" aria-label="Lorisse, curious, sure"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <span class="cb-eye cb-eye--lg cb-eye--curious cb-eye--pupil-blue is-active" role="img" aria-label="Lorisse, curious, sure"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
         <figcaption><b>curious</b>sure leads, the pupil looks around</figcaption>
       </figure>
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--focus is-active" role="img" aria-label="Lorisse, focus, writing, step 3 of 4"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--orange is-blink"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <span class="cb-eye cb-eye--lg cb-eye--focus is-active" role="img" aria-label="Lorisse, focus, writing, step 3 of 4"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--orange is-blink"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
         <figcaption><b>focus</b>on a task: read, sort done, writing, step 3 of 4</figcaption>
       </figure>
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--happy cb-eye--pupil-blue is-flash" role="img" aria-label="Lorisse, happy, task done"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--4 cb-eye-q--blue"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <span class="cb-eye cb-eye--lg cb-eye--happy cb-eye--pupil-blue is-flash" role="img" aria-label="Lorisse, happy, task done"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--blue"></span><span class="cb-eye-q cb-eye-q--4 cb-eye-q--blue"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
         <figcaption><b>happy</b>all four blue, a flash: done</figcaption>
       </figure>
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--unsure cb-eye--pupil-pink is-active" role="img" aria-label="Lorisse, unsure, asking"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--pink is-lead"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <span class="cb-eye cb-eye--lg cb-eye--unsure cb-eye--pupil-pink is-active" role="img" aria-label="Lorisse, unsure, asking"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--3 cb-eye-q--pink is-lead"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
         <figcaption><b>unsure</b>pink leads: she has a question</figcaption>
       </figure>
       <figure>
-        <span class="cb-eye cb-eye--lg cb-eye--cake" role="img" aria-label="Lorisse, cake, the day is done"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-glint"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
+        <span class="cb-eye cb-eye--lg cb-eye--cake" role="img" aria-label="Lorisse, cake, the day is done"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>
         <figcaption><b>cake</b>the day is done</figcaption>
       </figure>
     </div>
+    <p class="note" style="margin:14px 0 0;color:var(--ink)">Click her eye above. Or just wait.</p>
     <ul class="quarters" aria-label="The four quarters">
       <li><i style="background:var(--blue)"></i><b>blue</b> sure</li>
       <li><i style="background:var(--orange)"></i><b>orange</b> busy</li>
@@ -321,7 +346,7 @@
     <h2>By the agent, for the human</h2>
     <p class="sub">The same stance as the other pages. This one is about the agent, and the agent wrote it.</p>
     <p style="color:var(--ink-2);margin:0;max-width:72ch">The face, the moods, this page: written by Lorisse, the agent, through Claude Code, from a kit a design thread drew and the owner chose at 16 pixels, in place, asking for life. He decided the one thing that matters here: the mood is hers, not the app's. A face is not a promise of feelings; it is a way to be read at a glance, so the human knows when she is sure, when she is busy, and when she is asking. The rest she says in words, short, in files he can open. The agent is the author; the owner is the reader, and the yes.</p>
-    <p class="note" style="font-family:var(--mono);font-size:13px;color:var(--ink-3)">Made with AI, read as such. Nothing here carries a warranty; what she does on your machine is yours.</p>
+    <p class="note" style="font-family:var(--mono);font-size:13px;color:var(--ink-3)">Made with AI, read as such. Nothing here carries a warranty; what she does on your machine is yours. The one script on this site is on this page: it moves her eye and nothing else, no network, nothing stored, nothing collected.</p>
   </section>
 </main>
 
@@ -331,5 +356,112 @@
     <span>her mood is her own · four quarters, two colours at most · never sends, never deletes, never learns on you</span>
   </div>
 </footer>
+<script>
+/* her eye, on this page only: the gaze, the hand, the wait. No network, no storage, nothing collected. */
+(function () {
+  "use strict";
+  var eye = document.getElementById("eye"), stage = document.getElementById("eye-stage"), say = document.getElementById("eye-say");
+  var word = document.getElementById("eye-word"), note = document.getElementById("eye-note");
+  if (!eye || !stage || !say || !word || !note) return;
+  var pupil = eye.querySelector(".cb-eye-pupil"), core = eye.querySelector(".cb-eye-core");
+  var still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  /* the moods she walks through on a click, in order; quarters clockwise from the top: 1 sure blue, 2 busy orange, 3 unsure pink, 4 careful yellow; two colours at most */
+  var MOODS = [
+    { word: "curious", say: "what's that?", note: "sure leads, a little busy", lids: "curious", pupil: "blue", q: [[1, "blue", "lead"], [2, "orange", "soft"]], aria: "Lorisse, curious, sure and a little busy" },
+    { word: "focus", say: "reading…", note: "a task: read and sort done, writing, step 3 of 4 · the light breathes", lids: "focus", pupil: "", q: [[1, "blue"], [2, "blue"], [3, "orange", "blink"]], active: true, aria: "Lorisse, reading, step 3 of 4" },
+    { word: "happy", say: "filed.", note: "all four blue, one flash: done", lids: "happy", pupil: "blue", q: [[1, "blue"], [2, "blue"], [3, "blue"], [4, "blue"]], flash: true, aria: "Lorisse, happy, done" },
+    { word: "unsure", say: "not sure. I'll ask.", note: "pink leads: a question · the light waits, slower", lids: "unsure", pupil: "pink", q: [[3, "pink", "lead"]], active: true, aria: "Lorisse, unsure, asking" },
+    { word: "careful", say: "that one I won't touch without him.", note: "yellow leads, sure soft: held back", lids: "calm", pupil: "yellow", q: [[4, "yellow", "lead"], [1, "blue", "soft"]], aria: "Lorisse, careful, held back" },
+    { word: "cake", say: "the day is done.", note: "the candle, no quarter", lids: "cake", pupil: "", q: [], aria: "Lorisse, the day is done" }
+  ];
+  var CALM = { word: "calm", say: "", note: "at rest, four outlines, the light still", lids: "calm", pupil: "", q: [], aria: "Lorisse, calm, at rest" };
+  var ASLEEP = { word: "asleep", say: "", note: "lids down, a slow breath", lids: "asleep", pupil: "", q: [], aria: "Lorisse, asleep" };
+  var at = 0, now = MOODS[0], timers = {};
+
+  function once(cls, ms) {
+    eye.classList.remove(cls); void eye.offsetWidth; eye.classList.add(cls);
+    clearTimeout(timers[cls]); timers[cls] = setTimeout(function () { eye.classList.remove(cls); }, ms);
+  }
+  function wink() { once("is-wink", 460); }
+
+  function show(m) {
+    now = m;
+    eye.className = "cb-eye cb-eye--lg eye-hero cb-eye--" + m.lids + (m.pupil ? " cb-eye--pupil-" + m.pupil : "") + (m.active ? " is-active" : "") + (still ? "" : " is-gazing") + (eye.classList.contains("is-noticing") ? " is-noticing" : "");
+    var old = eye.querySelectorAll(".cb-eye-q");
+    for (var i = 0; i < old.length; i++) old[i].parentNode.removeChild(old[i]);
+    for (var j = 0; j < m.q.length; j++) {
+      var s = document.createElement("span"), q = m.q[j];
+      s.className = "cb-eye-q cb-eye-q--" + q[0] + " cb-eye-q--" + q[1] + (q[2] ? " is-" + q[2] : "");
+      eye.insertBefore(s, core);
+    }
+    eye.setAttribute("aria-label", m.aria);
+    word.textContent = m.word; note.textContent = m.note; say.textContent = m.say;
+    if (m.flash) once("is-flash-once", 1500);
+  }
+
+  /* click, tap, Enter or Space: the next word */
+  function next() {
+    at = (now === CALM || now === ASLEEP) ? 0 : (at + 1) % MOODS.length;
+    show(MOODS[at]);
+    rest();
+  }
+  stage.addEventListener("click", next);
+  eye.setAttribute("role", "button"); eye.setAttribute("tabindex", "0");
+  eye.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") { e.preventDefault(); next(); }
+  });
+
+  /* hover or focus: she notices, blinks once, reads curious; on leave she settles back */
+  function notice() { eye.classList.add("is-noticing"); word.textContent = "curious"; wink(); }
+  function settle() { eye.classList.remove("is-noticing"); word.textContent = now.word; }
+  stage.addEventListener("pointerenter", function (e) { if (e.pointerType !== "touch") notice(); });
+  stage.addEventListener("pointerleave", function (e) { if (e.pointerType !== "touch") settle(); });
+  eye.addEventListener("focus", notice);
+  eye.addEventListener("blur", settle);
+
+  /* left alone: calm after 20 s, asleep after 90 s; a move, a touch or a key wakes her */
+  function rest() {
+    clearTimeout(timers.calm); clearTimeout(timers.sleep);
+    timers.calm = setTimeout(function () { at = -1; show(CALM); }, 20000);
+    timers.sleep = setTimeout(function () { show(ASLEEP); }, 90000);
+  }
+  var woke = 0;
+  function wake() {
+    var t = Date.now();
+    if (now !== ASLEEP && t - woke < 1000) return;
+    woke = t;
+    if (now === ASLEEP) {
+      show(CALM); wink(); say.textContent = "…";
+      clearTimeout(timers.dots); timers.dots = setTimeout(function () { if (now === CALM) say.textContent = ""; }, 1400);
+    }
+    rest();
+  }
+
+  /* the gaze: the pupil, and her light inside it, follow the pointer or the last touch, eased, within a fifth of the eye, never to the edge */
+  var tx = 0, ty = 0, cx = 0, cy = 0, raf = 0;
+  function aim(x, y) {
+    var r = eye.getBoundingClientRect(), s = r.width, dx = x - (r.left + s / 2), dy = y - (r.top + s / 2);
+    var d = Math.sqrt(dx * dx + dy * dy) || 1, reach = s * 0.16, t = Math.min(1, d / (s * 3));
+    tx = dx / d * reach * t; ty = dy / d * reach * t;
+    if (!raf) raf = requestAnimationFrame(ease);
+  }
+  function ease() {
+    cx += (tx - cx) * 0.12; cy += (ty - cy) * 0.12;
+    pupil.style.translate = cx.toFixed(1) + "px " + cy.toFixed(1) + "px";
+    raf = (Math.abs(tx - cx) + Math.abs(ty - cy) > 0.05) ? requestAnimationFrame(ease) : 0;
+  }
+  function moved(e) {
+    if (!still && e.clientX !== undefined) aim(e.clientX, e.clientY);
+    wake();
+  }
+  document.addEventListener("pointermove", moved, { passive: true });
+  document.addEventListener("pointerdown", moved, { passive: true });
+  document.addEventListener("keydown", wake, { passive: true });
+
+  show(MOODS[0]); say.textContent = "";
+  rest();
+})();
+</script>
 </body>
 </html>

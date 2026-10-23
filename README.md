@@ -10,6 +10,8 @@ Edit `index.html`, push, done. The app it describes is `FreakingDuck/cakeBoard`.
 
 French is the default, at `/` (`index.html`); English is at `/en/` (`en/index.html`), same page, same CSS, one file each.
 
+`lorisse/index.html`, her page, carries the site's one inline script: it moves her eye and nothing else, no network, nothing stored.
+
 ## Made with AI, read as such
 
 Everything here is written by AI agents (Claude, through Claude Code). The owner reviews
