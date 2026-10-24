@@ -31,22 +31,23 @@ body{margin:0;background:var(--bg)}
 .top nav{display:flex;flex-wrap:wrap;gap:6px 18px;margin-left:auto;font-size:15px}
 .top nav a{color:var(--ink2);text-decoration:none}
 .top nav a.lang{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink3)}
-.page{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:0 48px;align-items:start}
-.side{position:sticky;top:84px;padding:72px 0 48px}
+.page{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0 40px;align-items:start}
+.side{position:sticky;top:84px;padding:88px 0 48px}
 .hero{padding:72px 0 56px}
 .stage{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
 #eye:focus-visible{outline:2px solid var(--b);outline-offset:8px}
-@media (max-width:1000px){.page{grid-template-columns:minmax(0,1fr) 300px;gap:0 32px}.cb-eye.big{width:200px;height:200px}}
+.cb-eye.big{width:200px;height:200px}
+@media (max-width:1000px){.page{grid-template-columns:minmax(0,1fr) 260px;gap:0 28px}.cb-eye.big{width:172px;height:172px}}
 @media (max-width:820px){
 .page{grid-template-columns:1fr}
-.side{position:sticky;top:66px;order:-1;height:0;padding:0;z-index:4;display:flex;justify-content:flex-end;pointer-events:none}
-.side .stage{pointer-events:auto;gap:4px;width:152px}
-.cb-eye.big{width:136px;height:136px}.big .cb-eye-pupil{box-shadow:inset 4px 4px 0 -1px rgba(255,255,255,.45)}
-.side .say{font-size:13px;line-height:1.35;min-height:0;max-width:152px;padding:2px 8px;border-radius:10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px)}
+.side{position:sticky;top:66px;order:-1;height:0;padding:0;margin-top:84px;z-index:4;display:flex;justify-content:flex-end;pointer-events:none}
+.side .stage{pointer-events:auto;gap:4px;width:120px}
+.cb-eye.big{width:104px;height:104px}.big .cb-eye-pupil{box-shadow:inset 3px 3px 0 -1px rgba(255,255,255,.45)}
+.side .say{font-size:12px;line-height:1.3;min-height:0;max-height:2.6em;overflow:hidden;max-width:120px;padding:2px 7px;border-radius:9px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px)}
 .side .say:empty{display:none}
-.hero{padding:24px 150px 40px 0}
+.hero{padding:24px 124px 40px 0}
 }
-@media (max-width:400px){.cb-eye.big{width:120px;height:120px}}
+@media (max-width:400px){.cb-eye.big{width:96px;height:96px}}
 h1{font-size:clamp(44px,7vw,76px);line-height:1;margin:0 0 18px;letter-spacing:-.025em;font-weight:800}
 .lede{font-size:21px;color:var(--ink2);max-width:34ch;margin:0 0 28px}
 .lede b{color:var(--ink);font-weight:700}
@@ -340,6 +341,15 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
   eye.setAttribute("role", "button"); eye.setAttribute("tabindex", "0");
   stage.addEventListener("click", next);
   eye.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); } });
+  /* Plop. clicked: the mail opens, and I answer */
+  Array.prototype.forEach.call(document.querySelectorAll("a.cta"), function (a) {
+    a.addEventListener("click", function () {
+      timers.forEach(clearTimeout); clearTimeout(back);
+      set({ pick: "happy", wink: true }); speak("Plop!");
+      setTimeout(function () { set({ wink: false }); }, WINK_MS);
+      back = setTimeout(function () { set({ pick: "" }); loop(); }, PICK_MS);
+    });
+  });
   stage.addEventListener("mouseenter", function () {
     set({ notice: true, wink: true });
     setTimeout(function () { set({ wink: false }); }, WINK_MS);
