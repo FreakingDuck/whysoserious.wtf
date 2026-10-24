@@ -32,22 +32,23 @@ body{margin:0;background:var(--bg)}
 .top nav a{color:var(--ink2);text-decoration:none}
 .top nav a.lang{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--ink3)}
 /* the eye: a side image of the statement; when the page scrolls it stays while the text moves up (one mechanism, every width) */
+/* at rest the eye sits right after the statement (the script pulls it there); once the statement scrolls past, it stays at the right edge */
 .page{display:flex;flex-direction:column}
-.col{padding-right:240px}
-.side{order:-1;position:sticky;top:84px;height:0;z-index:4;display:flex;justify-content:flex-end;pointer-events:none;margin-top:calc(72px + clamp(44px,7vw,76px) + 18px)}
-.side .stage{pointer-events:auto;width:200px;gap:10px}
+.col{padding-right:280px}
+.side{order:-1;position:sticky;top:84px;height:0;z-index:4;display:flex;justify-content:flex-end;pointer-events:none;margin-top:48px}
+.side .stage{pointer-events:auto;width:240px;gap:10px;transition:transform .45s ease}
 .hero{padding:72px 0 56px}
 .stage{cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none}
 #eye:focus-visible{outline:2px solid var(--b);outline-offset:8px}
-.cb-eye.big{width:180px;height:180px}
+.side .cb-eye.big{width:240px;height:240px}
 .side .say{font-size:16px;line-height:1.35;min-height:0;max-height:2.7em;overflow:hidden;max-width:200px;padding:3px 10px;border-radius:10px;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(6px)}
 .side .say:empty{display:none}
-@media (max-width:1000px){.col{padding-right:190px}.side .stage{width:160px}.cb-eye.big{width:144px;height:144px}}
+@media (max-width:1000px){.col{padding-right:220px}.side .stage{width:180px}.side .cb-eye.big{width:180px;height:180px}}
 @media (max-width:820px){
 .col{padding-right:0}
-.side{top:66px;margin-top:calc(24px + clamp(44px,7vw,76px) + 18px)}
+.side{top:66px;margin-top:90px}
 .side .stage{width:92px;gap:4px}
-.cb-eye.big{width:80px;height:80px}.side .big .cb-eye-pupil{box-shadow:inset 2px 2px 0 -1px rgba(255,255,255,.45)}
+.side .cb-eye.big{width:80px;height:80px}.side .big .cb-eye-pupil{box-shadow:inset 2px 2px 0 -1px rgba(255,255,255,.45)}
 .side .say{font-size:11px;line-height:1.3;max-height:2.6em;max-width:92px;padding:2px 6px;border-radius:8px}
 .hero{padding:24px 100px 40px 0}
 }
@@ -135,7 +136,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 <div class="k">
 <header class="top" id="top">
 <div class="wrap">
-<a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 800"><span id="brand-eye" class="cb-eye m-curious" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue is-lead"></span><span class="cb-eye-q cb-eye-q--2 cb-eye-q--orange is-soft"></span><span class="cb-eye-core"><span class="cb-eye-pupil pc-b"><span class="cb-eye-inner"></span></span><span class="cb-eye-candle"></span><span class="cb-eye-flame"></span><span class="cb-eye-line"></span><span class="cb-eye-lt"></span><span class="cb-eye-lb"></span></span></span>whysoserious.wtf</a>
+<a href="#" style="display: flex; align-items: center; gap: 10px; color: var(--ink); text-decoration: none; font-weight: 800"><span class="cb-eye m-curious" role="img" aria-label="Lorisse"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-core"><span class="cb-eye-pupil pc-b"><span class="cb-eye-inner"></span></span></span></span>whysoserious.wtf</a>
 <nav aria-label="Pages"><a href="#humeurs">Mes humeurs</a><a href="#fais">Ce que je fais</a><a href="#mots">Mes mots</a></nav>
 </div>
 </header>
@@ -242,7 +243,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
   var stage = document.getElementById("stage");
   var top = document.getElementById("top");
   var faces = Array.prototype.slice.call(document.querySelectorAll(".face[data-m]"));
-  var brand = document.getElementById("brand-eye"), bcore = brand.querySelector(".cb-eye-core"), bpupil = brand.querySelector(".cb-eye-pupil"), lastBQ = null;
+  var lede = document.querySelector(".lede"), side = document.querySelector(".side"), pull = 0, stuck = null;
 
   var st = { phase: 0, pick: "", typed: "", typing: false, gx: 0, gy: 0, notice: false, wink: false, hideTop: false };
   var timers = [], tick = null, back = null, lastQ = null, lastY = window.scrollY || 0;
@@ -283,18 +284,6 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
     var pcls = "cb-eye-pupil" + (L.pc ? " " + L.pc : "");
     if (pupil.className !== pcls) pupil.className = pcls;
     pupil.style.setProperty("translate", st.gx + "px " + st.gy + "px");
-
-    /* the small eye in the top bar is the same eye: same mood, same quarters, same gaze */
-    var bcls = "cb-eye " + L.cls + (st.wink ? " is-wink" : "");
-    if (brand.className !== bcls) brand.className = bcls;
-    if (key !== lastBQ) {
-      var bq = brand.querySelectorAll(".cb-eye-q");
-      for (var a = 0; a < bq.length; a++) brand.removeChild(bq[a]);
-      for (var b = 0; b < L.q.length; b++) { var bs = document.createElement("span"); bs.className = "cb-eye-q " + L.q[b]; brand.insertBefore(bs, bcore); }
-      lastBQ = key;
-    }
-    if (bpupil.className !== pcls) bpupil.className = pcls;
-    bpupil.style.setProperty("translate", (st.gx * 0.15).toFixed(1) + "px " + (st.gy * 0.15).toFixed(1) + "px");
 
     say.textContent = st.typed;
     if (st.typing) say.appendChild(document.createElement("i"));
@@ -373,11 +362,27 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
   });
   stage.addEventListener("mouseleave", function () { set({ notice: false }); });
   window.addEventListener("pointermove", aim);
+  /* at rest I sit right after the statement; once it scrolls past me I stay at the right edge while the text moves up */
+  function place(force) {
+    var s = lede.getBoundingClientRect().top < parseFloat(getComputedStyle(side).top) + 4;
+    if (s === stuck && !force) return;
+    stuck = s;
+    stage.style.transform = stuck || !pull ? "" : "translateX(-" + pull + "px)";
+  }
+  function measure() {
+    var restLeft = side.getBoundingClientRect().left + stage.offsetLeft, lr = lede.getBoundingClientRect();
+    pull = Math.max(0, Math.round(restLeft - lr.right - 48));
+    place(true);
+  }
+  window.addEventListener("resize", measure);
+  window.addEventListener("load", measure);
   window.addEventListener("scroll", function () {
     var y = window.scrollY || 0, hide = y > 80 && y > lastY;
     if (hide !== !!st.hideTop) set({ hideTop: hide });
     lastY = y;
+    place();
   }, { passive: true });
+  measure();
 
   loop();
 })();
