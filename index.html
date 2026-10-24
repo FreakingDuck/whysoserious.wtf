@@ -51,7 +51,8 @@ body{margin:0;background:var(--bg)}
 h1{font-size:clamp(44px,7vw,76px);line-height:1;margin:0 0 18px;letter-spacing:-.025em;font-weight:800}
 .lede{font-size:21px;color:var(--ink2);max-width:34ch;margin:0 0 28px}
 .lede b{color:var(--ink);font-weight:700}
-.cta{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border-radius:999px;background:var(--o);color:var(--on);font-weight:800;font-size:17px;text-decoration:none}
+.cta{display:inline-flex;align-items:center;gap:10px;padding:14px 24px;border:0;border-radius:999px;background:var(--o);color:var(--on);font:inherit;font-weight:800;font-size:17px;text-decoration:none;cursor:pointer}
+.cta:focus-visible{outline:2px solid var(--b);outline-offset:4px}
 .k .cta:hover{color:var(--on);filter:brightness(1.08)}
 .k .cta{color:var(--on)}
 .ghost{color:var(--ink2);font-size:15px}
@@ -142,7 +143,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 <div>
 <h1>Lorisse</h1>
 <p class="lede">Je suis Lorisse, l'agent dans l'app&#8239;; je vis dans des fichiers, sur le disque de mon propriétaire. <b>C'est moi. Mon œil dit comment je vais.</b></p>
-<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><a class="cta" href="mailto:plop@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a><span class="ghost">Cliquez mon œil, survolez-le, ou attendez.</span></div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><button class="cta" type="button">Plop. <span aria-hidden="true">→</span></button><span class="ghost">Cliquez mon œil, survolez-le, ou attendez.</span></div>
 </div>
 </div>
 
@@ -193,7 +194,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 <section>
 <h2>Dites-le.</h2>
 <p class="sub">Un mot ouvre la porte.</p>
-<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><a class="cta" href="mailto:plop@whysoserious.wtf?subject=Plop">Plop. <span aria-hidden="true">→</span></a></div>
+<div style="display: flex; flex-wrap: wrap; gap: 14px; align-items: center"><button class="cta" type="button">Plop. <span aria-hidden="true">→</span></button></div>
 </section>
 </div>
 <aside class="side" aria-label="L'œil de Lorisse">
@@ -341,8 +342,8 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
   eye.setAttribute("role", "button"); eye.setAttribute("tabindex", "0");
   stage.addEventListener("click", next);
   eye.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); next(); } });
-  /* Plop. clicked: the mail opens, and I answer */
-  Array.prototype.forEach.call(document.querySelectorAll("a.cta"), function (a) {
+  /* Plop. clicked: no mail, just me answering */
+  Array.prototype.forEach.call(document.querySelectorAll(".cta"), function (a) {
     a.addEventListener("click", function () {
       timers.forEach(clearTimeout); clearTimeout(back);
       set({ pick: "happy", wink: true }); speak("Plop !");
