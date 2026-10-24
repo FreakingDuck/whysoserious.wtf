@@ -117,6 +117,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 .m-asleep{animation:e-breath 4.5s ease-in-out infinite}.m-asleep .cb-eye-pupil{display:none}.m-asleep .cb-eye-line{display:block}.m-asleep .cb-eye-off{opacity:.5}
 .m-cake .cb-eye-pupil{display:none}.m-cake .cb-eye-candle,.m-cake .cb-eye-flame{display:block}
 .cb-eye.is-flash{animation:e-flash 1.6s ease-out 1}
+.cb-eye.is-happy{animation:e-happy 2.4s ease-out 1}
 .cb-eye.is-noticing .cb-eye-lt,.cb-eye.is-noticing .cb-eye-lb{scale:1 .55}
 .cb-eye.is-wink .cb-eye-lt{animation:e-wink .42s ease-in-out}
 @keyframes e-blink{0%,93%,100%{transform:scaleY(1)}96%{transform:scaleY(.08)}}
@@ -125,6 +126,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
 @keyframes e-seg{0%,100%{opacity:1}50%{opacity:.15}}
 @keyframes e-lead{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
 @keyframes e-flash{0%{box-shadow:0 0 0 0 var(--glow)}45%,100%{box-shadow:0 0 0 22px transparent}}
+@keyframes e-happy{0%{box-shadow:0 0 0 0 transparent}25%{box-shadow:0 0 34px 10px color-mix(in srgb,var(--o) 60%,transparent)}60%{box-shadow:0 0 18px 4px color-mix(in srgb,var(--o) 35%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
 @keyframes e-wink{50%{height:100%}}
 @keyframes e-flick{0%,100%{transform:scale(1,1) skewX(0)}30%{transform:scale(.9,1.1) skewX(4deg)}60%{transform:scale(1.06,.94) skewX(-4deg)}}
 @keyframes e-breath{0%,100%{transform:scale(1)}50%{transform:scale(.975)}}
@@ -265,7 +267,7 @@ footer{padding:36px 0 56px;border-top:1px solid var(--ln);color:var(--ink3);font
     var step = st.pick ? (mood === "focus" ? 3 : mood === "happy" ? 5 : 0) : p.step;
     var L = look(mood, step);
 
-    var cls = "cb-eye big " + L.cls + (step === 5 && !st.pick ? " is-flash" : "") + (st.notice ? " is-noticing" : "") + (st.wink ? " is-wink" : "");
+    var cls = "cb-eye big " + L.cls + (step === 5 && !st.pick ? " is-flash" : "") + (st.pick === "happy" ? " is-happy" : "") + (st.notice ? " is-noticing" : "") + (st.wink ? " is-wink" : "");
     if (eye.className !== cls) eye.className = cls;
     eye.setAttribute("aria-label", "Lorisse, " + mood);
 
