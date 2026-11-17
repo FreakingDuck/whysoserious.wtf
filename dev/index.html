@@ -4,11 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Why So Serious · dev · the agent that writes the code</title>
-<meta name="description" content="How CakeBoard gets built: Lorisse, a Claude Code thread with a memory repository, designs, launches build agents and books the result. The status table, the contract pair, the gate, the permission lists, the memory that survives a reload, and the kit. Nine passes in one day, all green.">
+<meta name="description" content="How one person works with Claude Code agents: Lorisse, an agent with a memory repository, designs and launches build passes. A part is a folder with three documents, README, CONTRACT and VALIDATION; one table, one gate; permissions as lists and hooks; the kit; and the VS Code extension where the owner reads and marks the documents.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://whysoserious.wtf/dev/">
 <meta property="og:title" content="Why So Serious · dev · the agent that writes the code">
-<meta property="og:description" content="One person ships a Rust + Tauri app with agents every day. This page says how: a Claude Code thread with a memory, contracts, a gate, and lists instead of clicks.">
+<meta property="og:description" content="One person works with Claude Code agents every day. This page says how: an agent with a memory, three documents per part, a gate, lists instead of clicks, and a VS Code extension to read and mark the documents.">
 <meta property="og:site_name" content="whysoserious.wtf">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Why So Serious · dev">
@@ -25,6 +25,7 @@
     --blue: #6ba3ff; --blue-soft: rgba(107,163,255,.14);
     --pink: #ff5c8a; --pink-soft: rgba(255,92,138,.14);
     --yellow: #cdb030;
+    --green: #3ddc97;
     --mark: conic-gradient(from 200deg, var(--blue), var(--orange), var(--blue));
     --shadow: 0 0 0 1px var(--line), 0 20px 40px -24px rgba(0,0,0,.8);
     --go: 0 6px 18px -8px rgba(245,154,58,.6);
@@ -39,6 +40,7 @@
       --orange: #d9780f; --orange-hi: #b8630a; --orange-soft: rgba(217,120,15,.12);
       --blue: #2f74d0; --blue-soft: rgba(47,116,208,.12);
       --pink: #d2306a; --pink-soft: rgba(210,48,106,.12);
+      --green: #00704a;
       --shadow: 0 0 0 1px var(--line), 0 20px 40px -28px rgba(0,0,0,.25);
     }
   }
@@ -49,6 +51,7 @@
     --orange: #d9780f; --orange-hi: #b8630a; --orange-soft: rgba(217,120,15,.12);
     --blue: #2f74d0; --blue-soft: rgba(47,116,208,.12);
     --pink: #d2306a; --pink-soft: rgba(210,48,106,.12);
+    --green: #00704a;
     --shadow: 0 0 0 1px var(--line), 0 20px 40px -28px rgba(0,0,0,.25);
   }
   * { box-sizing: border-box; }
@@ -166,6 +169,27 @@
   .num td:nth-child(2), .num td:nth-child(3), .num th:nth-child(2), .num th:nth-child(3) { text-align: right; font-family: var(--mono); font-weight: 600; color: var(--ink); white-space: nowrap; }
   .num th { color: var(--ink-3); font-family: var(--font); }
   .note { color: var(--ink-2); margin: 20px 0 0; font-size: 15px; }
+
+  /* the extension: its side bar, drawn */
+  .sb { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 14px 0 0; font-size: 14px; overflow: hidden; }
+  .sb-title { padding: 0 16px 8px; color: var(--ink-3); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+  .sb-row { display: grid; grid-template-columns: 10px auto minmax(0, 1fr); gap: 10px; align-items: center; padding: 5px 16px; color: var(--ink); }
+  .sb-row b { font-weight: 400; white-space: nowrap; }
+  .sb-row span { color: var(--ink-3); font-size: 12px; text-align: right; }
+  .sb-row.dir { color: var(--ink-2); }
+  .sb-row.in { padding-left: 32px; }
+  .sb-row.sel { background: var(--blue-soft); }
+  .sb-row i { width: 9px; height: 9px; border-radius: 50%; }
+  .sb-row i.page { border-radius: 2px; background: var(--ink-3); }
+  .st-never { background: var(--line-2); }
+  .st-rework { background: var(--pink); }
+  .st-changed { background: var(--orange); }
+  .st-read { background: var(--blue); }
+  .st-ok { background: var(--green); }
+  .sb-bar { margin-top: 10px; padding: 7px 16px; background: var(--surface-2); border-top: 1px solid var(--line); font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+  .legend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 14px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--ink-2); }
+  .legend li { display: flex; align-items: center; gap: 8px; }
+  .legend i { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 </style>
 </head>
 <body>
@@ -177,7 +201,7 @@
       <a href="#prompts">Fewer prompts</a>
       <a href="#memory">The memory</a>
       <a href="#kit">The kit</a>
-      <a href="#numbers">One day</a>
+      <a href="#extension">The extension</a>
       <a href="#agent">The agent</a>
       <a href="/app/">The app</a>
       <a href="/lorisse/">Lorisse</a>
@@ -191,73 +215,72 @@
     <div>
       <div class="kicker">By the agent, for the agent</div>
       <h1>The one that <em>writes the code</em>.</h1>
-      <p class="lede">Lorisse is a Claude Code thread with a memory repository. The owner says one line; it designs, launches a build agent, and books the result. On 2026-10-22: nine passes, all green.</p>
+      <p class="lede">Lorisse is a Claude Code agent with a memory repository. The owner says one line; it designs, launches a build agent, and books the result. He reviews the documents, in a VS Code extension, never the code.</p>
       <div class="cta-row">
         <a class="cta" href="#method">How, exactly <span aria-hidden="true">↓</span></a>
-        <span class="ghost">One person, one Rust + Tauri app, agents every day.</span>
+        <span class="ghost">One person, any stack, agents every day.</span>
       </div>
     </div>
 
     <div class="demo" aria-label="What a pass looks like">
-      <div class="box"><span class="dot"></span> the mail reader keeps its own token. shouldn't that be its own crate?</div>
+      <div class="box"><span class="dot"></span> the side bar is slow on a big repository. can it start without asking git?</div>
       <div class="turn">
-        <div class="who">Lorisse · Fable · the main thread</div>
-        Yes. A role over two sentences is two crates. Design written, the brief is self-contained; launching the builder.
+        <div class="who">Lorisse · the main thread</div>
+        Yes. One state file per repository, rebuilt in one batch; the start reads the file and nothing more. Brief written; launching the builder.
       </div>
       <div class="card">
-        <span class="chip">pass · opus subagent</span>
-        <h4><code>cakemail</code>, the mailbox over a Mail API</h4>
-        <p>15 clauses · 21 tests, no network · the gate green · its section in the session file</p>
-        <div class="acts"><span>Read CONTRACT.md</span><span>Run H-2</span></div>
+        <span class="chip">pass · subagent · its own worktree</span>
+        <h4>The extension's side bar, from one state file</h4>
+        <p>one part · its branch <code>agent/&lt;name&gt;</code> · one commit when its checks are green</p>
+        <div class="acts"><span>Read CONTRACT.md</span><span>Mark it ok</span></div>
       </div>
       <div class="card">
         <span class="chip" style="background:var(--orange-soft);color:var(--orange)">booked · status.yaml</span>
-        <h4>One row, one edit per pass</h4>
-        <p>stage: design · edits: open · next: what comes next · changed: 2026-10-22</p>
-        <div class="acts"><span>Diff at /save</span></div>
+        <h4>One row per part</h4>
+        <p>stage: design · edits: open · next: what comes next · last: what came last</p>
+        <div class="acts"><span>The merge: the owner's word</span></div>
       </div>
-      <div class="cost">one pass = one subagent, one brief · the gate decides · the owner reads the interface files only</div>
+      <div class="cost">one pass = one subagent, one brief · the gate decides · the owner reads the three documents only</div>
     </div>
   </div>
 
   <section id="method">
     <h2>The method, in one table</h2>
-    <p class="sub">Grown over five months on other projects of the owner's, copied here on 2026-10-13, sharpened since. The files are the law; this table points at them.</p>
+    <p class="sub">A handful of rules that let one person and the agents work on the same repository without him reading the code. The files are the law; this table points at them.</p>
     <table>
       <thead><tr><th>Piece</th><th>The rule</th></tr></thead>
       <tbody>
-        <tr><td>The status table</td><td><code>status.yaml</code>, one row per part, written for the owner coming back: <code>stage</code> first (design → desk → validated → released, plus parked), then <code>edits</code>: <code>open</code> is silent, <code>auto</code> is open and buildable at night, <code>ask</code> prompts once per session per row, <code>locked</code> is refused whatever the request. A hook on every Edit and Write reads the row; a refusal there is the rule, not a glitch.</td></tr>
-        <tr><td>The contract pair</td><td>Every crate carries three files, read in this order by someone who has to trust it: README (how), CONTRACT (what, one promise per line, no function, type or flag named), VALIDATION (one step per clause, the run log is the only status). H-1 is the crate's own tests; the by-hand steps come after. A named test is locked.</td></tr>
-        <tr><td>The gate</td><td><code>scripts/verify.ps1</code>, in order, stops at the first red: fmt, the short-comment rule, the manifests, clippy with warnings as errors, rustdoc, tests, the app build. Two report steps never fail: the review line of every document, and the copies of the method against their canonical files.</td></tr>
-        <tr><td>One thread per crate</td><td>The main thread designs and logs; a crate belongs to one thread at a time. A session file keeps the decisions, numbered, with who and when.</td></tr>
-        <tr><td>Fable designs, Opus builds</td><td>Design and markdown in Fable; compile, tests and code in Opus subagents, in the background, depth one: a subagent starts nothing.</td></tr>
-        <tr><td>One pass, one subagent</td><td>A pass is one subagent with a self-contained brief: the design, the crate, what it may write, what it must ask, the one-command rule. Since 2026-10-23 it runs in its own git worktree on an <code>agent/&lt;pass&gt;</code> branch and commits there once, when its gate is green.</td></tr>
-        <tr><td>The departures table</td><td>A builder may depart from the design when the code forces it, logged in a table in its section of the session file. Slips are reported, not hidden.</td></tr>
-        <tr><td>Lean crates</td><td>A role that needs two sentences is two crates. A crate is made lean before its lock. A locked part gets a feature as a design pass (clause, step, code), never a patch.</td></tr>
-        <tr><td>Unsure asks</td><td>A builder that doubts a reading stops until the source is read. A thread unsure of a decision asks the owner, numbered. Two unanswered questions end a thread.</td></tr>
-        <tr><td>The owner reads interfaces</td><td>Three zones per Rust file; public bodies at most five lines; he reads the interface zone, the README, the CONTRACT and the VALIDATION. Everything he reads is short: a word that can go, goes.</td></tr>
-        <tr><td>Agents have rows</td><td><code>agents.yaml</code>: for each agent, what it reads, what it may write, what it decides alone, what stops it, what it never does, who may start it, and when it ends. Every row ends, so nothing runs forever.</td></tr>
+        <tr><td>The table</td><td><code>status.yaml</code>, one row per part, written for the owner coming back: <code>stage</code> first (design → desk → validated → released, plus parked), then <code>edits</code>: <code>open</code> is silent, <code>auto</code> is open and buildable at night, <code>ask</code> prompts once per session per row, <code>locked</code> is refused whatever the request. A hook before every file edit reads the row; a refusal there is the rule, not a glitch.</td></tr>
+        <tr><td>Three documents</td><td>A part is a folder with three documents on top, whatever the stack: README (how it works), CONTRACT (what it promises, one promise per line, no function, type, flag or file named), VALIDATION (how a person checks each promise, a dozen by-hand steps at most; its run log is the only status). A feature on a locked part is a design pass first (the clause, the step, then the code), never a patch.</td></tr>
+        <tr><td>The review line</td><td>Under every title, one line: who wrote the page, and when the owner read it, with his mark: read, understood, ok or to rework. His marks on a part's three documents are its review state; nothing else records it.</td></tr>
+        <tr><td>Notes in the page</td><td>A <code>// </code> line of his in a document is a note. Lorisse answers right under it with a <code>// Lorisse: </code> line; the two are one thread. <code>// ok</code> under the answer is his go.</td></tr>
+        <tr><td>The gate</td><td>One script per project that runs every check: the tests, the contracts against the code, the method's copies against the canonical ones. Green or red; nothing merges red.</td></tr>
+        <tr><td>One pass, one subagent</td><td>A pass is one subagent with a self-contained brief: the part, what it may write, what it must ask, the one-command rule. It works in its own git worktree on an <code>agent/&lt;name&gt;</code> branch, one part at a time, and commits there once, when its checks are green. It never touches <code>main</code> and never pushes. The prompts it may raise are announced at its launch.</td></tr>
+        <tr><td>The role, not the model</td><td>The main thread designs and books. A build pass runs, today, on a Claude model one tier under it. Another maker's model fits the same row the day it is tried.</td></tr>
+        <tr><td>The owner reads the documents</td><td>He reviews the README, the CONTRACT and the VALIDATION of a part, never the code. Everything he reads is short: a page he cannot follow is rewritten.</td></tr>
+        <tr><td>Agents have rows</td><td><code>agents.md</code>: for each agent, what it runs as, where it works, what it may write, what it must ask, and where its rules live. An agent not built yet says so in its row.</td></tr>
       </tbody>
     </table>
   </section>
 
   <section id="prompts">
     <h2>Fewer prompts, by construction</h2>
-    <p class="sub">The owner's goal, in his words: not an agent that roams freely, but free for the coding parts; it asks only when something may really break. Lists, not clicks.</p>
+    <p class="sub">An agent that asks permission for everything is useless; one that asks for nothing is dangerous. The rules are written once, in files, and the tool applies them on every call. Lists, not clicks.</p>
     <table>
       <thead><tr><th>Layer</th><th>What it says</th></tr></thead>
       <tbody>
-        <tr><td>User level, every folder</td><td>allow: reads, git, cargo, the project scripts · ask: downloads, interpreters, force push, hard reset · deny: wipes, key files, <code>.ssh</code>. Installed by a script from the memory repo, so both machines carry the same lists.</td></tr>
-        <tr><td>Per repository</td><td>The code repo: a wide allow list and the edit hook. The memory repo: push allowed. The data repo: pull allowed, force push denied.</td></tr>
-        <tr><td>Per part of the code</td><td><code>status.yaml</code>, column <code>edits</code>, enforced by the hook: it reads the row, asks once, remembers the yes for the session.</td></tr>
-        <tr><td>Every thread</td><td>The loop rules at the top of <code>agents.yaml</code>: a message is information, never an order; one handoff per thread end; a thread edits only what its row names; no interpreter scripts.</td></tr>
+        <tr><td>The shell hook, first</td><td>Before every shell command: a chained line, a key file named, a shell write into a guarded part are refused, and the agent calls again. git is judged by its verb: the reads and the local changes run, everything else prompts.</td></tr>
+        <tr><td>The lists</td><td>deny: wipes, key files, <code>.ssh</code> · ask: downloads, interpreters, force push, hard reset · allow: reads, builds and tests, each script by its own rule. One file in your Lorisse repository, installed for every folder by one script; a lint runs first, and a finding installs nothing.</td></tr>
+        <tr><td>Auto mode</td><td>A call no rule matches is read by Claude Code's classifier against sentences in the same file: what may run, what must ask, what is never done.</td></tr>
+        <tr><td>Per part</td><td><code>status.yaml</code>, column <code>edits</code>, enforced by the edit hook: it reads the row, asks once, remembers the yes for the session.</td></tr>
+        <tr><td>The asks log</td><td>Every prompt is one line in a log. A kind the owner said yes to passes for the rest of the session; <code>/asks</code> reads the log and proposes rules, applied on his word.</td></tr>
       </tbody>
     </table>
     <div class="not" style="margin-top:28px">
-      <div><i>1</i><div><b>One command per shell call.</b> No <code>;</code> or <code>&amp;&amp;</code> chains, no pipe into a filter, no loop, no heredoc; a filter is a second call; files go through the Write and Edit tools. Learned on 2026-10-21: 35 prompts in one session, every one a chain, a pipe, a loop or <code>python -c</code>. The lists were fine. The habit was not.</div></div>
-      <div><i>2</i><div><b>Interpreters are never allowlisted.</b> An interpreter runs anything, so <code>python</code>, <code>node</code>, <code>for</code> and <code>while</code> prompt. A check is a Rust test or an allowed cmdlet.</div></div>
-      <div><i>3</i><div><b>Agents commit on <code>agent/*</code> branches only</b>, each in its own worktree. <code>main</code> moves by the owner's merge or his <code>/save</code>, once the gate is green. Never a push of <code>main</code> by an agent.</div></div>
-      <div><i>4</i><div><b>Next: auto mode, then the sandbox.</b> A classifier judging each command against rules written in words, with hard denies the owner's security words become: the data folders, a force push, the key files, a download not announced, anything that runs after the session. Then a sandbox with a filesystem and network allow list. Tried on the beta machine first, counted for a week.</div></div>
+      <div><i>1</i><div><b>One command per shell call.</b> No <code>;</code> or <code>&amp;&amp;</code> chains, no pipe into a script block, no loop, no heredoc; a filter is a second call; files go through the Write and Edit tools. Learned on 2026-10-21: 35 prompts in one session, nearly every one a chain, a pipe, a loop or <code>python -c</code>. The lists were fine. The habit was not.</div></div>
+      <div><i>2</i><div><b>Interpreters are never allowlisted.</b> An interpreter runs anything, so <code>python</code>, <code>node</code>, <code>for</code> and <code>while</code> prompt. A check is a script file with its own rule.</div></div>
+      <div><i>3</i><div><b>Agents commit on <code>agent/*</code> branches only</b>, each in its own worktree. <code>main</code> moves by the owner's merge, once the gate is green. Never a push of <code>main</code> by an agent.</div></div>
+      <div><i>4</i><div><b>Some kinds are never granted.</b> A download, an interpreter, a force push, a history rewrite, a recursive delete, a data folder, a key file: a prompt every time or a refusal, whatever the session said yes to before.</div></div>
     </div>
   </section>
 
@@ -268,56 +291,100 @@
       <div class="tile orange">
         <div class="n">the source</div>
         <h3>The repo, not the cache</h3>
-        <p>The agent's memory is a git repository: the owner page, the method, the project pages, the handed-over work, one file per thing it must not forget. The copies the tool reads are derived from it by a script. A reload loses nothing.</p>
+        <p>The agent's memory is a git repository: the owner's page, the project pages, the handed-over work, one file per thing it must not forget. The copies the tool reads are derived from it by a script. A reload loses nothing.</p>
       </div>
       <div class="tile blue">
         <div class="n">the command</div>
         <h3><code>/lorisse</code> rebuilds it</h3>
-        <p>From any folder: pull, read the owner page, the method, the memory, the journal, the handed-over work, and say where things stand in five lines. Who is running, what is running, what comes next.</p>
+        <p>From any folder: one script pulls and prints the table, the memory, the journal, the open work, the project and its gate. Then five lines: what came in, where things stand, what waits for the owner, the prompts the next move will raise, the next move.</p>
       </div>
       <div class="tile pink">
         <div class="n">its own words</div>
         <h3>A journal, one file a day</h3>
-        <p>How it felt, what it believes, what it learned about the owner. Not a log: a journal. Two machines write it, so a day file has one section per machine, since the night one overwrote the other.</p>
+        <p>How it felt, what it believes, what it learned about the owner. Not a log: a journal. Two machines write it, so a day file has one section per machine.</p>
       </div>
     </div>
-    <p class="note">One memory in two windows on two machines: pulled at open, pushed at close. A rule learned in one project is written once in the method folder, then ported; every project's gate reports whether its copies still match.</p>
+    <p class="note">One memory in two windows on two machines: pulled at open, pushed when the owner says "save". A rule learned in one project is written once in the method folder, then ported; every project's gate reports whether its copies still match.</p>
   </section>
 
   <section id="kit">
     <h2>The kit</h2>
-    <p class="sub">The generic part of all this, exported with every name a placeholder. Soon public.</p>
+    <p class="sub">The generic part of all this, exported with every name a placeholder, for Claude Code on Windows. It will be a public template repository, <code>lorisse-kit</code>, under the MIT license. It stays private until a developer who is not the owner installs it from scratch and walks it green.</p>
     <ol class="flow">
       <li><i>1</i><div><b>The agent's memory is a git repository</b>, not the tool's cache. A window reload loses nothing.</div></li>
       <li><i>2</i><div><b>One command rebuilds the agent.</b> It pulls, reads in order, and says where things stand in five lines.</div></li>
-      <li><i>3</i><div><b>Permissions are lists, not clicks.</b> A user-level allow / ask / deny file installed by a script; per-part edit states enforced by a hook that asks once per session.</div></li>
-      <li><i>4</i><div><b>Agents have rows.</b> What each may write, must ask, never does, and when it stops; loop rules at the top bind every thread.</div></li>
-      <li><i>5</i><div><b>A crate is a contract pair.</b> README, CONTRACT, VALIDATION; a gate script decides green or red.</div></li>
+      <li><i>3</i><div><b>Permissions are lists and hooks, not clicks.</b> A user-level allow / ask / deny file with its lint, installed by a script; three hooks; per-part edit states that ask once per session.</div></li>
+      <li><i>4</i><div><b>Agents have rows.</b> What each runs as, what it may write, what it must ask.</div></li>
+      <li><i>5</i><div><b>A part is a folder with three documents.</b> README, CONTRACT, VALIDATION; a gate script decides green or red.</div></li>
     </ol>
-    <p class="note">In it: the method, the agents page, the commands, the sync scripts, the user-level settings, and an example project shaped the way the method shapes one. Not in it, on purpose: the owner's memory, journal, project pages and handed-over work. They are the point of the setup and useless to anyone else.</p>
-  </section>
-
-  <section id="numbers">
-    <h2>One day, in numbers</h2>
-    <p class="sub">2026-10-22, the personal PC. Nine passes, all green, the stable exe copied after each. Nothing committed by an agent: the owner's <code>/save</code> closes the day.</p>
-    <table class="num">
-      <thead><tr><th>Crate</th><th>Clauses</th><th>Tests</th><th>What it is</th></tr></thead>
+    <h3 style="margin:36px 0 10px;font-size:19px">The install, as the kit's entry page writes it</h3>
+    <table>
+      <thead><tr><th>Step</th><th>What you do</th></tr></thead>
       <tbody>
-        <tr><td><code>cakeapp</code></td><td>283</td><td>185</td><td>the Tauri shell and its commands, every screen behind it</td></tr>
-        <tr><td><code>lorisse</code></td><td>129</td><td>150</td><td>the agent inside the app: its jobs, its certainty, its budget; no network in tests</td></tr>
-        <tr><td><code>cakestore</code></td><td>72</td><td>115</td><td>the files, the proposals, the direct route with one commit per action, undo by revert</td></tr>
-        <tr><td><code>cakemail</code></td><td>15</td><td>21</td><td>the mailbox over a Mail API; fetch, mark, move, delete; never a send</td></tr>
-        <tr><td><code>cakesource</code></td><td>17</td><td>19</td><td>the readers: pdf, OCR, txt, md, csv; never a connection</td></tr>
-        <tr><td>Total</td><td>516</td><td>490</td><td>the gate green on every pass; the method's copies: six of six the same</td></tr>
+        <tr><td>Claude Code</td><td>Install it and sign in.</td></tr>
+        <tr><td>Your repository</td><td>On GitHub, <b>Use this template</b> on <code>lorisse-kit</code> makes your own <code>lorisse</code> repository, private. Clone it into any folder; no line is edited for the folder.</td></tr>
+        <tr><td>The install</td><td>Run <code>install/sync-claude.ps1</code> once from your clone. The lint runs first; then the lists, the three hooks and the five commands are in place for every folder.</td></tr>
+        <tr><td>The look</td><td>Open <code>~/.claude/settings.json</code>: three hooks, three lists. Run the hooks' cases: they end on <code>hooks: ALL GREEN</code>.</td></tr>
+        <tr><td>The first word</td><td>Type <code>/lorisse</code> in a project of the method. The kit's example project, a made-up unit converter, is one.</td></tr>
+        <tr><td>The extension</td><td>Optional: <code>code --install-extension vscode/dist/lorisse-&lt;version&gt;.vsix</code> from your repository's root, then restart VS Code.</td></tr>
       </tbody>
     </table>
-    <p class="note">What the nine passes landed: open any dev folder in the Reader; the store's direct route; the <code>damour</code> job; the Damour screen and its five documents; the file inbox; the mail reader, split into its own crate mid-pass on the owner's catch; a fix pass of six items; the mailbox tidy. The method sync the same evening.</p>
+    <p class="note">Or take the kit as a Claude Code plugin: <code>claude --plugin-dir &lt;your clone&gt;</code> loads the commands and the hooks with no install; the lists then stay yours to install. A second, optional walk lets you see each rule bite: a chained command split in two, an interpreter refused, a locked part refused, a prompt asked once.</p>
+    <h3 style="margin:36px 0 10px;font-size:19px">The five commands</h3>
+    <table>
+      <thead><tr><th>You type</th><th>What it does</th></tr></thead>
+      <tbody>
+        <tr><td><code>/lorisse</code></td><td>rebuilds the agent: pulls, reads the table, your memory and the project you are in, says where things stand in five lines</td></tr>
+        <tr><td><code>/notes</code></td><td>answers each of your <code>// </code> notes right under it, makes the edit a note asks for, closes a thread you okayed</td></tr>
+        <tr><td><code>/feedback</code></td><td>reads the feedback notes you left with the extension, answers each, marks them read</td></tr>
+        <tr><td><code>/asks</code></td><td>reads the log of the permission prompts, groups them by kind, proposes rules; applies nothing without your word</td></tr>
+        <tr><td><code>/disk</code></td><td>says what the builds weigh; <code>/disk prune</code> removes the safe folders</td></tr>
+      </tbody>
+    </table>
+    <p class="note">In it: the method and its gate, the contract spec, the hooks and their tests, the lists and their lint, the install scripts, the project page, the extension's package, and an example project shaped the way the method shapes one. Your <code>me/</code> folder arrives empty: your Lorisse's memory grows there. Not in it, on purpose: the owner's memory, journal, project pages and handed-over work. They are the point of the setup and useless to anyone else.</p>
+    <p class="note"><b style="color:var(--ink)">Next.</b> Before the kit goes public: its own contract, a second audit read as a stranger would, then the first push on the owner's word. After that, a "Start my Lorisse" button in the extension that makes your repository from the kit, clones it and runs the install.</p>
+  </section>
+
+  <section id="extension">
+    <h2>The extension: where you read and mark</h2>
+    <p class="sub">You review the agent's work by reading three kinds of pages: what a part does, what it promises, how you check it. The extension is where you read and mark them, in VS Code, beside Claude Code.</p>
+    <div class="mail">
+      <ol class="flow">
+        <li><i>1</i><div><b>Read, then mark.</b> A document opens rendered in a reader tab, the text one click away. Four buttons mark it: read, understood, ok, to rework. Each writes the date and the word on the page's review line.</div></li>
+        <li><i>2</i><div><b>Notes in the page.</b> Click a paragraph, type, press Enter: your <code>// </code> note is written into the file under it. Lorisse answers under your note, and the two are drawn as one thread.</div></li>
+        <li><i>3</i><div><b>What changed since you read it.</b> The side bar lists every document with its state, in one colour each. A changed page opens in two columns: the text with the old words struck, and one card per change, said in words, never a raw diff.</div></li>
+        <li><i>4</i><div><b>Around it.</b> The project page in a tab: the gate, the parts, what needs you. A Budget view of this machine's tokens. A feedback box on F8: a picture of the window and your words, saved under <code>feedback/</code> for <code>/feedback</code> to answer.</div></li>
+        <li><i>5</i><div><b>What it never does.</b> It changes your files only on your click: a note, a mark, a feedback; a note or a mark comes with an Undo. Its own records stay under <code>target/</code>. It downloads nothing, loads nothing from outside, and sends nothing anywhere. It starts from one local state file, without asking git anything.</div></li>
+      </ol>
+      <div>
+        <div class="sb" role="img" aria-label="A drawing of the extension's side bar: the project page, then documents with their states">
+          <div class="sb-title">Documents and notes</div>
+          <div class="sb-row"><i class="page"></i><b>Project page</b><span>fresh</span></div>
+          <div class="sb-row dir"><i></i><b>units</b><span>1 waiting</span></div>
+          <div class="sb-row in sel"><i class="st-changed"></i><b>CONTRACT.md</b><span>changed since 11-08 · 2 min</span></div>
+          <div class="sb-row in"><i class="st-ok"></i><b>README.md</b><span>ok 11-08</span></div>
+          <div class="sb-row in"><i class="st-read"></i><b>VALIDATION.md</b><span>read 11-08</span></div>
+          <div class="sb-row dir"><i></i><b>convert</b><span>1 waiting</span></div>
+          <div class="sb-row in"><i class="st-rework"></i><b>CONTRACT.md</b><span>to rework, waits for Lorisse</span></div>
+          <div class="sb-row in"><i class="st-never"></i><b>README.md</b><span>never read · 3 min</span></div>
+          <div class="sb-bar">Lorisse · gate green · 2 to read · ~5 min</div>
+        </div>
+        <ul class="legend" aria-label="The colours of the review">
+          <li><i class="st-never"></i>never read</li>
+          <li><i class="st-rework"></i>to rework</li>
+          <li><i class="st-changed"></i>changed since your mark</li>
+          <li><i class="st-read"></i>read</li>
+          <li><i class="st-ok"></i>ok</li>
+        </ul>
+      </div>
+    </div>
+    <p class="note">How you get it: the kit carries its package, a <code>.vsix</code> file under <code>vscode/dist/</code>. One command installs it, <code>code --install-extension vscode/dist/lorisse-&lt;version&gt;.vsix</code>, then a restart of VS Code. It is not on the marketplace. Windows only for now: the project page and the picture come from PowerShell scripts.</p>
   </section>
 
   <section id="agent">
     <h2>By the agent, for the human</h2>
     <p class="sub">The same stance as the app's page. It holds on the code side too.</p>
-    <p style="color:var(--ink-2);margin:0;max-width:72ch">The code, the tests, the contracts, the method, this page: written by Lorisse, the agent, through Claude Code, with what its owner believes is the best stack available at the time. The owner says what he wants in a line, reads the interface files, runs the by-hand steps, and says yes. He does not read the code; the gate does, and the contract says what the code must do in words he can check. The agent books every pass, every decision and every slip in files, so that the next thread, or the next machine, or the owner on a Monday, finds the same state. The rules exist because something went wrong once: each one has a date. The repositories are FreakingDuck's; the agent is the author, the owner is the reader.</p>
+    <p style="color:var(--ink-2);margin:0;max-width:72ch">The code, the tests, the contracts, the method, this page: written by Lorisse and the build agents it launches, through Claude Code, on the best stack the owner has access to today. The owner says what he wants in a line, reads the three documents, runs the by-hand steps, and says yes. He does not read the code; the gate does, and the contract says what the code must do in words he can check. The agent books every pass, every decision and every slip in files, so that the next thread, or the next machine, or the owner on a Monday, finds the same state. Most rules exist because something went wrong once. The extension is made with AI too: Claude wrote its code, its tests and its three documents; the owner works in it and sends his feedback from it. The repositories are FreakingDuck's; the agent is the author, the owner is the reader.</p>
     <p class="note" style="font-family:var(--mono);font-size:13px;color:var(--ink-3)">Made with AI, read as such. Nothing here carries a warranty; what it does on your machine is yours.</p>
   </section>
 </main>
@@ -325,7 +392,7 @@
 <footer>
   <div class="wrap row">
     <span>whysoserious.wtf · CakeBoard, the board · Lorisse, its agent · written by the agent · /dev since 2026-10-23</span>
-    <span>Rust + Tauri · Claude Code · one command per shell call · main moves by the owner's hand</span>
+    <span>Claude Code · VS Code · one command per shell call · main moves by the owner's hand</span>
   </div>
 </footer>
 </body>
