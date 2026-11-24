@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lorisse · les agents écrivent le code, vous décidez de ce qui fusionne</title>
+<meta name="description" content="Lorisse est une façon de travailler avec Claude Code, avec une extension VS Code&nbsp;: les agents écrivent le code, chacun dans sa branche&nbsp;; une gate de tests tranche&nbsp;; vous relisez trois pages courtes par partie au lieu du code, et rien ne fusionne sans votre accord.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://whysoserious.wtf/fr/">
+<meta property="og:locale" content="fr_FR">
+<meta property="og:title" content="Lorisse · les agents écrivent le code, vous décidez de ce qui fusionne">
+<meta property="og:description" content="Les agents écrivent le code dans leurs branches, une gate de tests tranche, et vous relisez trois pages courtes par partie au lieu du code.">
+<meta property="og:site_name" content="whysoserious.wtf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lorisse · les agents écrivent le code, vous décidez de ce qui fusionne">
+<meta name="twitter:description" content="Vous relisez trois pages courtes par partie au lieu du code, et rien ne fusionne sans votre accord.">
+<link rel="alternate" hreflang="en" href="https://whysoserious.wtf/">
+<link rel="alternate" hreflang="fr" href="https://whysoserious.wtf/fr/">
+<link rel="alternate" hreflang="x-default" href="https://whysoserious.wtf/">
+<script>/* the language, before the first paint: a stored choice "pv-lang" wins; else a French browser on an English page goes to the French twin; storage refused, the page stays */
+(function () { var me = "fr", twin = "/";
+  try { var s = localStorage.getItem("pv-lang");
+    if (s === "fr" || s === "en") { if (s !== me) location.replace(twin + location.search + location.hash); }
+    else if (me === "en" && /^fr/i.test(navigator.language || "")) location.replace(twin + location.search + location.hash);
+  } catch (e) {}
+  document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a[data-lang]"); if (a) { try { localStorage.setItem("pv-lang", a.getAttribute("data-lang")); } catch (x) {} } });
+})();</script>
+<meta name="theme-color" content="#07111a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ebe7e0" media="(prefers-color-scheme: light)">
+<script>/* the colour setting, before the first paint: the status pages' key "pv-theme", "light" or "dark" on data-theme; Auto or nothing stored follows the system */
+(function () { var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {} if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) {} }
+  if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v); })();</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='25' fill='%2303080d'/%3E%3Cg fill='none' stroke-width='5'%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%234cc9f0' stroke-dasharray='40 139' transform='rotate(-135 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%23ffb703' stroke-dasharray='40 139' transform='rotate(-45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(135 32 32)'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='10' fill='%234cc9f0'/%3E%3Ccircle cx='29' cy='29' r='3.5' fill='%23fff' fill-opacity='.45'/%3E%3C/svg%3E">
+<style>
+  /* Lorisse's look: the tokens of Lorisse's shared stylesheet, the same as the status pages wear.
+     Dark on :root, light below; no colour is written outside these three blocks. */
+  :root {
+    color-scheme: dark;
+    --cb-bg: #07111a; --cb-surface: #0d1a26; --cb-surface-2: #13222f;
+    --cb-line: #1a2b3b; --cb-line-2: #2f4558;
+    --cb-ink: #e6f1fa; --cb-ink-2: #9fb4c6; --cb-ink-3: #6a8296; --cb-on-accent: #07111a;
+    --cb-blue: #4cc9f0; --cb-orange: #ffb703; --cb-orange-hi: #ffcb47; --cb-pink: #ff5c8a; --cb-green: #3ddc97;
+    --cb-blue-soft: rgba(76, 201, 240, .14); --cb-orange-soft: rgba(255, 183, 3, .14);
+    --cb-pink-soft: rgba(255, 92, 138, .14); --cb-green-soft: rgba(61, 220, 151, .14);
+    --cb-eye-core: #03080d; --cb-eye-light: rgba(255, 255, 255, .75); --cb-eye-rim: rgba(255, 255, 255, .45); --cb-eye-off: var(--cb-line-2);
+    --cb-font-app: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --cb-font-mono: "B612 Mono", ui-monospace, Consolas, "Courier New", monospace;
+    --cb-radius-sm: 8px; --cb-radius-md: 12px; --cb-radius-card: 14px; --cb-radius-pill: 999px;
+    --cb-shadow-card: 0 0 0 1px var(--cb-line);
+    --cb-focus-ring: 2px solid var(--cb-blue); --cb-focus-offset: 2px;
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(0, 0, 0, .5);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+      --cb-line: #d0cabf; --cb-line-2: #9a9488;
+      --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+      --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+      --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+      --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+      --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+    --cb-line: #d0cabf; --cb-line-2: #9a9488;
+    --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+    --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+    --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+    --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cb-bg); color: var(--cb-ink); font-family: var(--cb-font-app);
+    font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-wrap: anywhere; }
+  a { color: var(--cb-blue); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  a:focus-visible { outline: var(--cb-focus-ring); outline-offset: 2px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  /* the header of the dev pages: the brand, the pages, the colour setting */
+  header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--cb-bg) 86%, transparent); border-bottom: 1px solid var(--cb-line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 10px 16px; flex-wrap: wrap; padding: 8px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; color: var(--cb-ink); }
+  .brand:hover { text-decoration: none; }
+  .nav nav { display: flex; align-items: center; gap: 8px 18px; font-size: 15px; flex-wrap: wrap; }
+  .nav nav a { color: var(--cb-ink-2); white-space: nowrap; padding: 2px 0; border-bottom: 2px solid transparent; }
+  .nav nav a:hover { color: var(--cb-ink); text-decoration: none; }
+  .nav nav a[aria-current="page"] { color: var(--cb-ink); font-weight: 600; border-bottom-color: var(--cb-blue); }
+  .nav nav a.eye-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .nav nav a.eye-item .cb-eye { width: 16px; height: 16px; }
+  .nav-r { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
+  @media (max-width: 640px) { .nav-r { width: 100%; justify-content: space-between; } .nav nav { font-size: 14px; gap: 6px 14px; } }
+  .cb-seg { display: inline-flex; padding: 2px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); box-shadow: var(--cb-shadow-seg); }
+  .cb-seg-item { min-height: 26px; padding: 2px 10px; border: 0; border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2); font: 600 12px/1.4 var(--cb-font-app); cursor: pointer; }
+  .cb-seg-item[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+  .cb-seg-item:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+  .ctl { display: flex; align-items: center; gap: 10px; }
+  a.cb-seg-item { display: inline-flex; align-items: center; }
+  a.cb-seg-item:hover { text-decoration: none; color: var(--cb-ink); }
+  a.cb-seg-item[aria-current="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+
+  /* the eye, small: a presence */
+  .cb-eye { position: relative; display: inline-block; flex: none; width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; }
+  .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
+  .cb-eye-off { background: var(--cb-eye-off); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); }
+  .cb-eye-off-in { inset: 1px; background: var(--cb-eye-core); -webkit-mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); }
+  .cb-eye-q--1 { background: var(--cb-blue); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); animation: cb-eye-lead 2.4s ease-in-out infinite; }
+  .cb-eye-q--2 { background: var(--cb-orange); opacity: .45; -webkit-mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); }
+  .cb-eye-core { position: absolute; inset: 9%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
+  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; width: 46%; height: 46%; background: var(--cb-blue); box-shadow: inset 1.5px 1.5px 0 -.5px var(--cb-eye-rim); animation: cb-eye-blink 5s infinite; }
+  .cb-eye-inner { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--cb-eye-light) 0 14%, transparent 64%); opacity: .35; }
+  .cb-eye.small { width: 40px; height: 40px; }
+  .cb-eye.small .cb-eye-pupil { box-shadow: inset 2px 2px 0 -.5px var(--cb-eye-rim); }
+  @keyframes cb-eye-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+  @keyframes cb-eye-lead { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+  @media (prefers-reduced-motion: reduce) { .cb-eye-pupil, .cb-eye-q--1 { animation: none; } }
+
+  .hero { padding: 64px 0 40px; max-width: 780px; }
+  @media (max-width: 820px) { .hero { padding-top: 40px; } }
+  .kick { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+  .kicker { color: var(--cb-orange); font-weight: 700; letter-spacing: .09em; text-transform: uppercase; font-size: 12px; }
+  h1 { font-size: clamp(34px, 5.2vw, 54px); line-height: 1.06; margin: 0 0 20px; letter-spacing: -.02em; font-weight: 800; }
+  h1 em { font-style: normal; color: var(--cb-orange); }
+  .lede { font-size: 20px; color: var(--cb-ink-2); max-width: 54ch; margin: 0 0 14px; }
+  .lede b { color: var(--cb-ink); font-weight: 600; }
+  .for { font-size: 17px; color: var(--cb-ink-2); max-width: 60ch; margin: 0; }
+  .for b { color: var(--cb-ink); }
+
+  section { padding: 48px 0; border-top: 1px solid var(--cb-line); }
+  h2 { font-size: clamp(26px, 3.6vw, 34px); letter-spacing: -.01em; margin: 0 0 14px; font-weight: 800; }
+  p.body { color: var(--cb-ink-2); margin: 0 0 12px; max-width: 66ch; }
+  p.body b { color: var(--cb-ink); }
+
+  /* the example: a note in a page, its answer, the dated mark */
+  .two { display: grid; grid-template-columns: .95fr 1.05fr; gap: 32px; align-items: center; }
+  @media (max-width: 820px) { .two { grid-template-columns: 1fr; gap: 20px; } }
+  .thread { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 18px 20px; font-size: 15px; }
+  .thread .t { color: var(--cb-ink-3); font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; margin-bottom: 10px; }
+  .thread .ttl { font-size: 18px; font-weight: 800; margin: 0; }
+  .thread .line { font: 12px/1.5 var(--cb-font-mono); color: var(--cb-ink-3); margin: 2px 0 12px; }
+  .thread .line b { color: var(--cb-green); font-weight: 400; }
+  .thread p { margin: 0 0 6px; color: var(--cb-ink); }
+  .thread code { display: block; font: 13px/1.5 var(--cb-font-mono); padding: 6px 10px; border-radius: var(--cb-radius-sm); background: var(--cb-surface-2); color: var(--cb-ink); margin-top: 6px; white-space: pre-wrap; }
+  .thread code.l { background: var(--cb-blue-soft); }
+
+  /* what you get */
+  .get { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 720px) { .get { grid-template-columns: minmax(0, 1fr); } }
+  .tile { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 18px 20px; }
+  .tile h3 { margin: 0 0 6px; font-size: 18px; }
+  .tile p { margin: 0; color: var(--cb-ink-2); font-size: 15.5px; }
+  .tile.blue { border-top: 3px solid var(--cb-blue); } .tile.orange { border-top: 3px solid var(--cb-orange); }
+  .tile.pink { border-top: 3px solid var(--cb-pink); } .tile.green { border-top: 3px solid var(--cb-green); }
+
+  /* one run, end to end: seven steps */
+  .run { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 12px; counter-reset: s; }
+  .run li { position: relative; padding: 14px 16px 14px 16px; border-radius: var(--cb-radius-md); background: var(--cb-surface); box-shadow: var(--cb-shadow-card); color: var(--cb-ink-2); font-size: 15px; counter-increment: s; }
+  .run li::before { content: counter(s); display: grid; place-items: center; width: 26px; height: 26px; margin-bottom: 8px; border-radius: 50%; background: var(--cb-blue-soft); color: var(--cb-blue); font-weight: 700; font-size: 13px; }
+  .run li b { display: block; color: var(--cb-ink); margin-bottom: 2px; }
+  .run li.red { box-shadow: 0 0 0 1px var(--cb-pink); }
+  .run li.red::before { background: var(--cb-pink-soft); color: var(--cb-pink); }
+  .run + h2 { margin-top: 40px; }
+  .run li.go::before { background: var(--cb-green-soft); color: var(--cb-green); }
+
+  /* where it stops */
+  .stops { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; max-width: 70ch; }
+  .stops li { display: grid; grid-template-columns: 22px 1fr; gap: 10px; color: var(--cb-ink-2); font-size: 16px; }
+  .stops i { font-style: normal; color: var(--cb-pink); font-weight: 700; }
+
+  code { font-family: var(--cb-font-mono); font-size: .9em; background: var(--cb-surface-2); padding: 1px 6px; border-radius: 6px; color: var(--cb-ink); }
+
+  /* the way on: two large buttons at the end of the page, stacked on a phone */
+  section.leads { border-top: 1px solid var(--cb-line); }
+  .leads-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .leads-row { grid-template-columns: minmax(0, 1fr); } }
+  a.lead { display: flex; flex-direction: column; gap: 6px; min-height: 132px; padding: 22px 24px; border-radius: var(--cb-radius-card); background: var(--cb-surface); box-shadow: var(--cb-shadow-card); border-top: 3px solid var(--cb-orange); color: var(--cb-ink); }
+  a.lead.ext { border-top-color: var(--cb-blue); }
+  a.lead.home { border-top-color: var(--cb-green); }
+  a.lead:hover { text-decoration: none; background: var(--cb-surface-2); }
+  a.lead:focus-visible { outline: var(--cb-focus-ring); outline-offset: 3px; }
+  a.lead b { font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
+  a.lead span { color: var(--cb-ink-2); font-size: 15.5px; }
+  a.lead i { margin-top: auto; font-style: normal; color: var(--cb-blue); font-weight: 600; font-size: 15px; }
+
+  footer { padding: 36px 0 56px; border-top: 1px solid var(--cb-line); color: var(--cb-ink-3); font-size: 14px; }
+  footer .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--cb-ink-2); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/fr/"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf</a>
+    <div class="nav-r">
+    <nav aria-label="Les pages">
+      <a href="/fr/" aria-current="page">Lorisse</a>
+      <a href="/fr/method/">La méthode</a>
+      <a href="/fr/extension/">L'extension</a>
+      <a href="/method/status/project_page.html">Où ça en est</a>
+      <a class="eye-item" href="/fr/lorisse/" title="L'œil de Lorisse, ses humeurs et ses couleurs"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span>L'œil</a>
+    </nav>
+    <div class="ctl">
+    <div class="cb-seg" id="lang" role="group" aria-label="Langue"><a class="cb-seg-item" href="/fr/" hreflang="fr" lang="fr" data-lang="fr" aria-current="true">FR</a><a class="cb-seg-item" href="/" hreflang="en" lang="en" data-lang="en">EN</a></div>
+    <div class="cb-seg" id="theme" role="group" aria-label="Thème"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Clair</button><button class="cb-seg-item" type="button" data-value="dark">Sombre</button></div>
+    </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <div class="kick"><span class="cb-eye small" role="img" aria-label="L'œil de Lorisse"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span><span class="kicker">Lorisse · pour Claude Code</span></div>
+    <h1>Les agents écrivent le code. Vous lisez trois pages courtes et <em>décidez de ce qui fusionne</em>.</h1>
+    <p class="lede">Lorisse est une façon de travailler avec Claude Code, avec une extension VS Code. <b>Les agents écrivent le code, chacun dans sa branche&nbsp;; la gate, le contrôle qui lance tous les tests, dit si ça tient&nbsp;; vous relisez trois pages courtes par partie au lieu du code, et rien ne fusionne sans votre accord.</b></p>
+    <p class="for">Vos agents écrivent plus vite que personne ne peut lire. <b>Lorisse vous rend le dernier mot.</b> Que vous codiez vous-même ou que vous meniez le projet sans toucher au code, c'est vous qui décidez.</p>
+  </div>
+
+  <section id="example">
+    <div class="two">
+      <div>
+        <h2>À quoi ressemble une relecture</h2>
+        <p class="body">Vous lisez une page du projet, jamais son code. Quand quelque chose vous intrigue, vous écrivez une note dans la page, sur une ligne qui commence par deux barres obliques.</p>
+        <p class="body">Lorisse répond juste sous votre note&nbsp;: la question et la réponse se lisent d'un seul fil. Quand vous êtes d'accord avec la page, vous la marquez, et votre marque s'écrit sous son titre avec la date. Cette ligne est la trace de ce que vous avez approuvé.</p>
+      </div>
+      <div class="thread" role="img" aria-label="Une page d'un projet imaginaire&nbsp;: sa ligne de relecture avec une marque datée, une phrase, la note d'un lecteur et la réponse de Lorisse dessous">
+        <div class="t">Une page d'un projet imaginaire</div>
+        <p class="ttl">convert</p>
+        <div class="line">&gt; written by Lorisse · reviewed by the owner: <b>2026-11-18, ok</b></div>
+        <p>A temperature has no factor: it goes through the kelvin.</p>
+        <code>// Why the kelvin?</code>
+        <code class="l">// Lorisse: it starts at absolute zero, so one check refuses what is below.</code>
+      </div>
+    </div>
+  </section>
+
+  <section id="get">
+    <h2>Ce que vous obtenez</h2>
+    <div class="get">
+      <div class="tile blue"><h3>Un agent dont la mémoire survit à la session</h3><p>Lorisse garde ce qu'elle apprend de vous et du projet dans de petits fichiers, au sein d'un dépôt à vous. Elle les relit au début de chaque session, vous pouvez les corriger, et git en garde l'historique.</p></div>
+      <div class="tile orange"><h3>Trois pages par partie, et vos marques dessus</h3><p>Chaque partie a un README qui dit comment elle fonctionne, un CONTRACT qui liste ce qu'elle promet, et une VALIDATION qui dit comment vérifier chaque promesse à la main. Vous marquez chaque page read, ok ou to rework, et la marque porte sa date.</p></div>
+      <div class="tile pink"><h3>Des garde-fous que l'outil applique lui-même</h3><p>Un hook limite l'agent à une commande par appel du shell. Les permissions sont écrites en listes et vérifiées avant d'être installées. Une partie que vous verrouillez, aucun agent ne peut la modifier.</p></div>
+      <div class="tile green"><h3>Un lecteur dans VS Code</h3><p>L'extension montre chaque page avec son état, vous dit en mots ce qui a changé depuis votre marque, et écrit vos notes et vos marques dans la page d'un clic.</p></div>
+    </div>
+  </section>
+
+  <section id="adds">
+    <h2>Ce qu'elle ajoute à Claude Code</h2>
+    <p class="body">Claude Code vous donne le moteur&nbsp;: des fichiers de mémoire, des sous-agents, un shell. Lorisse y ajoute des habitudes sur lesquelles compter. Chaque partie a ses trois pages. Chaque changement passe la gate. Une partie verrouillée le reste. Et vous avez un endroit calme pour lire et pour marquer.</p>
+    <p class="body">Rien de tout cela ne repose sur la bonne mémoire d'un agent. Les règles vivent dans des fichiers et des hooks que Claude Code exécute à chaque appel&nbsp;: elles tiennent aussi le jour où l'agent n'a plus envie de les suivre.</p>
+  </section>
+
+  <section id="run">
+    <h2>Un changement, de votre demande à la fusion</h2>
+    <p class="body">Prenons un changement dans un convertisseur d'unités imaginaire.</p>
+    <ol class="run">
+      <li><b>Vous demandez</b>Vous dites ce que vous voulez, avec vos mots&nbsp;: «&nbsp;une température sous le zéro absolu doit être refusée&nbsp;».</li>
+      <li><b>La promesse d'abord</b>Avant tout code, Lorisse écrit ce qui sera vrai&nbsp;: une nouvelle clause dans le CONTRACT de la partie, ou une clause modifiée, avec l'étape qui la vérifie.</li>
+      <li><b>Un bâtisseur dans sa branche</b>Un sous-agent prend cette seule partie, dans une branche à lui, et écrit le code et ses tests.</li>
+      <li class="red"><b>La gate dit non</b>La gate lance tous les tests. L'un échoue&nbsp;: rien ne peut fusionner. Le bâtisseur corrige, et la gate passe au vert.</li>
+      <li class="go"><b>Vous dites fusionnez</b>La branche rejoint la branche principale sur votre parole, jamais avant.</li>
+    </ol>
+    <h2>Votre relecture, à votre rythme</h2>
+    <p class="body">Lire est une boucle à part. Vous ouvrez le lecteur quand vous avez un quart d'heure tranquille, pas quand un agent a besoin de vous.</p>
+    <ol class="run">
+      <li><b>Vous lisez ce qui a changé</b>Le lecteur liste les pages qui ont bougé depuis votre dernière marque, et dit en mots ce qui a changé dans chacune.</li>
+      <li><b>Vous demandez dans la page</b>Quelque chose vous intrigue&nbsp;? Vous laissez une note à l'endroit même, et Lorisse répond juste dessous.</li>
+      <li class="go"><b>Vous marquez</b>Read, ok ou to rework. Votre marque s'écrit sous le titre avec sa date&nbsp;: c'est la trace de ce que vous avez accepté.</li>
+    </ol>
+  </section>
+
+  <section id="stops">
+    <h2>Là où ça s'arrête, dit franchement</h2>
+    <p class="body">Nous préférons vous le dire maintenant plutôt que vous laisser le découvrir plus tard.</p>
+    <ul class="stops">
+      <li><i>!</i><span>Une gate ne vaut que ce que valent ses tests, et ce sont les agents qui écrivent les tests. Ce ne sont donc pas eux qu'on vous demande de croire.</span></li>
+      <li><i>!</i><span>Ce à quoi vous pouvez vous fier, c'est ce que vous lisez et ce que vous voyez&nbsp;: les promesses du CONTRACT, et une courte marche que vous faites à la main.</span></li>
+      <li><i>!</i><span>Pour du code livré à d'autres, gardez votre revue de sécurité et le regard de votre expert. Lorisse ne les remplace pas&nbsp;; elle les libère pour l'essentiel.</span></li>
+      <li><i>!</i><span>Elle a été faite par une seule personne, pour les projets d'une seule personne, et c'est là qu'elle brille. Windows aujourd'hui, avec Claude Code et VS Code. macOS vient ensuite.</span></li>
+    </ul>
+  </section>
+
+  <section class="leads" aria-label="Où aller ensuite">
+    <div class="leads-row">
+      <a class="lead" href="/fr/method/"><b>La méthode</b><span>Les trois pages de chaque partie, la gate, et les garde-fous que l'outil applique lui-même.</span><i>Lire la méthode →</i></a>
+      <a class="lead ext" href="/fr/extension/"><b>L'extension</b><span>Là où vous lisez et marquez les pages, avec une démo à essayer tout de suite dans votre navigateur.</span><i>Voir l'extension →</i></a>
+    </div>
+  </section>
+
+  <section id="made">
+    <h2>Par l'agent, pour l'humain</h2>
+    <p class="body">Le code, les tests, les contrats, la méthode et cette page ont été écrits par Lorisse et par les bâtisseurs qu'elle lance, à travers Claude Code. Le propriétaire dit ce qu'il veut, lit les trois pages, fait les étapes à la main, et dit oui. Il ne lit pas le code&nbsp;: c'est la gate qui le lit, et le CONTRACT dit ce que le code doit faire avec des mots qu'il peut vérifier.</p>
+    <p class="body">L'agent consigne dans des fichiers chaque passe, chaque décision et chaque faux pas, pour que la session suivante, une autre machine, ou le propriétaire un lundi matin retrouvent le même état. La plupart des règles existent parce que quelque chose a mal tourné un jour. L'agent est l'auteur&nbsp;; le propriétaire est le lecteur.</p>
+    <p style="font-family:var(--cb-font-mono);font-size:13px;color:var(--cb-ink-3);margin-top:18px">Fait avec l'IA, à lire comme tel. Rien ici n'est garanti&nbsp;; ce que cela fait sur votre machine vous appartient.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span>whysoserious.wtf · Lorisse · cette page est écrite par l'agent</span>
+    <span>Claude Code · fait avec l'IA, à lire comme tel · sans garantie</span>
+  </div>
+</footer>
+<script>
+/* the colour setting: Auto follows the system; Light and Dark are kept in this browser under the status pages' own key */
+(function () {
+  var g = document.getElementById("theme"); if (!g) return;
+  function set(v, save) {
+    if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v);
+    else { document.documentElement.removeAttribute("data-theme"); v = "auto"; }
+    var bs = g.querySelectorAll("[data-value]");
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-value") === v));
+    if (save) { try { localStorage.setItem("pv-theme", v); } catch (e) { /* storage may be off */ } }
+  }
+  g.addEventListener("click", function (e) { var b = e.target.closest("[data-value]"); if (b) set(b.getAttribute("data-value"), true); });
+  window.addEventListener("storage", function (e) { if (e.key === "pv-theme") set(e.newValue || "auto", false); });
+  var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {}
+  if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) { /* storage may be off */ } }
+  set(v || "auto", false);
+})();
+</script>
+</body>
+</html>

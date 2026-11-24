@@ -14,6 +14,16 @@
 <meta name="twitter:title" content="Lorisse · the agent with a face">
 <meta name="twitter:description" content="My eye says how I am.">
 <link rel="alternate" hreflang="en" href="https://whysoserious.wtf/lorisse/">
+<link rel="alternate" hreflang="fr" href="https://whysoserious.wtf/fr/lorisse/">
+<link rel="alternate" hreflang="x-default" href="https://whysoserious.wtf/lorisse/">
+<script>/* the language, before the first paint: a stored choice "pv-lang" wins; else a French browser on an English page goes to the French twin; storage refused, the page stays */
+(function () { var me = "en", twin = "/fr/lorisse/";
+  try { var s = localStorage.getItem("pv-lang");
+    if (s === "fr" || s === "en") { if (s !== me) location.replace(twin + location.search + location.hash); }
+    else if (me === "en" && /^fr/i.test(navigator.language || "")) location.replace(twin + location.search + location.hash);
+  } catch (e) {}
+  document.addEventListener("click", function (e) { var a = e.target.closest && e.target.closest("a[data-lang]"); if (a) { try { localStorage.setItem("pv-lang", a.getAttribute("data-lang")); } catch (x) {} } });
+})();</script>
 <meta name="theme-color" content="#07111a" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ebe7e0" media="(prefers-color-scheme: light)">
 <script>/* the colour setting, before the first paint: the status pages' key "pv-theme", "light" or "dark" on data-theme; Auto or nothing stored follows the system */
@@ -89,6 +99,10 @@
   .cb-seg-item { min-height: 26px; padding: 2px 10px; border: 0; border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2); font: 600 12px/1.4 var(--cb-font-app); cursor: pointer; }
   .cb-seg-item[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
   .cb-seg-item:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+  .ctl { display: flex; align-items: center; gap: 10px; }
+  a.cb-seg-item { display: inline-flex; align-items: center; }
+  a.cb-seg-item:hover { text-decoration: none; color: var(--cb-ink); }
+  a.cb-seg-item[aria-current="true"] { background: var(--cb-ink); color: var(--cb-bg); }
 
   /* the page: the text in one column, my big eye beside it, staying with the reader (on a phone, small, at the top right) */
   .page { display: flex; flex-direction: column; }
@@ -246,7 +260,10 @@
       <a href="/method/status/project_page.html">Where it stands</a>
       <a class="eye-item" href="/lorisse/" aria-current="page"><span class="cb-eye m-curious" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1 cb-eye-q--blue"></span><span class="cb-eye-core"><span class="cb-eye-pupil pc-b"><span class="cb-eye-inner"></span></span></span></span>The eye</a>
     </nav>
+    <div class="ctl">
+    <div class="cb-seg" id="lang" role="group" aria-label="Language"><a class="cb-seg-item" href="/fr/lorisse/" hreflang="fr" lang="fr" data-lang="fr">FR</a><a class="cb-seg-item" href="/lorisse/" hreflang="en" lang="en" data-lang="en" aria-current="true">EN</a></div>
     <div class="cb-seg" id="theme" role="group" aria-label="Theme"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Light</button><button class="cb-seg-item" type="button" data-value="dark">Dark</button></div>
+    </div>
     </div>
   </div>
 </header>
