@@ -88,6 +88,21 @@
   .nav nav a { color: var(--cb-ink-2); white-space: nowrap; padding: 2px 0; border-bottom: 2px solid transparent; }
   .nav nav a:hover { color: var(--cb-ink); text-decoration: none; }
   .nav nav a[aria-current="page"] { color: var(--cb-ink); font-weight: 600; border-bottom-color: var(--cb-blue); }
+  .nav nav { align-items: center; }
+  .nav nav a.eye-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .nav nav a.eye-item .cb-eye { width: 16px; height: 16px; }
+  /* the way on: two large buttons at the end of the page, stacked on a phone */
+  section.leads { border-top: 1px solid var(--cb-line); }
+  .leads-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .leads-row { grid-template-columns: minmax(0, 1fr); } }
+  a.lead { display: flex; flex-direction: column; gap: 6px; min-height: 132px; padding: 22px 24px; border-radius: var(--cb-radius-card); background: var(--cb-surface); box-shadow: var(--cb-shadow-card); border-top: 3px solid var(--cb-orange); color: var(--cb-ink); }
+  a.lead.ext { border-top-color: var(--cb-blue); }
+  a.lead.home { border-top-color: var(--cb-green); }
+  a.lead:hover { text-decoration: none; background: var(--cb-surface-2); }
+  a.lead:focus-visible { outline: var(--cb-focus-ring); outline-offset: 3px; }
+  a.lead b { font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
+  a.lead span { color: var(--cb-ink-2); font-size: 15.5px; }
+  a.lead i { margin-top: auto; font-style: normal; color: var(--cb-blue); font-weight: 600; font-size: 15px; }
   .nav-r { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
   @media (max-width: 640px) { .nav-r { width: 100%; justify-content: space-between; } .nav nav { font-size: 14px; gap: 6px 14px; } }
   /* the colour setting: the status pages' own switch, the same storage key, attribute and values */
@@ -149,7 +164,7 @@
   .st-ok { background: var(--cb-green); }
   .st-rework { background: var(--cb-pink); }
   .st-changed { background: var(--cb-orange); }
-  .st-answered { background: transparent; box-shadow: inset 0 0 0 2px var(--cb-blue); }
+  .st-answered { background: transparent; box-shadow: inset 0 0 0 2px var(--cb-orange); }
   .st-note { background: transparent; box-shadow: inset 0 0 0 2px var(--cb-pink); }
   .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
   .stage { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 14px 16px; font-size: 15px; }
@@ -162,7 +177,8 @@
     border: var(--cb-border-chip) solid var(--cb-line-2); border-radius: var(--cb-radius-pill); background: transparent;
     color: var(--cb-ink-2); font-size: 11.5px; font-weight: 700; line-height: 1.45; letter-spacing: .06em; text-transform: uppercase; }
   .chip.s-never { color: var(--cb-ink-2); border-color: var(--cb-ink-3); }
-  .chip.s-read, .chip.s-answered { color: var(--cb-blue); border-color: var(--cb-blue); }
+  .chip.s-read { color: var(--cb-blue); border-color: var(--cb-blue); }
+  .chip.s-answered { color: var(--cb-orange); border-color: var(--cb-orange); }
   .chip.s-ok { color: var(--cb-green); border-color: var(--cb-green); }
   .chip.s-rework, .chip.s-note { color: var(--cb-pink); border-color: var(--cb-pink); }
   .chip.s-changed { color: var(--cb-orange); border-color: var(--cb-orange); background: var(--cb-orange-soft); }
@@ -189,24 +205,45 @@
   .win-ctl { justify-self: end; display: flex; height: 100%; }
   .win-ctl span { display: grid; place-items: center; width: 44px; height: 100%; color: var(--cb-ink-3); font-size: 13px; }
 
-  .win-main { display: grid; grid-template-columns: 48px 280px minmax(0, 1fr); min-height: 0; }
-  .win-act { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 6px; background: var(--cb-surface-2); border-right: 1px solid var(--cb-line); }
-  .win-act span { display: grid; place-items: center; width: 48px; height: 44px; color: var(--cb-ink-3); }
+  .win-main { display: grid; grid-template-columns: 48px 310px minmax(0, 1fr); min-height: 0; }
+  /* the activity bar: Lorisse's eye first, with its count, then VS Code's usual icons, drawn simply */
+  .win-act { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 0 6px; background: var(--cb-surface-2); border-right: 1px solid var(--cb-line); }
+  .win-act span { position: relative; display: grid; place-items: center; width: 48px; height: 44px; color: var(--cb-ink-3); }
   .win-act span.on { color: var(--cb-ink); box-shadow: inset 2px 0 0 var(--cb-blue); }
+  .win-act span.low { margin-top: auto; }
   .win-act svg { width: 22px; height: 22px; }
+  .win-act .badge { position: absolute; right: 6px; bottom: 6px; display: block; width: auto; min-width: 16px; height: 16px; padding: 0 4px; border-radius: 8px; background: var(--cb-blue); color: var(--cb-on-accent); font: 700 10px/16px var(--cb-font-app); text-align: center; box-shadow: none; }
 
-  .dl { min-height: 0; overflow: auto; padding: 0 0 12px; background: var(--cb-surface); border-right: 1px solid var(--cb-line); }
-  .dl-title { display: flex; align-items: center; height: 35px; padding: 0 16px; color: var(--cb-ink-2); font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
-  .dl-grp { display: flex; align-items: center; gap: 6px; padding: 6px 12px 2px; color: var(--cb-ink); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
-  .dl-grp::before { content: ""; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid var(--cb-ink-3); }
-  .dl-grp small { font-weight: 400; color: var(--cb-ink-3); font-size: inherit; letter-spacing: 0; }
-  .dl button { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 2px 10px; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--cb-ink);
-    background: transparent; border: 0; padding: 5px 12px 5px 28px; cursor: pointer; }
-  .dl button:hover { background: var(--cb-surface-2); }
-  .dl button.sel { background: var(--cb-blue-soft); box-shadow: inset 2px 0 0 var(--cb-blue); }
-  .dl button:focus-visible { outline: var(--cb-focus-ring); outline-offset: -2px; }
-  .dl button b { font-weight: 400; font-family: var(--cb-font-mono); font-size: 13px; }
-  .dl button span.w { grid-column: 2; color: var(--cb-ink-3); font-size: 12px; line-height: 1.3; }
+  /* the side bar: the view "Lorisse", its sections, the tree */
+  .dl { display: flex; flex-direction: column; min-height: 0; overflow: hidden; background: var(--cb-surface); border-right: 1px solid var(--cb-line); }
+  .dl-view { flex: none; display: flex; align-items: center; justify-content: space-between; height: 35px; padding: 0 12px 0 16px; color: var(--cb-ink-2); font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
+  .dl-sec { flex: none; display: flex; align-items: center; gap: 4px; width: 100%; min-height: 24px; padding: 0 8px 0 4px; border: 0; border-top: 1px solid var(--cb-line); background: transparent; color: var(--cb-ink); font: 700 11.5px/1.2 var(--cb-font-app); text-align: left; cursor: pointer; white-space: nowrap; }
+  .dl-sec small { min-width: 0; overflow: hidden; text-overflow: ellipsis; margin-left: 6px; color: var(--cb-ink-3); font-size: 11.5px; font-weight: 400; }
+  .dl-sec.inert { cursor: default; }
+  .dl-tree { flex: 1 1 auto; min-height: 0; overflow: auto; padding: 2px 0 8px; }
+  .dl-budget { flex: none; padding: 2px 0 6px; }
+  .dl-budget .tr .nm { flex: 1 1 auto; min-width: 0; max-width: none; font-size: 12.5px; }
+  .dl-end { flex: none; margin-top: auto; }
+  .tr { display: flex; align-items: center; gap: 5px; width: 100%; min-height: 22px; padding: 1px 8px 1px calc(4px + var(--ind, 0) * 14px); border: 0; background: transparent; color: var(--cb-ink); font: 13px/1.3 var(--cb-font-app); text-align: left; cursor: pointer; white-space: nowrap; }
+  .tr:hover { background: var(--cb-surface-2); }
+  .tr.sel { background: var(--cb-blue-soft); box-shadow: inset 2px 0 0 var(--cb-blue); }
+  .tr:focus-visible { outline: var(--cb-focus-ring); outline-offset: -2px; }
+  .tr.inert { cursor: default; }
+  .tr.inert:hover { background: transparent; }
+  .tr .nm { flex: none; max-width: 62%; overflow: hidden; text-overflow: ellipsis; }
+  .tr .w { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--cb-ink-3); font-size: 12px; }
+  .tr .ic { flex: none; display: grid; place-items: center; width: 16px; height: 16px; }
+  .tr .ic svg { width: 16px; height: 16px; }
+  .tr .ic .st { width: 9px; height: 9px; }
+  .chev, .nochev { flex: none; display: grid; place-items: center; width: 14px; height: 14px; color: var(--cb-ink-3); }
+  .chev::before { content: ""; border-top: 4px solid transparent; border-bottom: 4px solid transparent; border-left: 5px solid currentColor; transition: transform .15s; }
+  [aria-expanded="true"] > .chev::before { transform: rotate(90deg); }
+  .f-rework, .f-note { color: var(--cb-pink); }
+  .f-changed { color: var(--cb-orange); }
+  .f-never { color: var(--cb-ink-3); }
+  .f-read { color: var(--cb-blue); }
+  .f-ok { color: var(--cb-green); }
+  .f-plain { color: var(--cb-ink-2); }
 
   .ed { display: grid; grid-template-rows: 35px minmax(0, 1fr); min-width: 0; min-height: 0; }
   .ed-tabs { display: flex; min-width: 0; background: var(--cb-surface); border-bottom: 1px solid var(--cb-line); overflow: hidden; }
@@ -221,14 +258,15 @@
   .win-status .g { color: var(--cb-green); }
   .win-status .grow { flex: 1; }
 
-  @media (max-width: 1000px) { .win-main { grid-template-columns: 48px 240px minmax(0, 1fr); } .win-menu > span:not(.cb-eye) { display: none; } }
+  @media (max-width: 1000px) { .win-main { grid-template-columns: 48px 270px minmax(0, 1fr); } .win-menu > span:not(.cb-eye) { display: none; } }
   /* under 760 pixels: the list above the document, each at full width; the document keeps a tall scrolling view */
   @media (max-width: 760px) {
     .win { height: auto; grid-template-rows: 32px auto 24px; }
     .win-title { grid-template-columns: auto minmax(0, 1fr) auto; }
     .win-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; }
     .win-act { display: none; }
-    .dl { max-height: 300px; border-right: 0; border-bottom: 1px solid var(--cb-line); }
+    .dl { display: block; max-height: 340px; overflow: auto; border-right: 0; border-bottom: 1px solid var(--cb-line); }
+    .dl-tree { overflow: visible; }
     .ed { grid-template-rows: 35px auto; }
     .rd { height: min(78vh, 680px); min-height: 460px; }
     .win-ctl span { width: 32px; }
@@ -320,13 +358,14 @@
 <body>
 <header>
   <div class="wrap nav">
-    <a class="brand" href="/lorisse/"><span class="cb-eye" role="img" aria-label="Lorisse's eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/extension</small></a>
+    <a class="brand" href="/"><span class="cb-eye" role="img" aria-label="Lorisse's eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/extension</small></a>
     <div class="nav-r">
     <nav aria-label="The pages">
-      <a href="/lorisse/">Lorisse</a>
+      <a href="/">Lorisse</a>
       <a href="/method/">The method</a>
       <a href="/extension/" aria-current="page">The extension</a>
       <a href="/method/status/project_page.html">Where it stands</a>
+      <a class="eye-item" href="/lorisse/" title="Lorisse's eye, her moods and her colours"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span>The eye</a>
     </nav>
     <div class="cb-seg" id="theme" role="group" aria-label="Theme"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Light</button><button class="cb-seg-item" type="button" data-value="dark">Dark</button></div>
     </div>
@@ -346,12 +385,9 @@
   <section id="install">
     <h2>Install</h2>
     <div class="install">
-      <ol>
-        <li>In VS Code, open the <b>Extensions</b> view.</li>
-        <li>Search <b>Lorisse</b>.</li>
-        <li>Click <b>Install</b>.</li>
-      </ol>
-      <p>From the package file instead: <code>code --install-extension lorisse-&lt;version&gt;.vsix</code></p>
+      <p>Today the extension comes as a package file, handed over with the method's repository. One command installs it, then you restart VS Code:</p>
+      <p><code>code --install-extension lorisse-&lt;version&gt;.vsix</code></p>
+      <p>Once it is on the VS Code marketplace, it will be three clicks: open the <b>Extensions</b> view, search <b>Lorisse</b>, click <b>Install</b>.</p>
     </div>
   </section>
 
@@ -412,9 +448,14 @@
         </div>
         <div class="win-main">
           <div class="win-act" aria-hidden="true">
+            <span class="on"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="7"><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-135 32 32)"/><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(135 32 32)"/><circle cx="32" cy="32" r="10" fill="currentColor" stroke="none"/></svg><b class="badge" id="act-badge"></b></span>
             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5"/></svg></span>
             <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg></span>
-            <span class="on"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="7"><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-135 32 32)"/><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(135 32 32)"/><circle cx="32" cy="32" r="10" fill="currentColor" stroke="none"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M18 9c0 5-7 4-11 8"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M8 5l11 7-11 7z"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><rect x="3.5" y="10.5" width="6" height="6"/><rect x="10.5" y="10.5" width="6" height="6"/><rect x="3.5" y="3.5" width="6" height="6"/><rect x="13" y="2.5" width="6" height="6" transform="rotate(15 16 5.5)"/></svg></span>
+            <span class="low"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="9" r="4"/><path d="M4.5 20c1.5-4 4.5-5.5 7.5-5.5s6 1.5 7.5 5.5"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="3.2"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M5.3 18.7l2.1-2.1M16.6 7.4l2.1-2.1"/></svg></span>
           </div>
           <div class="dl" id="dl" aria-label="Documents and notes"></div>
           <div class="ed">
@@ -430,6 +471,13 @@
 
  <div class="wrap">
   <div class="stands">Where it stands: <a href="status/project_page.html">the extension's project page</a>, made by its own scripts.</div>
+
+  <section class="leads" aria-label="Where to go next">
+    <div class="leads-row">
+      <a class="lead" href="/method/"><b>The method</b><span>The three pages of each part, the gate, and the guard rails the tool applies itself.</span><i>Read the method →</i></a>
+      <a class="lead home" href="/"><b>Back to Lorisse</b><span>What Lorisse is, who it is for, and where it stops.</span><i>Back to the start →</i></a>
+    </div>
+  </section>
  </div>
 </main>
 
@@ -804,15 +852,114 @@
     d.undo = null;
   }
 
+  /* the side bar's tree, as the extension draws it: two repositories, a project page, Lorisse's pick, the folders with their
+     summaries and the colour of their worst state, the files with their sign and their words; then the budget and the settings.
+     The figures are made up. */
+  var REPOS = [
+    { key: "unitconv", name: "unitconv", project: true, folders: ["cli", "convert", "docs"] },
+    { key: "method", name: "the method", note: "a real page", folders: ["install"] }
+  ];
+  var OPEN = { "sec-docs": true, "sec-budget": true, unitconv: true, method: true, pick: false,
+    "unitconv/cli": false, "unitconv/convert": true, "unitconv/docs": false, "method/install": true };
+  var PICK = [
+    { id: "cv-r", why: "Lorisse answered your note" },
+    { id: "cv-c", why: "a new clause to check" },
+    { id: "d-guide", why: "rewritten for more than half" },
+    { id: "cli-v", why: "the steps to walk" },
+    { id: "cli-r", why: "read it before the contract" },
+    { id: "d-conv", why: "the rules every script follows" }
+  ];
+  var ORDER = ["rework", "note", "changed", "never", "read", "ok"];
+  function repoOf(d) { return d.grp === "the method" ? "method" : "unitconv"; }
+  function byId(id) { for (var i = 0; i < DOCS.length; i++) if (DOCS[i].id === id) return DOCS[i]; return null; }
+  function kind(d) { return d.state === "answered" ? "changed" : d.state; }
+  function worst(list) { var w = 9; list.forEach(function (d) { w = Math.min(w, ORDER.indexOf(kind(d))); }); return ORDER[w] || "ok"; }
+  function toRead(d) { return d.state === "never" || d.state === "changed" || d.state === "answered"; }
+  function summary(list) {
+    var c = { rework: 0, note: 0, changed: 0, never: 0, read: 0, ok: 0 }, s, r = 0;
+    list.forEach(function (d) { c[kind(d)]++; if (toRead(d)) r++; });
+    if (c.rework) s = c.rework + " to rework";
+    else if (c.note) s = c.note + (c.note > 1 ? " notes" : " note") + " to answer";
+    else if (c.changed) s = c.changed + " changed";
+    else if (c.never) s = c.never + " never read";
+    else s = c.ok + " of " + list.length + " ok";
+    if ((c.rework || c.note || c.changed) && r && !(c.changed === r && !c.rework && !c.note)) s += " · " + r + " to read";
+    return s;
+  }
+  function minutes(d, onlyCh) {
+    var w = 0;
+    d.blocks.forEach(function (b) { if (!onlyCh || b.ch) w += b.t.replace(/<[^>]+>/g, " ").split(/\s+/).filter(Boolean).length; });
+    return Math.max(1, Math.round(w / 200));
+  }
+  function rowWords(d) {
+    if (d.state === "never") return "never read · " + minutes(d) + " min";
+    if (d.state === "changed") {
+      var n = changes(d).length, left = n - okCount(d);
+      return "changed since " + d.date + " · " + minutes(d, true) + " min" + (left && left < n ? " · " + left + " to check" : "");
+    }
+    return listWords(d);
+  }
+  var SVG = {
+    folder: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M1.5 4.5v8h13v-6.5H7.5L6 4.5z"/><path d="M1.5 4.5V3.5h4.2l1 1"/></svg>',
+    page: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2.5" y="2" width="11" height="12" rx="1"/><path d="M5 5.5h6M5 8h6M5 10.5h4"/></svg>',
+    eye: '<svg viewBox="0 0 64 64" fill="none" stroke-width="8"><circle cx="32" cy="32" r="24" stroke="var(--cb-blue)" stroke-dasharray="35 116" transform="rotate(-135 32 32)"/><circle cx="32" cy="32" r="24" stroke="var(--cb-orange)" stroke-opacity=".5" stroke-dasharray="35 116" transform="rotate(-45 32 32)"/><circle cx="32" cy="32" r="24" stroke="var(--cb-line-2)" stroke-dasharray="35 116" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="24" stroke="var(--cb-line-2)" stroke-dasharray="35 116" transform="rotate(135 32 32)"/><circle cx="32" cy="32" r="11" fill="var(--cb-blue)" stroke="none"/></svg>',
+    wrench: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"><path d="M10.5 2.5a3 3 0 0 0-2.8 4L3 11.2a1.2 1.2 0 0 0 1.8 1.8l4.7-4.7a3 3 0 0 0 4-2.8l-1.8 1.2-1.6-.4-.4-1.6z"/></svg>',
+    bubble: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M2.5 3h11v7.5H7l-3 2.5v-2.5H2.5z"/></svg>',
+    bubbles: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"><path d="M1.5 2.5h8v5.5H5L3 9.8V8H1.5z"/><path d="M11.5 5.5h3v6h-1.5v1.8L11 11.5H6.5V10"/></svg>',
+    pulse: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8.5h3l1.5-4 3 7 1.5-3h4"/></svg>',
+    cal: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><rect x="2" y="3" width="12" height="11" rx="1"/><path d="M2 6.5h12M5 1.5v3M11 1.5v3"/></svg>',
+    bars: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M3 14V9M6.3 14V6M9.6 14V8M13 14V3"/></svg>'
+  };
+  function fileSign(d) {
+    if (d.state === "rework") return '<span class="ic f-rework">' + SVG.wrench + "</span>";
+    if (d.state === "note") return '<span class="ic f-note">' + SVG.bubble + "</span>";
+    if (d.state === "answered") return '<span class="ic f-changed">' + SVG.bubbles + "</span>";
+    return '<span class="ic"><i class="st ' + sign(d.state) + '"></i></span>';
+  }
+  function fold(key, ind, icon, name, words) {
+    return '<button type="button" class="tr" data-fold="' + key + '" aria-expanded="' + !!OPEN[key] + '" style="--ind:' + ind + '">' +
+      '<span class="chev"></span>' + icon + '<span class="nm">' + esc(name) + '</span><span class="w">' + esc(words) + "</span></button>";
+  }
+  function fileRow(d, ind, name, words) {
+    return '<button type="button" class="tr' + (d === cur ? " sel" : "") + '" data-doc="' + d.id + '"' + (d === cur ? ' aria-current="true"' : "") + ' style="--ind:' + ind + '">' +
+      '<span class="nochev"></span>' + fileSign(d) + '<span class="nm">' + esc(name) + '</span><span class="w">' + esc(words) + "</span></button>";
+  }
+
   function drawList() {
-    var h = '<div class="dl-title">Documents and notes</div>', grp = "", waits = 0;
-    DOCS.forEach(function (d) {
-      if (d.grp !== grp) { grp = d.grp; h += '<div class="dl-grp">' + esc(grp) + (d.grpNote ? " <small>· " + esc(d.grpNote) + "</small>" : "") + "</div>"; }
-      if (d.state === "never" || d.state === "changed" || d.state === "answered") waits++;
-      h += '<button type="button" data-doc="' + d.id + '"' + (d === cur ? ' class="sel" aria-current="true"' : "") + ">" +
-        '<i class="st ' + sign(d.state) + '"></i><b>' + esc(d.label || d.file) + '</b><span class="w">' + esc(listWords(d)) + "</span></button>";
-    });
+    var waits = DOCS.filter(toRead).length;
+    var h = '<div class="dl-view"><span>Lorisse</span><span aria-hidden="true">···</span></div>';
+    h += '<button type="button" class="dl-sec" data-fold="sec-docs" aria-expanded="' + !!OPEN["sec-docs"] + '"><span class="chev"></span>Documents And Notes<small>1 folder hidden</small></button>';
+    h += '<div class="dl-tree">';
+    if (OPEN["sec-docs"]) {
+      REPOS.forEach(function (r) {
+        var docs = DOCS.filter(function (d) { return repoOf(d) === r.key; });
+        h += fold(r.key, 0, '<span class="ic f-' + worst(docs) + '">' + SVG.folder + "</span>", r.name, summary(docs) + (r.note ? " · " + r.note : ""));
+        if (!OPEN[r.key]) return;
+        if (r.project) {
+          h += '<div class="tr inert" style="--ind:1"><span class="nochev"></span><span class="ic f-plain">' + SVG.page + '</span><span class="nm">Project page</span><span class="w">from 11-23</span></div>';
+          var left = PICK.filter(function (p) { var d = byId(p.id); return d && (toRead(d) || d.state === "rework" || d.state === "note"); }).length;
+          h += fold("pick", 1, '<span class="ic">' + SVG.eye + "</span>", "Lorisse's pick", left ? left + " of " + PICK.length + " left" : "all done");
+          if (OPEN.pick) PICK.forEach(function (p) { var d = byId(p.id); h += fileRow(d, 2, d.dir + " · " + d.file, p.why); });
+        }
+        r.folders.forEach(function (f) {
+          var key = r.key + "/" + f, in_ = docs.filter(function (d) { return d.dir === f; });
+          h += fold(key, 1, '<span class="ic f-' + worst(in_) + '">' + SVG.folder + "</span>", f, summary(in_));
+          if (OPEN[key]) in_.forEach(function (d) { h += fileRow(d, 2, d.file, rowWords(d)); });
+        });
+      });
+    }
+    h += "</div>";
+    h += '<button type="button" class="dl-sec" data-fold="sec-budget" aria-expanded="' + !!OPEN["sec-budget"] + '"><span class="chev"></span>Budget<small>everything on this machine</small></button>';
+    if (OPEN["sec-budget"]) {
+      h += '<div class="dl-budget">' +
+        '<div class="tr inert" style="--ind:0"><span class="chev"></span><span class="ic f-plain">' + SVG.pulse + '</span><span class="nm">Today · $0.38 · in 240 k · out 3.1 k</span></div>' +
+        '<div class="tr inert" style="--ind:0"><span class="chev"></span><span class="ic f-plain">' + SVG.cal + '</span><span class="nm">Last 7 days · $2.90 · in 1.9 M · out 26 k</span></div>' +
+        '<div class="tr inert" style="--ind:0"><span class="chev"></span><span class="ic f-plain">' + SVG.bars + '</span><span class="nm">Last 30 days · $9.70 · in 6.8 M · out 94 k</span></div></div>';
+    }
+    h += '<div class="dl-end"><div class="dl-sec inert"><span class="chev"></span>Settings</div></div>';
     dl.innerHTML = h;
+    var badge = document.getElementById("act-badge");
+    if (badge) { badge.textContent = waits || ""; badge.style.display = waits ? "" : "none"; }
     if (wstat) wstat.innerHTML = '<span>main</span><span class="g">gate green</span><span>' + waits + " to read</span><span class=\"grow\"></span><span>Lorisse</span>";
   }
 
@@ -918,8 +1065,11 @@
   }
 
   dl.addEventListener("click", function (e) {
+    var f = e.target.closest("[data-fold]");
+    if (f) { var k = f.getAttribute("data-fold"); OPEN[k] = !OPEN[k]; drawList(); return; }
     var b = e.target.closest("[data-doc]"); if (!b) return;
     for (var i = 0; i < DOCS.length; i++) if (DOCS[i].id === b.getAttribute("data-doc")) cur = DOCS[i];
+    OPEN[repoOf(cur) + "/" + cur.dir] = true;
     cur.box = -1;
     if (cur.state === "changed" && !cur.seen) cur.view = "chg";
     draw();

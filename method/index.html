@@ -85,6 +85,28 @@
   .nav nav a { color: var(--cb-ink-2); white-space: nowrap; padding: 2px 0; border-bottom: 2px solid transparent; }
   .nav nav a:hover { color: var(--cb-ink); text-decoration: none; }
   .nav nav a[aria-current="page"] { color: var(--cb-ink); font-weight: 600; border-bottom-color: var(--cb-blue); }
+  .nav nav { align-items: center; }
+  .nav nav a.eye-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .nav nav a.eye-item .cb-eye { width: 16px; height: 16px; }
+  /* the way on: two large buttons at the end of the page, stacked on a phone */
+  section.leads { border-top: 1px solid var(--cb-line); }
+  .leads-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 640px) { .leads-row { grid-template-columns: minmax(0, 1fr); } }
+  a.lead { display: flex; flex-direction: column; gap: 6px; min-height: 132px; padding: 22px 24px; border-radius: var(--cb-radius-card); background: var(--cb-surface); box-shadow: var(--cb-shadow-card); border-top: 3px solid var(--cb-orange); color: var(--cb-ink); }
+  a.lead.ext { border-top-color: var(--cb-blue); }
+  a.lead.home { border-top-color: var(--cb-green); }
+  a.lead:hover { text-decoration: none; background: var(--cb-surface-2); }
+  a.lead:focus-visible { outline: var(--cb-focus-ring); outline-offset: 3px; }
+  a.lead b { font-size: 24px; font-weight: 800; letter-spacing: -.01em; }
+  a.lead span { color: var(--cb-ink-2); font-size: 15.5px; }
+  a.lead i { margin-top: auto; font-style: normal; color: var(--cb-blue); font-weight: 600; font-size: 15px; }
+  /* the rules that came from something going wrong: a date, then the story and the rule */
+  .learned { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; max-width: 74ch; }
+  .learned li { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 4px 18px; color: var(--cb-ink-2); font-size: 16px; }
+  .learned time, .learned .nd { font: 13px/1.9 var(--cb-font-mono); color: var(--cb-orange); }
+  .learned .nd { color: var(--cb-ink-3); }
+  .learned b { color: var(--cb-ink); }
+  @media (max-width: 640px) { .learned li { grid-template-columns: minmax(0, 1fr); } }
   .nav-r { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
   @media (max-width: 640px) { .nav-r { width: 100%; justify-content: space-between; } .nav nav { font-size: 14px; gap: 6px 14px; } }
   /* the colour setting: the status pages' own switch, the same storage key, attribute and values */
@@ -164,13 +186,14 @@
 <body>
 <header>
   <div class="wrap nav">
-    <a class="brand" href="/lorisse/"><span class="cb-eye" role="img" aria-label="Lorisse's eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/method</small></a>
+    <a class="brand" href="/"><span class="cb-eye" role="img" aria-label="Lorisse's eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/method</small></a>
     <div class="nav-r">
     <nav aria-label="The pages">
-      <a href="/lorisse/">Lorisse</a>
+      <a href="/">Lorisse</a>
       <a href="/method/" aria-current="page">The method</a>
       <a href="/extension/">The extension</a>
       <a href="/method/status/project_page.html">Where it stands</a>
+      <a class="eye-item" href="/lorisse/" title="Lorisse's eye, her moods and her colours"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span>The eye</a>
     </nav>
     <div class="cb-seg" id="theme" role="group" aria-label="Theme"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Light</button><button class="cb-seg-item" type="button" data-value="dark">Dark</button></div>
     </div>
@@ -191,10 +214,10 @@
 
     <div class="part" role="img" aria-label="A drawing of one part: a folder with its three pages on top and the code below">
       <div class="path">convert/ · one part of a made-up project</div>
-      <div class="doc r"><b>README.md</b><p>How it works, in plain words.</p></div>
-      <div class="doc c"><b>CONTRACT.md</b><p>What it promises. One promise a line, each with an id.</p></div>
-      <div class="doc v"><b>VALIDATION.md</b><p>How a person checks each promise. A dozen steps at most, and a run log.</p></div>
-      <div class="code">the code and its tests · the agents' side, checked by the gate</div>
+      <div class="doc r"><b>README.md</b><p>It says how the part works, in plain words.</p></div>
+      <div class="doc c"><b>CONTRACT.md</b><p>It says what the part promises, one promise to a line, each with an id.</p></div>
+      <div class="doc v"><b>VALIDATION.md</b><p>It says how a person checks each promise, in a dozen steps at most, with a log of every walk.</p></div>
+      <div class="code">The code and its tests are the agents' side, and the gate checks them.</div>
     </div>
   </div>
 
@@ -204,11 +227,11 @@
     <div class="grid">
       <div class="tile orange">
         <h3>Three pages a part</h3>
-        <p>How it works, what it promises, how you check each promise by hand.</p>
+        <p>They say how the part works, what it promises, and how you check each promise by hand.</p>
       </div>
       <div class="tile blue">
         <h3>A gate</h3>
-        <p>One script runs every test and checks the pages against the code. Green or red. Nothing merges red.</p>
+        <p>One script runs every test and checks the pages against the code. It says green or red, and nothing merges while it is red.</p>
       </div>
       <div class="tile pink">
         <h3>Rules the tool applies</h3>
@@ -233,21 +256,39 @@
     <ol class="flow start">
       <li><i>1</i><div><b>Install Claude Code</b> and sign in.</div></li>
       <li><i>2</i><div><b>Make your own copy.</b> On GitHub, <b>Use this template</b> on <code>lorisse-kit</code> makes your private repository. Clone it, then run its install script once: the lint runs first, and a finding installs nothing.</div></li>
-      <li><i>3</i><div><b>Type <code>/lorisse</code></b> in the kit's example project. Five lines, no question.</div></li>
+      <li><i>3</i><div><b>Type <code>/lorisse</code></b> in the kit's example project. It answers in five lines and asks no question.</div></li>
     </ol>
   </section>
 
   <section id="not">
     <h2>What it is not</h2>
     <div class="not">
-      <div><i>×</i><div><b>Not a framework.</b> Files, a few PowerShell scripts, and the habits they enforce.</div></div>
-      <div><i>×</i><div><b>Not a way to skip review.</b> You review promises and walk steps instead of reading diffs.</div></div>
-      <div><i>×</i><div><b>Not a sandbox.</b> The rules cut the prompts and refuse the risky calls. What runs on your machine is still yours to judge.</div></div>
-      <div><i>×</i><div><b>Not for every system.</b> Windows and Windows PowerShell 5.1 only.</div></div>
+      <div><i>×</i><div><b>It is not a framework.</b> It is made of files, a few PowerShell scripts, and the habits they enforce.</div></div>
+      <div><i>×</i><div><b>It is not a way to skip review.</b> You review the promises and walk the steps instead of reading the diffs.</div></div>
+      <div><i>×</i><div><b>It is not a sandbox.</b> The rules cut the prompts and refuse the risky calls, but what runs on your machine is still yours to judge.</div></div>
+      <div><i>×</i><div><b>It is not for every system.</b> It runs on Windows, with Windows PowerShell 5.1, and nowhere else.</div></div>
     </div>
   </section>
 
+  <section id="learned">
+    <h2>Rules that came from something going wrong</h2>
+    <p class="sub">Each of these rules was written after something went wrong while the method was being built. Where the day is known, it is given.</p>
+    <ul class="learned">
+      <li><time datetime="2026-10-20">2026-10-20</time><div><b>The memory lives in a repository.</b> A window reload ended a session and took the agent's thread with it. From that day, the agent's memory is a git repository of yours, and the copies the tool reads are made from it by a script, so a reload loses nothing.</div></li>
+      <li><time datetime="2026-10-21">2026-10-21</time><div><b>One command per shell call.</b> One session raised 35 permission prompts, and nearly every one came from a chained command, a pipe, a loop or a one-line interpreter call. The lists were right, but the habit was wrong, so an agent runs one command per call and writes files with the editing tools.</div></li>
+      <li><span class="nd">—</span><div><b>Interpreters are never allowed by a rule.</b> An interpreter can run anything, so a call to Python, to Node or to a shell loop always asks first. A check is a script file with its own rule.</div></li>
+      <li><span class="nd">—</span><div><b>Agents work on their own branches.</b> Each builder works in its own worktree, on a branch of its own, and commits there only when its checks are green. The main branch moves when you merge, and an agent never pushes it.</div></li>
+    </ul>
+  </section>
+
   <div class="stands">Where it stands: <a href="/method/status/project_page.html">the method's project page</a>, made by its own scripts.</div>
+
+  <section class="leads" aria-label="Where to go next">
+    <div class="leads-row">
+      <a class="lead ext" href="/extension/"><b>The extension</b><span>Where you read and mark the pages, with a demo you can try now in your browser.</span><i>See the extension →</i></a>
+      <a class="lead home" href="/"><b>Back to Lorisse</b><span>What Lorisse is, who it is for, and where it stops.</span><i>Back to the start →</i></a>
+    </div>
+  </section>
 </main>
 
 <footer>
