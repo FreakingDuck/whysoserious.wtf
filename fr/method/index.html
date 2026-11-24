@@ -207,7 +207,7 @@
       <a href="/fr/">Lorisse</a>
       <a href="/fr/method/" aria-current="page">La méthode</a>
       <a href="/fr/extension/">L'extension</a>
-      <a href="/method/status/project_page.html">Où ça en est</a>
+      <a href="/method/status/project_page.html">Avancement</a>
       <a class="eye-item" href="/fr/lorisse/" title="L'œil de Lorisse, ses humeurs et ses couleurs"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span>L'œil</a>
     </nav>
     <div class="ctl">
@@ -249,7 +249,7 @@
       </div>
       <div class="tile blue">
         <h3>Une gate</h3>
-        <p>La gate, c'est le contrôle qui lance tous les tests&nbsp;: un seul script, qui vérifie aussi les pages contre le code. Il dit vert ou rouge, et rien ne fusionne tant qu'il est rouge.</p>
+        <p>La gate, c'est le contrôle qui lance tous les tests&nbsp;: un seul script, qui vérifie aussi les pages contre le code. Il dit vert ou rouge, et rien n'est mergé tant qu'il est rouge.</p>
       </div>
       <div class="tile pink">
         <h3>Des règles que l'outil applique</h3>
@@ -263,9 +263,9 @@
     <ol class="flow">
       <li><i>1</i><div><b>Vous tapez <code>/lorisse</code>.</b> L'agent relit sa mémoire et le projet, dit où en sont les choses en cinq lignes, et attend.</div></li>
       <li><i>2</i><div><b>Vous dites ce que vous voulez, en une ligne.</b> La promesse s'écrit d'abord, dans les pages. Vous les lisez.</div></li>
-      <li><i>3</i><div><b>Un bâtisseur se met au travail</b> dans sa branche, sur une seule partie, et ne fait son commit qu'au vert.</div></li>
+      <li><i>3</i><div><b>Un builder se met au travail</b> dans sa branche, sur une seule partie, et ne fait son commit qu'au vert.</div></li>
       <li><i>4</i><div><b>Vous lisez, annotez et marquez</b> les pages qui ont changé, puis vous faites la validation à la main.</div></li>
-      <li><i>5</i><div><b>Vous fusionnez, ou non.</b> La branche principale n'avance que sur votre parole.</div></li>
+      <li><i>5</i><div><b>Vous mergez, ou non.</b> La branche principale n'avance que sur votre parole.</div></li>
     </ol>
   </section>
 
@@ -295,11 +295,11 @@
       <li><time datetime="2026-10-20">2026-10-20</time><div><b>La mémoire vit dans un dépôt.</b> Un rechargement de fenêtre a mis fin à une session et emporté le fil de l'agent. Depuis ce jour, la mémoire de l'agent est un dépôt git à vous, et les copies que l'outil lit en sont tirées par un script&nbsp;: un rechargement ne fait plus rien perdre.</div></li>
       <li><time datetime="2026-10-21">2026-10-21</time><div><b>Une commande par appel du shell.</b> Une seule session a déclenché 35 demandes d'autorisation, et presque toutes venaient d'une commande enchaînée, d'un pipe, d'une boucle ou d'un appel d'interpréteur en une ligne. Les listes étaient bonnes, mais l'habitude ne l'était pas&nbsp;: un agent lance une commande par appel et écrit les fichiers avec les outils d'édition.</div></li>
       <li><span class="nd">—</span><div><b>Un interpréteur n'est jamais autorisé par une règle.</b> Un interpréteur peut tout exécuter, donc un appel à Python, à Node ou à une boucle du shell demande toujours d'abord. Une vérification est un fichier de script, avec sa propre règle.</div></li>
-      <li><span class="nd">—</span><div><b>Les agents travaillent dans leurs propres branches.</b> Chaque bâtisseur travaille dans son propre worktree, sur sa propre branche, et n'y fait son commit que lorsque ses vérifications sont au vert. La branche principale avance quand vous fusionnez, et jamais un agent ne la pousse.</div></li>
+      <li><span class="nd">—</span><div><b>Les agents travaillent dans leurs propres branches.</b> Chaque builder travaille dans son propre worktree, sur sa propre branche, et n'y fait son commit que lorsque ses vérifications sont au vert. La branche principale avance quand vous mergez, et jamais un agent n'y fait de push.</div></li>
     </ul>
   </section>
 
-  <div class="stands">Où ça en est&nbsp;: <a href="/method/status/project_page.html">la page de projet de la méthode</a>, générée par ses propres scripts.</div>
+  <div class="stands">Avancement&nbsp;: <a href="/method/status/project_page.html">la page de projet de la méthode</a>, générée par ses propres scripts.</div>
 
   <section class="leads" aria-label="Où aller ensuite">
     <div class="leads-row">

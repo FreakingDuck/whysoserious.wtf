@@ -166,7 +166,9 @@
   .states .file, .states .mine { display: flex; align-items: center; gap: 8px; color: var(--cb-ink); }
   .states .file code { font: 13px var(--cb-font-mono); color: var(--cb-ink); background: none; padding: 0; }
   .states small { display: block; color: var(--cb-ink-3); font-size: 12.5px; margin-top: 2px; }
-  .states .who { display: inline-block; padding: 1px 10px; border-radius: var(--cb-radius-pill); border: 1px solid var(--cb-line-2); color: var(--cb-ink-2); font-size: 13px; font-weight: 600; }
+  .states th:nth-child(2), .states td:nth-child(2) { white-space: nowrap; }
+  .states .file code { white-space: nowrap; }
+  .states .who { display: inline-block; white-space: nowrap; padding: 3px 12px; border-radius: var(--cb-radius-pill); border: 1px solid var(--cb-line-2); color: var(--cb-ink-2); font-size: 13px; font-weight: 600; }
   .states .who-you { color: var(--cb-ink); border-color: var(--cb-orange); }
   .states .who-me { color: var(--cb-ink); border-color: var(--cb-pink); }
   @media (max-width: 720px) {
