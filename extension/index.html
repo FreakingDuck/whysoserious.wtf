@@ -1,0 +1,980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lorisse · the VS Code extension · keep track of a project you do not read the code of</title>
+<meta name="description" content="A VS Code extension for a project you work on with Lorisse: the project page in a tab, the road and the parts, what the machine spent, every page with its state, and your marks and notes written into the page on your click.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://whysoserious.wtf/extension/">
+<meta property="og:title" content="Lorisse · the VS Code extension">
+<meta property="og:description" content="Keep track of a project you do not read the code of.">
+<meta property="og:site_name" content="whysoserious.wtf">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Lorisse · the VS Code extension">
+<meta name="twitter:description" content="Keep track of a project you do not read the code of.">
+<link rel="alternate" hreflang="en" href="https://whysoserious.wtf/extension/">
+<meta name="theme-color" content="#07111a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ebe7e0" media="(prefers-color-scheme: light)">
+<script>/* the colour setting, before the first paint: the status pages' key "pv-theme", "light" or "dark" on data-theme; Auto or nothing stored follows the system */
+(function () { var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {} if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) {} }
+  if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v); })();</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='25' fill='%2303080d'/%3E%3Cg fill='none' stroke-width='5'%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%234cc9f0' stroke-dasharray='40 139' transform='rotate(-135 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%23ffb703' stroke-dasharray='40 139' transform='rotate(-45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(135 32 32)'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='10' fill='%234cc9f0'/%3E%3Ccircle cx='29' cy='29' r='3.5' fill='%23fff' fill-opacity='.45'/%3E%3C/svg%3E">
+<style>
+  /* Lorisse's look: the tokens of Lorisse's shared stylesheet, the same as the status pages and the extension wear.
+     Dark on :root, light below; no colour is written outside these three blocks. */
+  :root {
+    color-scheme: dark;
+    --cb-bg: #07111a; --cb-surface: #0d1a26; --cb-surface-2: #13222f;
+    --cb-line: #1a2b3b; --cb-line-2: #2f4558;
+    --cb-ink: #e6f1fa; --cb-ink-2: #9fb4c6; --cb-ink-3: #6a8296; --cb-on-accent: #07111a;
+    --cb-blue: #4cc9f0; --cb-orange: #ffb703; --cb-orange-hi: #ffcb47; --cb-pink: #ff5c8a; --cb-green: #3ddc97;
+    --cb-blue-soft: rgba(76, 201, 240, .14); --cb-orange-soft: rgba(255, 183, 3, .14);
+    --cb-pink-soft: rgba(255, 92, 138, .14); --cb-green-soft: rgba(61, 220, 151, .14);
+    --cb-blue-edge: rgba(76, 201, 240, .45); --cb-orange-edge: rgba(255, 183, 3, .5);
+    --cb-eye-core: #03080d; --cb-eye-light: rgba(255, 255, 255, .75); --cb-eye-rim: rgba(255, 255, 255, .45); --cb-eye-off: var(--cb-line-2);
+    --cb-font-app: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --cb-font-mono: "B612 Mono", ui-monospace, Consolas, "Courier New", monospace;
+    --cb-radius-sm: 8px; --cb-radius-md: 12px; --cb-radius-card: 14px; --cb-radius-pill: 999px;
+    --cb-border-chip: 1.5px;
+    --cb-shadow-card: 0 0 0 1px var(--cb-line);
+    --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(0, 0, 0, .9);
+    --cb-focus-ring: 2px solid var(--cb-blue); --cb-focus-offset: 2px;
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(0, 0, 0, .5);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+      --cb-line: #d0cabf; --cb-line-2: #9a9488;
+      --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+      --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+      --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+      --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+      --cb-blue-edge: rgba(0, 100, 136, .5); --cb-orange-edge: rgba(130, 78, 0, .5);
+      --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+      --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(28, 39, 51, .28);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+    --cb-line: #d0cabf; --cb-line-2: #9a9488;
+    --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+    --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+    --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+    --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+    --cb-blue-edge: rgba(0, 100, 136, .5); --cb-orange-edge: rgba(130, 78, 0, .5);
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+    --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(28, 39, 51, .28);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cb-bg); color: var(--cb-ink); font-family: var(--cb-font-app);
+    font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-wrap: anywhere; }
+  a { color: var(--cb-blue); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  a:focus-visible { outline: var(--cb-focus-ring); outline-offset: 2px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  /* the header: the brand, then the four pages; the current one marked as the status pages mark their tab */
+  header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--cb-bg) 86%, transparent); border-bottom: 1px solid var(--cb-line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 10px 16px; flex-wrap: wrap; padding: 8px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; color: var(--cb-ink); }
+  .brand:hover { text-decoration: none; }
+  .brand small { color: var(--cb-ink-3); font-weight: 400; font-size: inherit; }
+  .nav nav { display: flex; gap: 8px 18px; font-size: 15px; flex-wrap: wrap; }
+  .nav nav a { color: var(--cb-ink-2); white-space: nowrap; padding: 2px 0; border-bottom: 2px solid transparent; }
+  .nav nav a:hover { color: var(--cb-ink); text-decoration: none; }
+  .nav nav a[aria-current="page"] { color: var(--cb-ink); font-weight: 600; border-bottom-color: var(--cb-blue); }
+  .nav-r { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
+  @media (max-width: 640px) { .nav-r { width: 100%; justify-content: space-between; } .nav nav { font-size: 14px; gap: 6px 14px; } }
+  /* the colour setting: the status pages' own switch, the same storage key, attribute and values */
+  .cb-seg { display: inline-flex; padding: 2px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); box-shadow: var(--cb-shadow-seg); }
+  .cb-seg-item { min-height: 26px; padding: 2px 10px; border: 0; border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2); font: 600 12px/1.4 var(--cb-font-app); cursor: pointer; }
+  .cb-seg-item[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+  .cb-seg-item:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+
+  .cb-eye { position: relative; display: inline-block; flex: none; width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; }
+  .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
+  .cb-eye-off { background: var(--cb-eye-off); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); }
+  .cb-eye-off-in { inset: 1px; background: var(--cb-eye-core); -webkit-mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); }
+  .cb-eye-q--1 { background: var(--cb-blue); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); animation: cb-eye-lead 2.4s ease-in-out infinite; }
+  .cb-eye-q--2 { background: var(--cb-orange); opacity: .45; -webkit-mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); }
+  .cb-eye-core { position: absolute; inset: 9%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
+  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; width: 46%; height: 46%; background: var(--cb-blue); box-shadow: inset 1.5px 1.5px 0 -.5px var(--cb-eye-rim); animation: cb-eye-blink 5s infinite; }
+  .cb-eye-inner { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--cb-eye-light) 0 14%, transparent 64%); opacity: .35; }
+  @keyframes cb-eye-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+  @keyframes cb-eye-lead { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+  @media (prefers-reduced-motion: reduce) { .cb-eye-pupil, .cb-eye-q--1 { animation: none; } }
+
+  .hero { padding: 64px 0 40px; max-width: 760px; }
+  @media (max-width: 820px) { .hero { padding-top: 40px; } }
+  .kicker { color: var(--cb-orange); font-weight: 700; letter-spacing: .09em; text-transform: uppercase; font-size: 12px; }
+  h1 { font-size: clamp(34px, 5.4vw, 56px); line-height: 1.05; margin: 12px 0 18px; letter-spacing: -.02em; font-weight: 800; }
+  h1 em { font-style: normal; color: var(--cb-orange); }
+  .lede { font-size: 20px; color: var(--cb-ink-2); max-width: 46ch; margin: 0 0 14px; }
+  .lede b { color: var(--cb-ink); font-weight: 600; }
+  .small { color: var(--cb-ink-3); font-size: 15px; margin: 0 0 26px; max-width: 62ch; }
+  .cta { display: inline-flex; align-items: center; gap: 10px; background: var(--cb-orange); color: var(--cb-on-accent);
+    padding: 14px 22px; border-radius: var(--cb-radius-pill); font-weight: 700; font-size: 17px; }
+  .cta:hover { background: var(--cb-orange-hi); text-decoration: none; }
+
+  section { padding: 52px 0; border-top: 1px solid var(--cb-line); }
+  h2 { font-size: clamp(26px, 3.6vw, 36px); letter-spacing: -.01em; margin: 0 0 8px; font-weight: 800; }
+  h3 { font-size: 19px; margin: 0 0 6px; }
+  .sub { color: var(--cb-ink-2); margin: 0 0 24px; max-width: 62ch; }
+
+  .install { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 20px 22px; max-width: 760px; }
+  .install ol { margin: 0 0 12px; padding-left: 22px; color: var(--cb-ink); }
+  .install li { margin: 4px 0; }
+  .install p { margin: 0; color: var(--cb-ink-2); font-size: 15px; }
+  code { font-family: var(--cb-font-mono); font-size: .9em; background: var(--cb-surface-2); padding: 1px 6px; border-radius: 6px; color: var(--cb-ink); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  @media (max-width: 820px) { .grid { grid-template-columns: 1fr; } }
+  .tile { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 18px 20px; }
+  .tile .n { font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--cb-ink-3); margin-bottom: 4px; }
+  .tile p { margin: 0 0 8px; color: var(--cb-ink-2); font-size: 15px; }
+  .tile p:last-child { margin-bottom: 0; }
+  .tile.orange { border-top: 3px solid var(--cb-orange); }
+  .tile.blue { border-top: 3px solid var(--cb-blue); }
+  .tile.green { border-top: 3px solid var(--cb-green); }
+
+  /* the states: one colour each, as the status pages and the extension draw them */
+  .st { display: inline-block; width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  .st-never { background: var(--cb-ink-3); }
+  .st-read { background: var(--cb-blue); }
+  .st-ok { background: var(--cb-green); }
+  .st-rework { background: var(--cb-pink); }
+  .st-changed { background: var(--cb-orange); }
+  .st-answered { background: transparent; box-shadow: inset 0 0 0 2px var(--cb-blue); }
+  .st-note { background: transparent; box-shadow: inset 0 0 0 2px var(--cb-pink); }
+  .stages { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 12px; }
+  .stage { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 14px 16px; font-size: 15px; }
+  .stage .chip { margin-bottom: 10px; }
+  .stage p { margin: 0; color: var(--cb-ink-2); }
+  .stage p + p { margin-top: 4px; }
+  .stage b { color: var(--cb-ink); font-weight: 600; }
+  /* a state chip: the shared chip (a pill, its line in the state's colour, small capitals) */
+  .chip { display: inline-flex; align-items: center; gap: 7px; min-height: 26px; padding: 2px 10px; max-width: 100%;
+    border: var(--cb-border-chip) solid var(--cb-line-2); border-radius: var(--cb-radius-pill); background: transparent;
+    color: var(--cb-ink-2); font-size: 11.5px; font-weight: 700; line-height: 1.45; letter-spacing: .06em; text-transform: uppercase; }
+  .chip.s-never { color: var(--cb-ink-2); border-color: var(--cb-ink-3); }
+  .chip.s-read, .chip.s-answered { color: var(--cb-blue); border-color: var(--cb-blue); }
+  .chip.s-ok { color: var(--cb-green); border-color: var(--cb-green); }
+  .chip.s-rework, .chip.s-note { color: var(--cb-pink); border-color: var(--cb-pink); }
+  .chip.s-changed { color: var(--cb-orange); border-color: var(--cb-orange); background: var(--cb-orange-soft); }
+  .marking { margin-top: 24px; max-width: 70ch; color: var(--cb-ink-2); }
+  .marking p { margin: 0 0 10px; }
+  .marking b { color: var(--cb-ink); }
+  .btnlike { display: inline-block; font-size: 13px; padding: 1px 9px; border-radius: var(--cb-radius-pill); border: 1px solid var(--cb-line-2); color: var(--cb-ink); background: var(--cb-surface); white-space: nowrap; }
+
+  /* the demo: a VS Code window, the full width of the page, with the extension's side bar and its reader */
+  section.demo-sec { padding: 0 0 52px; border-top: 0; }
+  .demo-sec > .wrap { border-top: 1px solid var(--cb-line); padding-top: 52px; }
+  .demo-help { color: var(--cb-ink-2); font-size: 15px; margin: 0 0 10px; max-width: 74ch; }
+  .demo-help b { color: var(--cb-ink); }
+  .demo-help:last-child { margin-bottom: 18px; }
+  .win-out { padding: 0 16px; }
+  .win { max-width: 1680px; height: clamp(600px, 70vh, 880px); margin: 0 auto; display: grid; grid-template-rows: 32px minmax(0, 1fr) 24px;
+    border-radius: 10px; overflow: hidden; background: var(--cb-bg); box-shadow: var(--cb-shadow-pop); font-size: 15px; }
+
+  .win-title { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, auto) minmax(0, 1fr); align-items: center; gap: 12px; padding: 0 0 0 12px;
+    background: var(--cb-surface-2); border-bottom: 1px solid var(--cb-line); font-size: 12px; color: var(--cb-ink-2); line-height: 1; user-select: none; }
+  .win-menu { display: flex; align-items: center; gap: 14px; min-width: 0; overflow: hidden; white-space: nowrap; }
+  .win-menu .cb-eye { width: 16px; height: 16px; }
+  .win-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; text-align: center; color: var(--cb-ink); }
+  .win-ctl { justify-self: end; display: flex; height: 100%; }
+  .win-ctl span { display: grid; place-items: center; width: 44px; height: 100%; color: var(--cb-ink-3); font-size: 13px; }
+
+  .win-main { display: grid; grid-template-columns: 48px 280px minmax(0, 1fr); min-height: 0; }
+  .win-act { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-top: 6px; background: var(--cb-surface-2); border-right: 1px solid var(--cb-line); }
+  .win-act span { display: grid; place-items: center; width: 48px; height: 44px; color: var(--cb-ink-3); }
+  .win-act span.on { color: var(--cb-ink); box-shadow: inset 2px 0 0 var(--cb-blue); }
+  .win-act svg { width: 22px; height: 22px; }
+
+  .dl { min-height: 0; overflow: auto; padding: 0 0 12px; background: var(--cb-surface); border-right: 1px solid var(--cb-line); }
+  .dl-title { display: flex; align-items: center; height: 35px; padding: 0 16px; color: var(--cb-ink-2); font-size: 11px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; }
+  .dl-grp { display: flex; align-items: center; gap: 6px; padding: 6px 12px 2px; color: var(--cb-ink); font-size: 12px; font-weight: 700; letter-spacing: .04em; }
+  .dl-grp::before { content: ""; width: 0; height: 0; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 5px solid var(--cb-ink-3); }
+  .dl-grp small { font-weight: 400; color: var(--cb-ink-3); font-size: inherit; letter-spacing: 0; }
+  .dl button { display: grid; grid-template-columns: 10px minmax(0, 1fr); gap: 2px 10px; align-items: center; width: 100%; text-align: left; font: inherit; color: var(--cb-ink);
+    background: transparent; border: 0; padding: 5px 12px 5px 28px; cursor: pointer; }
+  .dl button:hover { background: var(--cb-surface-2); }
+  .dl button.sel { background: var(--cb-blue-soft); box-shadow: inset 2px 0 0 var(--cb-blue); }
+  .dl button:focus-visible { outline: var(--cb-focus-ring); outline-offset: -2px; }
+  .dl button b { font-weight: 400; font-family: var(--cb-font-mono); font-size: 13px; }
+  .dl button span.w { grid-column: 2; color: var(--cb-ink-3); font-size: 12px; line-height: 1.3; }
+
+  .ed { display: grid; grid-template-rows: 35px minmax(0, 1fr); min-width: 0; min-height: 0; }
+  .ed-tabs { display: flex; min-width: 0; background: var(--cb-surface); border-bottom: 1px solid var(--cb-line); overflow: hidden; }
+  .ed-tab { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; padding: 0 12px 0 14px; background: var(--cb-bg);
+    border-right: 1px solid var(--cb-line); box-shadow: inset 0 2px 0 var(--cb-blue); font-size: 13px; color: var(--cb-ink); white-space: nowrap; }
+  .ed-tab .nm { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+  .ed-tab .x { color: var(--cb-ink-3); font-size: 14px; padding-left: 4px; }
+  .rd { min-width: 0; min-height: 0; overflow: auto; background: var(--cb-bg); container-type: inline-size; }
+  .rd-in { max-width: 1120px; }
+  .win-status { display: flex; align-items: center; gap: 16px; min-width: 0; padding: 0 12px; background: var(--cb-surface-2); border-top: 1px solid var(--cb-line);
+    font-size: 12px; color: var(--cb-ink-2); white-space: nowrap; overflow: hidden; }
+  .win-status .g { color: var(--cb-green); }
+  .win-status .grow { flex: 1; }
+
+  @media (max-width: 1000px) { .win-main { grid-template-columns: 48px 240px minmax(0, 1fr); } .win-menu > span:not(.cb-eye) { display: none; } }
+  /* under 760 pixels: the list above the document, each at full width; the document keeps a tall scrolling view */
+  @media (max-width: 760px) {
+    .win { height: auto; grid-template-rows: 32px auto 24px; }
+    .win-title { grid-template-columns: auto minmax(0, 1fr) auto; }
+    .win-main { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto; }
+    .win-act { display: none; }
+    .dl { max-height: 300px; border-right: 0; border-bottom: 1px solid var(--cb-line); }
+    .ed { grid-template-rows: 35px auto; }
+    .rd { height: min(78vh, 680px); min-height: 460px; }
+    .win-ctl span { width: 32px; }
+  }
+
+  .rd-head { padding: 14px 18px 12px; border-bottom: 1px solid var(--cb-line); }
+  .rd-path { font-family: var(--cb-font-mono); font-size: 12px; color: var(--cb-ink-3); }
+  .rd-title { font-size: 22px; font-weight: 800; margin: 2px 0 2px; }
+  .rd-by { font-family: var(--cb-font-mono); font-size: 12px; color: var(--cb-ink-3); margin-bottom: 10px; }
+  .rd-state { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
+  .rd-bar { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+  .seg { display: inline-flex; flex-wrap: wrap; padding: 2px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); box-shadow: 0 0 0 1px var(--cb-line); }
+  .seg button { font: inherit; font-size: 12.5px; font-weight: 600; color: var(--cb-ink-2); background: transparent; border: 0; border-radius: var(--cb-radius-pill); padding: 4px 11px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+  .seg button .cnt { color: var(--cb-orange); font-weight: 700; }
+  .seg button[aria-pressed="true"] .cnt { color: inherit; }
+  .marks { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+  .marks button, .allok button.big { font: inherit; font-size: 13px; color: var(--cb-ink); background: var(--cb-surface); border: 1px solid var(--cb-line-2); border-radius: var(--cb-radius-pill); padding: 3px 11px; cursor: pointer; }
+  .marks button:hover, .allok button.big:hover { border-color: var(--cb-blue); }
+  .marks button[aria-pressed="true"] { border-color: var(--cb-blue); background: var(--cb-blue-soft); }
+  .rd button:focus-visible { outline: var(--cb-focus-ring); outline-offset: 2px; }
+  .undo { font-size: 13px; color: var(--cb-ink-2); }
+  .undo button { font: inherit; font-size: 13px; color: var(--cb-blue); background: none; border: 0; padding: 0 0 0 4px; cursor: pointer; }
+  /* a page rewritten for more than half: one okay for all of it */
+  .allok { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; margin: 0 0 10px; font-size: 13px; color: var(--cb-ink-2); }
+  .allok .ok { color: var(--cb-green); font-weight: 600; }
+  .allok button.lk { font: inherit; font-size: 12px; color: var(--cb-blue); background: none; border: 0; padding: 0; cursor: pointer; }
+
+  .rd-body { padding: 16px 18px 20px; }
+  .row { display: grid; grid-template-columns: minmax(0, 1fr) 250px; gap: 8px 18px; align-items: start; }
+  @media (max-width: 620px) { .row { grid-template-columns: minmax(0, 1fr); } }
+  @container (max-width: 600px) { .row { grid-template-columns: minmax(0, 1fr); } }
+  .cl { min-width: 0; }
+  .blk { padding: 4px 8px; margin: 0 -8px 4px; border-radius: var(--cb-radius-sm); cursor: text; min-width: 0; }
+  .blk:hover { background: var(--cb-surface-2); }
+  .blk.h { font-weight: 700; font-size: 17px; margin-top: 10px; }
+  .blk.li { padding-left: 24px; position: relative; }
+  .blk.li::before { content: "–"; position: absolute; left: 9px; color: var(--cb-ink-3); }
+  .blk.st { padding-left: 34px; }
+  .blk.see { padding-left: 52px; color: var(--cb-ink-2); font-size: 14.5px; }
+  .blk code { font-size: 13px; }
+  .blk pre { margin: 0; padding: 10px 12px; overflow-x: auto; border: 1px solid var(--cb-line); border-radius: var(--cb-radius-sm); background: var(--cb-surface); font: 13px/1.5 var(--cb-font-mono); white-space: pre; }
+  .blk.chg { background: var(--cb-orange-soft); }
+  .blk.new { background: var(--cb-green-soft); }
+  .blk table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .blk th { padding: 4px 8px; border-bottom: 1px solid var(--cb-line-2); color: var(--cb-ink-2); font-size: 12px; font-weight: 600; text-align: left; }
+  .blk td { padding: 5px 8px; border-bottom: 1px solid var(--cb-line); vertical-align: top; }
+  .v-text ins { text-decoration: none; background: none; color: inherit; }
+  .v-chg ins { text-decoration: none; background: var(--cb-green-soft); color: var(--cb-green); font-weight: 600; border-radius: 3px; padding: 0 2px; }
+  .before { margin: -2px 0 8px; font-size: 13px; }
+  .before button { font: inherit; font-size: 12.5px; color: var(--cb-ink-2); background: none; border: 0; padding: 0; cursor: pointer; }
+  .before button::before { content: "▸ "; color: var(--cb-ink-3); }
+  .before button[aria-expanded="true"]::before { content: "▾ "; }
+  .before .old { margin-top: 4px; padding: 6px 10px; border-left: 2px solid var(--cb-line-2); color: var(--cb-ink-3); font-size: 14px; }
+  .mg { min-width: 0; padding-bottom: 6px; }
+  .card { border: 1px solid var(--cb-line-2); border-radius: var(--cb-radius-md); background: var(--cb-surface); padding: 9px 11px; font-size: 13px; }
+  .card + .card { margin-top: 6px; }
+  .card .who { font-size: 11px; color: var(--cb-ink-3); font-weight: 700; letter-spacing: .04em; }
+  .card p { margin: 1px 0 8px; color: var(--cb-ink); }
+  .card p:last-of-type { margin-bottom: 6px; }
+  .card .acts { display: flex; gap: 10px; flex-wrap: wrap; }
+  .card .acts button { font: inherit; font-size: 12px; color: var(--cb-blue); background: none; border: 0; padding: 0; cursor: pointer; }
+  .card .ok { color: var(--cb-green); }
+  .card .wait { color: var(--cb-pink); }
+  .card.done { opacity: .7; }
+  .card.mine { border-color: var(--cb-pink); }
+  .chl { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; color: var(--cb-ink-2); padding-top: 4px; }
+  .meter { display: inline-flex; gap: 2px; }
+  .meter i { width: 6px; height: 10px; border-radius: 2px; background: var(--cb-line-2); }
+  .meter i.on { background: var(--cb-orange); }
+  .chl button { font: inherit; font-size: 12px; color: var(--cb-blue); background: none; border: 0; padding: 0; cursor: pointer; }
+  .chl .ok { color: var(--cb-green); font-size: 12px; }
+  .fold { color: var(--cb-ink-3); font-size: 13px; font-style: italic; margin: 2px 0 8px; }
+  .fold button { font: inherit; font-style: normal; font-size: 12.5px; color: var(--cb-blue); background: none; border: 0; padding: 0; cursor: pointer; }
+  .none { color: var(--cb-ink-2); font-size: 14px; background: var(--cb-surface); border: 1px dashed var(--cb-line-2); border-radius: var(--cb-radius-sm); padding: 8px 12px; margin-bottom: 12px; }
+  .nbox { border: 1px solid var(--cb-blue); border-radius: var(--cb-radius-md); background: var(--cb-surface); padding: 8px; }
+  .nbox textarea { width: 100%; min-height: 72px; resize: vertical; font: inherit; font-size: 14px; color: var(--cb-ink); background: var(--cb-bg); border: 1px solid var(--cb-line-2); border-radius: var(--cb-radius-sm); padding: 6px 8px; }
+  .nbox .acts { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+  .nbox button { font: inherit; font-size: 13px; border-radius: var(--cb-radius-pill); padding: 3px 11px; cursor: pointer; border: 1px solid var(--cb-line-2); background: var(--cb-surface); color: var(--cb-ink); }
+  .nbox button.add { background: var(--cb-blue); border-color: var(--cb-blue); color: var(--cb-on-accent); }
+  .rd-end { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--cb-line); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; font-size: 13px; color: var(--cb-ink-3); }
+
+  .stands { padding: 28px 0 40px; border-top: 1px solid var(--cb-line); color: var(--cb-ink-2); font-size: 15px; }
+  footer { padding: 40px 0 60px; border-top: 1px solid var(--cb-line); color: var(--cb-ink-3); font-size: 14px; }
+  footer .row2 { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--cb-ink-2); }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/lorisse/"><span class="cb-eye" role="img" aria-label="Lorisse's eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/extension</small></a>
+    <div class="nav-r">
+    <nav aria-label="The pages">
+      <a href="/lorisse/">Lorisse</a>
+      <a href="/method/">The method</a>
+      <a href="/extension/" aria-current="page">The extension</a>
+      <a href="/method/status/project_page.html">Where it stands</a>
+    </nav>
+    <div class="cb-seg" id="theme" role="group" aria-label="Theme"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Light</button><button class="cb-seg-item" type="button" data-value="dark">Dark</button></div>
+    </div>
+  </div>
+</header>
+
+<main>
+ <div class="wrap">
+  <div class="hero">
+    <div class="kicker">Lorisse · for VS Code</div>
+    <h1>A VS Code extension for a project you work on <em>with Lorisse</em>.</h1>
+    <p class="lede">It keeps track of a project you do not read the code of: <b>where it stands, what waits for your read, what the machine spent.</b> You read the pages and mark them, in the same window as Claude Code.</p>
+    <p class="small">It writes into a page only on your click, with an Undo. It runs nothing of the repository, and reaches no network.</p>
+    <a class="cta" href="#demo">Try it on a made-up project <span aria-hidden="true">↓</span></a>
+  </div>
+
+  <section id="install">
+    <h2>Install</h2>
+    <div class="install">
+      <ol>
+        <li>In VS Code, open the <b>Extensions</b> view.</li>
+        <li>Search <b>Lorisse</b>.</li>
+        <li>Click <b>Install</b>.</li>
+      </ol>
+      <p>From the package file instead: <code>code --install-extension lorisse-&lt;version&gt;.vsix</code></p>
+    </div>
+  </section>
+
+  <section id="track">
+    <h2>Keep track of the project</h2>
+    <p class="sub">The project page opens in a tab of the window. It is made by the extension's own copy of the method's scripts, never by a script of the repository.</p>
+    <div class="grid">
+      <div class="tile orange">
+        <div class="n">the dashboard</div>
+        <h3>Where things stand</h3>
+        <p>The gate's last run, what waits for you, and the parts with their stage. A page it names opens in the reader.</p>
+      </div>
+      <div class="tile blue">
+        <div class="n">the road and the parts</div>
+        <h3>What is being worked on</h3>
+        <p>The road is the work in order. The parts are the road looked at deeper: each one opened shows its three pages, its stage, your marks, and the steps of its walk.</p>
+      </div>
+      <div class="tile green">
+        <div class="n">the tokens</div>
+        <h3>What the machine spent</h3>
+        <p>Today, the last seven days and the last thirty, each split by model, counted from Claude Code's own records on this machine.</p>
+        <p>The dollars are the API's list prices, not your invoice, and the view says so.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="stages">
+    <h2>The stages of a page</h2>
+    <p class="sub">Every page of the method carries a line under its title: who wrote it, and your mark. The extension shows that state everywhere the page appears: a sign and a few words in the list, a chip in the page's header.</p>
+    <div class="stages">
+      <div class="stage"><span class="chip s-never"><i class="st st-never"></i>never read</span><p><b>Shows</b> grey, with the minutes it takes to read.</p><p><b>Asks</b> your first read.</p></div>
+      <div class="stage"><span class="chip s-read"><i class="st st-read"></i>read · 11-18</span><p><b>Shows</b> blue, with the day of your read.</p><p><b>Asks</b> nothing. It is yours to mark further.</p></div>
+      <div class="stage"><span class="chip s-ok"><i class="st st-ok"></i>ok · 11-18</span><p><b>Shows</b> green: you agree with it.</p><p><b>Asks</b> nothing, until its text changes.</p></div>
+      <div class="stage"><span class="chip s-rework"><i class="st st-rework"></i>to rework</span><p><b>Shows</b> pink, "waits for Lorisse".</p><p><b>Asks</b> Lorisse to change it as your notes say, and to answer each note under it.</p></div>
+      <div class="stage"><span class="chip s-changed"><i class="st st-changed"></i>changed since your mark</span><p><b>Shows</b> orange. It opens on its changes, said in words.</p><p><b>Asks</b> your read of what changed. Each change can be okayed.</p></div>
+      <div class="stage"><span class="chip s-answered"><i class="st st-answered"></i>answered</span><p><b>Shows</b> "1 answer · your read": Lorisse answered a note of yours.</p><p><b>Asks</b> your read of the answer: okay it, or reply.</p></div>
+    </div>
+    <div class="marking">
+      <p><b>How you mark.</b> Three buttons on the page itself, in its header and again at its end: <span class="btnlike">Read</span> <span class="btnlike">Ok</span> <span class="btnlike">To rework</span>. A click writes the line under the title, and nothing else in the page. Undo puts it back; Next opens the next page that waits.</p>
+      <p><b>How you leave a note.</b> Click a block and type. Your note is written into the page, under that block. Lorisse answers under it in a session, and the two show as one card beside the text, never inside it.</p>
+    </div>
+  </section>
+ </div>
+
+  <section id="demo" class="demo-sec">
+    <div class="wrap">
+      <h2>Try it</h2>
+      <p class="demo-help">A made-up command-line unit converter: two parts with their three pages each, and its docs. Click a document on the left. Click a mark, a switch, an okay, or a block to leave a note. All of it stays in this page: nothing is saved, nothing is sent.</p>
+      <p class="demo-help">The last group, <b>the method</b>, holds a real page of the method: the contract of its install, whole, as the reader shows it.</p>
+    </div>
+
+    <div class="win-out">
+      <div class="win" id="demo-app" role="region" aria-label="The demo: a VS Code window with the extension's side bar and its reader">
+        <div class="win-title">
+          <span class="win-menu" aria-hidden="true"><span class="cb-eye"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span><span>File</span><span>Edit</span><span>Selection</span><span>View</span><span>Go</span><span>Terminal</span><span>Help</span></span>
+          <span class="win-name" id="win-name"></span>
+          <span class="win-ctl" aria-hidden="true"><span>&#8211;</span><span>&#9633;</span><span>&#215;</span></span>
+        </div>
+        <div class="win-main">
+          <div class="win-act" aria-hidden="true">
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M14 3H6.5A1.5 1.5 0 0 0 5 4.5v15A1.5 1.5 0 0 0 6.5 21h11a1.5 1.5 0 0 0 1.5-1.5V8z"/><path d="M14 3v5h5"/></svg></span>
+            <span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5.5 5.5"/></svg></span>
+            <span class="on"><svg viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="7"><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-135 32 32)"/><circle cx="32" cy="32" r="24" stroke-dasharray="35 116" transform="rotate(-45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(45 32 32)"/><circle cx="32" cy="32" r="24" stroke-opacity=".35" stroke-dasharray="35 116" transform="rotate(135 32 32)"/><circle cx="32" cy="32" r="10" fill="currentColor" stroke="none"/></svg></span>
+          </div>
+          <div class="dl" id="dl" aria-label="Documents and notes"></div>
+          <div class="ed">
+            <div class="ed-tabs" id="ed-tabs"></div>
+            <div class="rd" id="rd" aria-live="polite"></div>
+          </div>
+        </div>
+        <div class="win-status" id="win-status"></div>
+      </div>
+    </div>
+    <noscript><div class="wrap"><p class="demo-help">The demo needs JavaScript.</p></div></noscript>
+  </section>
+
+ <div class="wrap">
+  <div class="stands">Where it stands: <a href="status/project_page.html">the extension's project page</a>, made by its own scripts.</div>
+ </div>
+</main>
+
+<footer>
+  <div class="wrap row2">
+    <span><a href="/">whysoserious.wtf</a> · Lorisse, the extension · written by the agent</span>
+    <span>VS Code · Windows · made with AI, read as such</span>
+  </div>
+</footer>
+
+<script>
+/* the demo: a made-up project in memory, and one real page of the method; every click changes this page only. No network, no storage.
+   The notes and the commit words of the made-up project are made up. */
+(function () {
+  "use strict";
+  var dl = document.getElementById("dl"), rd = document.getElementById("rd");
+  var tabs = document.getElementById("ed-tabs"), wname = document.getElementById("win-name"), wstat = document.getElementById("win-status");
+  if (!dl || !rd) return;
+
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+  /* a table: a head and rows, each a list of cells already written in HTML */
+  function tb(head, rows) {
+    return "<table><thead><tr><th>" + head.join("</th><th>") + "</th></tr></thead><tbody>" +
+      rows.map(function (r) { return "<tr><td>" + r.join("</td><td>") + "</td></tr>"; }).join("") + "</tbody></table>";
+  }
+  function c(s) { return "<code>" + s + "</code>"; }
+  var RUN = "powershell -NoProfile -ExecutionPolicy Bypass -File ";
+  var SPEC = "Human file; format: the method's contract spec, " + c("method/contract_spec.md") + " of your Lorisse repository.";
+
+  /* the documents; a block is { k: kind, t: html }; kinds: p, h, li, st (a numbered move), see, tbl, pre */
+  var DOCS = [
+    { id: "cli-r", grp: "cli/", dir: "cli", file: "README.md", title: "cli", state: "read", date: "11-18", blocks: [
+      { k: "p", t: "The command line of the converter: " + c("unitconv.ps1 &lt;value&gt; &lt;from&gt; &lt;to&gt;") + "." },
+      { k: "p", t: "It is the only part a person types. It reads three words, asks " + c("convert") + " for the result and prints one line. It keeps nothing between two calls." },
+      { k: "h", t: "How it is built" },
+      { k: "li", t: c("unitconv.ps1") + " reads the three arguments, calls " + c("Convert-Unit") + " of " + c("convert/convert.ps1") + " and prints one line; " + c("-List") + " prints the units." },
+      { k: "li", t: "The value is read and printed in the invariant culture, so a dot is the decimal mark on every machine." },
+      { k: "li", t: c("test_cli.ps1") + " runs it in its own process for each case; the project's gate runs it." },
+      { k: "h", t: "The arguments" },
+      { k: "li", t: "The value: a number, a dot as the decimal mark; a minus sign is allowed, for a temperature." },
+      { k: "li", t: "The unit it is in, then the unit wanted, each spelled as the table spells it: " + c("km") + ", " + c("mi") + ", " + c("kg") + ", " + c("lb") + ", " + c("min") + ", " + c("h") + ", " + c("C") + ", " + c("F") + ", " + c("K") + "." },
+      { k: "li", t: c("-List") + " alone, in place of the three: the units known, on one line." },
+      { k: "h", t: "What it prints" },
+      { k: "p", t: "One line, always. A result reads " + c("12 km = 7.4565 mi") + ": the value and its unit as typed, then the result rounded to four decimals." },
+      { k: "p", t: "A wrong call reads " + c("unitconv: ") + " and the reason, in the words " + c("convert") + " gives: " + c("kg is a mass, m a length: no conversion") + ". The exit code is 1." },
+      { k: "p", t: "With no argument, it prints the usage line and exits 1." },
+      { k: "h", t: "Examples" },
+      { k: "li", t: c("unitconv.ps1 1 mi km") + " prints " + c("1 mi = 1.6093 km") + "." },
+      { k: "li", t: c("unitconv.ps1 100 C F") + " prints " + c("100 C = 212 F") + "." },
+      { k: "li", t: c("unitconv.ps1 -List") + " prints " + c("km m cm mi ft in kg g lb s min h C F K") + "." },
+      { k: "h", t: "Where to look next" },
+      { k: "li", t: "The promises this part keeps: " + c("CONTRACT.md") + ", beside this page." },
+      { k: "li", t: "How a person checks them: " + c("VALIDATION.md") + "." },
+      { k: "li", t: "The conversion itself, its table and its refusals: " + c("convert/README.md") + "." }
+    ]},
+    { id: "cli-c", grp: "cli/", dir: "cli", file: "CONTRACT.md", title: "cli — contract", state: "ok", date: "11-18", blocks: [
+      { k: "p", t: SPEC + " Stage " + c("design") + ": the ids may change." },
+      { k: "h", t: "1. Role" },
+      { k: "p", t: "The command line a person types to convert a value, on Windows PowerShell 5.1." },
+      { k: "h", t: "2. Does and does not" },
+      { k: "li", t: "prints one line per call: the result, the list of units, or why the call is wrong" },
+      { k: "li", t: "keeps nothing between two calls" },
+      { k: "p", t: "Does not:" },
+      { k: "li", t: "convert → " + c("convert") },
+      { k: "li", t: "read a file or the network → nothing" },
+      { k: "h", t: "3. Depends on" },
+      { k: "p", t: c("convert") + ". Nothing else from the repository." },
+      { k: "h", t: "4. The line printed" },
+      { k: "p", t: "We want a line a person reads at a glance and a script can parse." },
+      { k: "li", id: "C-4.1", t: "<b>C-4.1</b> A conversion prints " + c("&lt;value&gt; &lt;from&gt; = &lt;result&gt; &lt;to&gt;") + ", the result rounded to four decimals, a dot as the decimal mark." },
+      { k: "li", id: "C-4.2", t: "<b>C-4.2</b> The list prints every unit known on one line." },
+      { k: "li", id: "C-4.3", t: "<b>C-4.3</b> A wrong call prints one line saying why and exits 1." },
+      { k: "li", id: "C-4.4", t: "<b>C-4.4</b> The value and the units are printed as typed, so the line can be read against the call." },
+      { k: "h", t: "5. The arguments" },
+      { k: "p", t: "We want a call a person can type from memory." },
+      { k: "li", id: "C-5.1", t: "<b>C-5.1</b> Three arguments: the value, the unit it is in, the unit wanted." },
+      { k: "li", id: "C-5.2", t: "<b>C-5.2</b> A value is read with a dot as the decimal mark, whatever the machine's language." },
+      { k: "li", id: "C-5.3", t: "<b>C-5.3</b> A minus sign is accepted before a value." },
+      { k: "li", id: "C-5.4", t: "<b>C-5.4</b> A unit is read as the table spells it: " + c("KM") + " is not " + c("km") + "." },
+      { k: "li", id: "C-5.5", t: "<b>C-5.5</b> " + c("-List") + " alone prints the units and exits 0." },
+      { k: "h", t: "6. Exit codes" },
+      { k: "li", id: "C-6.1", t: "<b>C-6.1</b> A result or the list exits 0." },
+      { k: "li", id: "C-6.2", t: "<b>C-6.2</b> A wrong call exits 1, a refusal of " + c("convert") + " included." },
+      { k: "li", id: "C-6.3", t: "<b>C-6.3</b> Nothing is printed on the error stream." },
+      { k: "h", t: "7. Behaviour" },
+      { k: "tbl", t: tb(["Situation", "Reaction"], [
+        ["no argument", "the usage line, exit 1"],
+        ["four arguments", "the usage line, exit 1"],
+        ["a value with a comma", c("unitconv: 1,5 is not a number") + ", exit 1"]]) },
+      { k: "h", t: "8. Wanted, not promised yet" },
+      { k: "li", t: "none" },
+      { k: "h", t: "9. Non-goals" },
+      { k: "p", t: "An interactive prompt." }
+    ]},
+    { id: "cli-v", grp: "cli/", dir: "cli", file: "VALIDATION.md", title: "cli — validation", state: "never", date: "", blocks: [
+      { k: "p", t: SPEC },
+      { k: "tbl", t: tb(["Last run", "Where it stands", "Waiting on"], [["never", "no step walked", "your walk of H-1 and H-2, three minutes"]]) },
+      { k: "p", t: "This part is validated two ways:" },
+      { k: "li", t: "<b>By the gate</b>: the part's cases, which run the command line in its own process. Promise by promise, it is in the table at the end." },
+      { k: "li", t: "<b>By hand</b>: two steps in a terminal at the project's root, to read the line as a person reads it. They change nothing: the converter keeps no state." },
+      { k: "h", t: "Before you start" },
+      { k: "st", t: "1. In a terminal at the project's root, run " + c(RUN + "scripts/verify.ps1") + "." },
+      { k: "see", t: "See: its last line, " + c("verify: ALL GREEN") + "." },
+      { k: "h", t: "The command line" },
+      { k: "li", t: "<b>H-1</b> A conversion is one line, and a wrong call says what is wrong. It proves C-4.1 and C-4.3: the answer is read at once, and a mistake gets a sentence, never a stack trace." },
+      { k: "st", t: "1. In the terminal, run " + c(RUN + "cli/unitconv.ps1 12 km mi") + "." },
+      { k: "see", t: "See: " + c("12 km = 7.4565 mi") + "." },
+      { k: "st", t: "2. In the terminal, run " + c(RUN + "cli/unitconv.ps1 12 kg m") + "." },
+      { k: "see", t: "See: " + c("unitconv: kg is a mass, m a length: no conversion") + "." },
+      { k: "li", t: "<b>H-2</b> The list, the usage line and a value with a comma. It proves C-4.2, C-5.2 and C-5.5: a person finds the units and the right way to call." },
+      { k: "st", t: "1. In the terminal, run " + c(RUN + "cli/unitconv.ps1 -List") + "." },
+      { k: "see", t: "See: one line, " + c("km m cm mi ft in kg g lb s min h C F K") + "." },
+      { k: "st", t: "2. Run " + c(RUN + "cli/unitconv.ps1") + " with nothing after it." },
+      { k: "see", t: "See: " + c("usage: unitconv.ps1 &lt;value&gt; &lt;from&gt; &lt;to&gt; | -List") + "." },
+      { k: "st", t: "3. Run " + c(RUN + "cli/unitconv.ps1 1,5 km m") + "." },
+      { k: "see", t: "See: " + c("unitconv: 1,5 is not a number") + "." },
+      { k: "h", t: "For the gate: one row a promise" },
+      { k: "p", t: "For the gate, which checks that each promise of the contract has one row here, and for the assistant; nothing here is yours to read. The kinds: <b>output</b>, the line printed; <b>exit</b>, the exit code." },
+      { k: "tbl", t: tb(["Clause", "Automated", "By hand"], [
+        ["C-4.1", "2 tests · output", "H-1"], ["C-4.2", "1 test · output", "H-2"], ["C-4.3", "2 tests · output, exit", "H-1"],
+        ["C-4.4", "1 test · output", "—"], ["C-5.1", "2 tests · exit", "—"], ["C-5.2", "1 test · output", "H-2"],
+        ["C-5.3", "1 test · output", "—"], ["C-5.4", "1 test · exit", "—"], ["C-5.5", "1 test · output, exit", "H-2"],
+        ["C-6.1", "1 test · exit", "—"], ["C-6.2", "1 test · exit", "—"], ["C-6.3", "1 test · output", "—"]]) },
+      { k: "h", t: "Run log" },
+      { k: "tbl", t: tb(["Date", "Who", "Steps", "Verdict", "Notes"], [["—", "—", "—", "—", "no walk yet"]]) }
+    ]},
+    { id: "cv-r", grp: "convert/", dir: "convert", file: "README.md", title: "convert", state: "answered", base: "read", date: "11-19", blocks: [
+      { k: "p", t: "The conversion of a value from one unit to another: one function over one table." },
+      { k: "p", t: "It knows four kinds: length, mass, time and temperature. A value converts inside its kind, never across." },
+      { k: "h", t: "How it is built" },
+      { k: "li", t: c("convert.ps1") + " holds the table of units (each a kind and a factor to the kind's base unit: the metre, the gram, the second) and " + c("Convert-Unit") + ", dot-sourced by the command line." },
+      { k: "li", t: "A temperature has no factor: it goes through the kelvin, so any of the three scales converts to any other.",
+        thread: { you: "Why the kelvin and not the celsius?", lor: "The kelvin starts at absolute zero, so one check refuses what is below it." } },
+      { k: "li", t: c("test_convert.ps1") + " is the part's cases; the project's gate runs it." },
+      { k: "h", t: "The table" },
+      { k: "p", t: "Each line of the table is a unit: its name, its kind, its factor to the base unit." },
+      { k: "li", t: c("km") + ": a length, 1000 metres." },
+      { k: "li", t: c("mi") + ": a length, 1609.344 metres, the international mile." },
+      { k: "li", t: c("lb") + ": a mass, 453.59237 grams." },
+      { k: "li", t: c("h") + ": a time, 3600 seconds." },
+      { k: "li", t: c("C") + ", " + c("F") + ", " + c("K") + ": temperatures, no factor." },
+      { k: "h", t: "How a value is converted" },
+      { k: "p", t: "A value goes to the base unit by its factor, then from the base unit to the unit wanted." },
+      { k: "p", t: "A temperature goes to the kelvin by its own formula, then from the kelvin to the scale wanted." },
+      { k: "p", t: "The result is not rounded here: the rounding is the command line's." },
+      { k: "h", t: "The refusals" },
+      { k: "li", t: "A unit not in the table: " + c("unknown unit: &lt;unit&gt;") + "." },
+      { k: "li", t: "Two kinds: " + c("kg is a mass, m a length: no conversion") + "." },
+      { k: "li", t: "Below absolute zero: " + c("-300 C is below absolute zero") + "." },
+      { k: "h", t: "Adding a unit" },
+      { k: "p", t: "One line in the table, then a case in " + c("test_convert.ps1") + ". A new kind needs its base unit named in the comment above the table." }
+    ]},
+    { id: "cv-c", grp: "convert/", dir: "convert", file: "CONTRACT.md", title: "convert — contract", state: "changed", base: "read", date: "11-18", blocks: [
+      { k: "p", t: SPEC + " Stage " + c("design") + ": the ids may change." },
+      { k: "h", t: "1. Role" },
+      { k: "p", t: "The conversion of a value between two units of the same kind (length, mass, time, temperature), for the command line and any script of the project." },
+      { k: "h", t: "2. Does and does not" },
+      { k: "li", t: "converts a value between two units of one kind, both ways" },
+      { k: "p", t: "Does not:" },
+      { k: "li", t: "read the command line or print anything → " + c("cli") },
+      { k: "h", t: "3. Depends on" },
+      { k: "p", t: "Nothing else from the repository." },
+      { k: "h", t: "4. Conversions" },
+      { k: "p", t: "We want a result a person can check against a reference table, and a refusal that says why." },
+      { k: "li", id: "C-4.1", t: "<b>C-4.1</b> A length, a mass and a time convert by their factors: 1 km gives 1000 m, 1 lb gives 453.59237 g, 90 min gives 1.5 h." },
+      { k: "li", id: "C-4.2", t: "<b>C-4.2</b> A temperature converts between C, F and K: 100 C gives 212 F, 0 K gives -273.15 C." },
+      { k: "li", id: "C-4.3", t: "<b>C-4.3</b> A unit not in the table is refused<ins>, the unit named</ins>.",
+        ch: { say: "three words added", steps: 1, why: "convert: name the unit refused" } },
+      { k: "li", id: "C-4.4", t: "<b>C-4.4</b> Two units of different kinds are refused, both kinds named." },
+      { k: "li", id: "C-4.5", t: "<ins><b>C-4.5</b> A temperature below absolute zero is refused.</ins>",
+        ch: { say: "a new clause", steps: 4, why: "convert: refuse a temperature below absolute zero", whole: true } },
+      { k: "h", t: "5. Precision" },
+      { k: "li", id: "C-5.1", t: "<b>C-5.1</b> A result keeps every digit the factors give; the rounding is the caller's." },
+      { k: "li", id: "C-5.2", t: "<b>C-5.2</b> A conversion and its way back give the value back, within a billionth." },
+      { k: "li", id: "C-5.3", t: "<b>C-5.3</b> The same unit on both sides gives the value back unchanged." },
+      { k: "li", id: "C-5.4", t: "<b>C-5.4</b> Zero converts to zero, but for a temperature." },
+      { k: "h", t: "6. The table" },
+      { k: "li", id: "C-6.1", t: "<b>C-6.1</b> Every unit has a kind and, but for a temperature, a factor to the kind's base unit." },
+      { k: "li", id: "C-6.2", t: "<b>C-6.2</b> The units known are given in the table's order." },
+      { k: "li", id: "C-6.3", t: "<b>C-6.3</b> A unit's name is matched exactly, the case included." },
+      { k: "h", t: "7. Behaviour" },
+      { k: "tbl", t: tb(["Situation", "Reaction"], [["the same unit on both sides", "the value back, unchanged"], ["a value that is not a number", "refused, the value named"]]) },
+      { k: "h", t: "8. Wanted, not promised yet" },
+      { k: "li", t: "volumes and areas" },
+      { k: "h", t: "9. Non-goals" },
+      { k: "p", t: "Currencies: their rate changes every day." }
+    ]},
+    { id: "cv-v", grp: "convert/", dir: "convert", file: "VALIDATION.md", title: "convert — validation", state: "rework", date: "11-21", blocks: [
+      { k: "p", t: SPEC },
+      { k: "tbl", t: tb(["Last run", "Where it stands", "Waiting on"], [["11-20", "H-1 walked, pass", "your walk of H-2, one minute"]]) },
+      { k: "p", t: "This part is validated two ways:" },
+      { k: "li", t: "<b>By the gate</b>: the part's cases, one or more a promise: a value by its factor, a temperature through the kelvin, each refusal and its reason. Promise by promise, it is in the table at the end." },
+      { k: "li", t: "<b>By hand</b>: two steps in a terminal at the project's root, to see values anyone can check in a reference table. The command line is the tool that shows them; the factors are this part's." },
+      { k: "h", t: "Before you start" },
+      { k: "st", t: "1. In a terminal at the project's root, run " + c(RUN + "scripts/verify.ps1") + "." },
+      { k: "see", t: "See: a line " + c("convert: ALL GREEN") + " with its count of cases, and the last line, " + c("verify: ALL GREEN") + "." },
+      { k: "h", t: "A reference value" },
+      { k: "li", t: "<b>H-1</b> A mile is the international mile. It proves C-4.1: the factor is the one any reference table gives, so a wrong constant is seen by a person, not only by a test written from the same constant." },
+      { k: "st", t: "1. In the terminal, run " + c(RUN + "cli/unitconv.ps1 1 mi km") + "." },
+      { k: "see", t: "See: " + c("1 mi = 1.6093 km") + "." },
+      { k: "st", t: "2. Run " + c(RUN + "cli/unitconv.ps1 1 lb g") + "." },
+      { k: "see", t: "See: " + c("1 lb = 453.5924 g") + "." },
+      { k: "h", t: "A temperature" },
+      { k: "li", t: "<b>H-2</b> Water boils at 212 F, and nothing is colder than absolute zero. It proves C-4.2 and C-4.5.",
+        pending: { date: "11-21", t: "Say which reference table the 212 comes from, as H-1 does for the mile." } },
+      { k: "st", t: "1. Run " + c(RUN + "cli/unitconv.ps1 100 C F") + "." },
+      { k: "see", t: "See: " + c("100 C = 212 F") + "." },
+      { k: "st", t: "2. Run " + c(RUN + "cli/unitconv.ps1 0 K C") + "." },
+      { k: "see", t: "See: " + c("0 K = -273.15 C") + "." },
+      { k: "st", t: "3. Run " + c(RUN + "cli/unitconv.ps1 -300 C K") + "." },
+      { k: "see", t: "See: " + c("unitconv: -300 C is below absolute zero") + "." },
+      { k: "h", t: "For the gate: one row a promise" },
+      { k: "p", t: "For the gate, which checks that each promise of the contract has one row here, and for the assistant; nothing here is yours to read. The kinds: <b>output</b>, the value given back; <b>refusal</b>, the reason thrown." },
+      { k: "tbl", t: tb(["Clause", "Automated", "By hand"], [
+        ["C-4.1", "4 tests · output", "H-1"], ["C-4.2", "2 tests · output", "H-2"], ["C-4.3", "1 test · refusal", "—"],
+        ["C-4.4", "1 test · refusal", "—"], ["C-4.5", "1 test · refusal", "H-2"], ["C-5.1", "1 test · output", "—"],
+        ["C-5.2", "3 tests · output", "—"], ["C-5.3", "1 test · output", "—"], ["C-5.4", "1 test · output", "—"],
+        ["C-6.1", "1 test · output", "—"], ["C-6.2", "1 test · output", "—"], ["C-6.3", "1 test · refusal", "—"]]) },
+      { k: "h", t: "Run log" },
+      { k: "tbl", t: tb(["Date", "Who", "Steps", "Verdict", "Notes"], [
+        ["11-20", "you", "H-1", "pass", "the mile and the pound read as in the reference table"],
+        ["11-14", "you", "H-1", "fail", "the mile was the survey mile; the factor fixed the same day"]]) }
+    ]},
+    { id: "d-conv", grp: "docs/", dir: "docs", file: "coding_conventions.md", title: "Coding conventions", state: "read", date: "11-17", blocks: [
+      { k: "p", t: "The rules every script of this project follows. The page is a " + c("locked") + " row of the table: an agent reads it and never edits it; a change is the owner's." },
+      { k: "p", t: "Each section says who holds its rules: the gate, or a habit read at each review. A rule nothing checks drifts, so a habit that matters gets its script one day." },
+      { k: "h", t: "Scripts" },
+      { k: "p", t: "A habit." },
+      { k: "li", t: "Windows PowerShell 5.1: no operator it lacks (" + c("??") + ", " + c("?:") + ", " + c("&amp;&amp;") + "), a source file in ASCII." },
+      { k: "li", t: "One script, one job; its help block on top says what it prints and its exit code." },
+      { k: "li", t: "A function says what it gives back in its name (" + c("Convert-Unit") + ", " + c("Get-UnitNames") + ")." },
+      { k: "li", t: "A number printed for a person or a script is in the invariant culture." },
+      { k: "h", t: "Names" },
+      { k: "p", t: "A habit." },
+      { k: "li", t: "The unit is in the name of every value that has one (" + c("timeout_s") + ", " + c("length_m") + "), never a bare " + c("timeout") + "." },
+      { k: "li", t: "One word a concept, the same in the code and in the pages; a word retired is replaced everywhere." },
+      { k: "li", t: "A name or a design the owner chose stays: renaming something another part or a person uses asks first." },
+      { k: "h", t: "Structure" },
+      { k: "p", t: "A habit." },
+      { k: "li", t: "Dependencies go one way: a part never needs a part that needs it." },
+      { k: "li", t: "Nothing is dropped silently: what grows has a bound and says when it is reached; a call to an outside program has a timeout." },
+      { k: "li", t: "A warning is fixed, not silenced; one left on purpose carries its reason on the same line." },
+      { k: "h", t: "Comments" },
+      { k: "p", t: "A habit." },
+      { k: "li", t: "A comment says why, never what the next line does; six lines in a row at most." },
+      { k: "li", t: "No history in a comment: git keeps it." },
+      { k: "h", t: "Tests" },
+      { k: "p", t: "Held by the gate." },
+      { k: "li", t: "Each part has its cases in a " + c("test_&lt;part&gt;.ps1") + " beside its code, ending on " + c("&lt;part&gt;: ALL GREEN (&lt;n&gt; cases)") + "." },
+      { k: "li", t: "A case is named for what it proves, in plain words." },
+      { k: "li", t: "The gate (" + c("scripts/verify.ps1") + ") runs every part's cases; an agent commits only when it is green." }
+    ]},
+    { id: "d-guide", grp: "docs/", dir: "docs", file: "dev_guide.md", title: "unitconv — development guide", state: "changed", base: "read", date: "11-16", rewritten: true, blocks: [
+      { k: "p", t: "The rules of the road for unitconv, a command-line unit converter in PowerShell." },
+      { k: "h", t: "Layout" },
+      { k: "pre", t: "<pre>unitconv/\n├── status.yaml          the owner's table: one row per part, what an agent may do there\n├── agents.yaml          who builds what, and when each one stops\n├── CLAUDE.md            the reading order of an agent\n├── convert/             the conversion: the table of units and Convert-Unit, its three documents\n├── cli/                 the command line, its three documents\n├── docs/                this guide, the coding conventions (locked)\n└── scripts/verify.ps1   the gate</pre>" },
+      { k: "h", t: "The hard rules" },
+      { k: "li", t: "<b>The table decides.</b> " + c("convert") + " is open, " + c("cli") + " asks once a session, <ins>the coding conventions are locked:</ins> the edit hook reads the row before every edit.",
+        ch: { say: "a sentence reworded", steps: 2, why: "docs: lock the coding conventions",
+          before: "<b>The table decides.</b> " + c("convert") + " is open and " + c("cli") + " asks; the edit hook reads the row before every edit." } },
+      { k: "li", t: "<b>The gate before a commit.</b> <ins>" + c(RUN + "scripts/verify.ps1") + " runs every part's cases and checks the table; an agent commits only when it prints " + c("verify: ALL GREEN") + ", on an " + c("agent/&lt;task&gt;") + " branch, never on " + c("main") + ".</ins>",
+        ch: { say: "a sentence reworded", steps: 3, why: "docs: say where an agent commits",
+          before: "<b>The gate before a commit.</b> Run " + c("scripts/verify.ps1") + "; commit when it is green." } },
+      { k: "li", t: "<ins><b>A part is a folder with its three documents</b>: " + c("README.md") + " (how), " + c("CONTRACT.md") + " (what it promises), " + c("VALIDATION.md") + " (how each promise is checked), written as the method's contract spec says.</ins>",
+        ch: { say: "a new paragraph", steps: 4, why: "docs: name the three documents of a part", whole: true } },
+      { k: "li", t: "<ins><b>Nothing downloaded.</b> The project needs Windows PowerShell 5.1 and nothing else.</ins>",
+        ch: { say: "a new paragraph", steps: 4, why: "docs: nothing downloaded", whole: true } },
+      { k: "h", t: "<ins>A day on the project</ins>",
+        ch: { say: "a new heading", steps: 4, why: "docs: a day on the project", whole: true } },
+      { k: "p", t: "<ins>Open the project and read the table first: it says what an agent may touch today. Then read the three documents of the part you work on, in the order README, CONTRACT, VALIDATION.</ins>",
+        ch: { say: "a new paragraph", steps: 4, why: "docs: a day on the project", whole: true } },
+      { k: "p", t: "<ins>A change starts in the contract, as a promise a person can read. The code and its cases follow, and the gate says when they meet.</ins>",
+        ch: { say: "a new paragraph", steps: 4, why: "docs: a day on the project", whole: true } }
+    ]},
+
+    /* the method: one real page, the install's contract, whole */
+    { id: "m-install", grp: "the method", grpNote: "a real page", dir: "install", file: "CONTRACT.md", label: "install/CONTRACT.md", title: "install — contract", state: "ok", date: "11-23",
+      by: "written by Lorisse 2026-10-24 · reviewed by the owner: 2026-11-23, ok", blocks: [
+      { k: "p", t: "Human file; format: <code>../method/contract_spec.md</code>. The part is in <code>design</code>: ids may still change. Covers the install and the memory sync; the disk keeper is the <code>/disk</code> skill's, its script and its contract in that skill's folder (<code>../.claude/skills/disk/</code>). The settings lint the install runs first is <code>../lists/CONTRACT.md</code>." },
+      { k: "h", t: "1. Role" },
+      { k: "p", t: "The scripts that make this repository the source of the owner's Claude Code setup on a Windows machine, wherever it is cloned: they install the user-level settings and the skills, and copy the memory where Claude Code reads it." },
+      { k: "h", t: "2. Does and does not" },
+      { k: "li", t: "installs what the repository holds, never the other way round" },
+      { k: "li", t: "runs the settings lint before every install" },
+      { k: "p", t: "Does not:" },
+      { k: "li", t: "edit a rule → the owner, in <code>lists/settings.user.json</code>" },
+      { k: "li", t: "judge the settings → <code>lists</code> (the lint)" },
+      { k: "li", t: "reach the network, download, schedule anything → nothing" },
+      { k: "h", t: "3. Depends on" },
+      { k: "p", t: "Windows PowerShell 5.1; <code>lists</code> (the settings and their lint). Nothing else." },
+      { k: "h", t: "4. The install" },
+      { k: "p", t: "We want one command that puts the repository's settings in place, and nothing in place when they are wrong." },
+      { k: "li", id: "C-4.1", t: "<b>C-4.1</b> When the settings fail the lint, nothing is installed and the message says so." },
+      { k: "li", id: "C-4.2", t: "<b>C-4.2</b> The settings file a run replaces is kept beside the new one with the suffix <code>.bak</code>. The file found at the first install, the one this install did not write, is kept too under a name of its own, and no later run overwrites or removes it." },
+      { k: "li", id: "C-4.3", t: "<b>C-4.3</b> The five skills <code>/lorisse</code>, <code>/feedback</code>, <code>/notes</code>, <code>/asks</code> and <code>/disk</code> are made user-level, each a junction in the user's skills folder to this repository's skill folder, so a change in the repository is the skill at once; an old pointer command of the same name in the user's commands folder is removed only when it is one an install of ours wrote; a command of the user's own under that name is kept and named in one line." },
+      { k: "li", id: "C-4.4", t: "<b>C-4.4</b> The memory copies are refreshed at the end of the install." },
+      { k: "li", id: "C-4.5", t: "<b>C-4.5</b> A clone in any folder installs with no line edited: the install's repository is the folder it runs from, found from its own place with every junction on the way followed; it writes the lists' placeholders with that folder and with the user skills folder it makes its junctions in (<code>lists/CONTRACT.md</code> C-4.12), lints the file as written, writes that file and no other, and makes each junction to that folder's skill. Given <code>-To &lt;folder&gt;</code>, it writes the settings and the junctions into that folder in place of the user's own and leaves the memory sync out." },
+      { k: "li", id: "C-4.6", t: "<b>C-4.6</b> Settings this install did not write are never replaced unasked. On a machine whose settings file is someone's own, the install stops first: it says what it found there (how many rules, how many hooks, which other keys) and what it would do, writes nothing, and goes on only when run again with the switch that says yes." },
+      { k: "li", id: "C-4.7", t: "<b>C-4.7</b> What is not the install's stays. Every top-level key of the user's file other than the permissions, the auto-mode lists, the hooks and the install's own environment values is carried into the new file as it was. Not carried, each named in one line: the user's own rules and hooks; every other entry of their permissions (the default mode, the additional folders, any other); and a key that would switch the layer off (one that disables every hook). They stay readable in the first copy (C-4.2), theirs to add to the lists of their clone." },
+      { k: "li", id: "C-4.8", t: "<b>C-4.8</b> All or nothing. Everything is checked before the first write: the lint, each junction's place (free, or a junction of ours; a folder of the user's own under a skill's name refuses the install). A failure after the first write puts every file and junction back as it was, and the last line says which it is: installed, or nothing changed." },
+      { k: "li", id: "C-4.9", t: "<b>C-4.9</b> Given the preview switch, it prints each file and junction it would write, replace or remove, and writes nothing." },
+      { k: "li", id: "C-4.10", t: "<b>C-4.10</b> The walk has a user folder of its own. One script of this folder, named in the README, makes under <code>target/</code> the folder someone else would have: settings of their own (rules, a hook, other keys, one that disables every hook), a command of their own under a skill's name, an old pointer of ours, the same at each run. Every by-hand step installs into it, so a walk never touches the real settings." },
+      { k: "h", t: "5. The memory sync" },
+      { k: "p", t: "We want the repository's memory folder to be the one source, copied over every project memory folder Claude Code has on the machine, so no thread reads a stale copy." },
+      { k: "li", id: "C-5.1", t: "<b>C-5.1</b> Every file of the memory folder is copied over the memory folder of every project folder under <code>~/.claude/projects/</code> that already holds one, and of each named project: this repository's, the user folder's, and each repository the owner's list of repositories (<code>me/repositories.txt</code>, one folder a line) marks <code>memory</code> (its memory folder created once named); another project without a memory folder is skipped; a project not named keeps its own <code>MEMORY.md</code> index (every other file is copied); nothing is deleted, nothing is copied back. Without the list, the named projects are this repository's and the user folder's. Given <code>-Projects &lt;folder&gt;</code>, that folder is read in place of <code>~/.claude/projects/</code>." },
+      { k: "li", id: "C-5.2", t: "<b>C-5.2</b> One line per folder written." },
+      { k: "h", t: "6. Behaviour" },
+      { k: "tbl", t: tb(["Situation", "Reaction"], [
+        ["the settings fail the lint", "the install stops before touching the user's file"],
+        ["a project folder without a memory folder, not named", "skipped, not created"],
+        ["a named project without a memory folder", "created, then written"],
+        ["the repository in a folder whose name holds a space", "its hooks' commands and its rules written in double quotes"],
+        ["the machine's settings file is someone's own, no yes given", "what was found and what would be done, nothing written"],
+        ["a folder of the user's own under a skill's name", "refused before anything is written, the folder named"],
+        ["a failure half-way", "every file and junction back as it was, the last line <code>nothing changed</code>"],
+        ["run from a second clone", "the settings and the junctions follow that clone; run from the first again, they come back"]]) },
+      { k: "h", t: "7. Wanted, not promised yet" },
+      { k: "li", t: "one command that takes the install away: the first copy put back, the junctions it made removed" },
+      { k: "h", t: "8. Non-goals" },
+      { k: "p", t: "No script reaches the network or runs after it ends." }
+    ]}
+  ];
+  DOCS.forEach(function (d) {
+    d.view = d.state === "changed" ? "chg" : "text";
+    d.seen = false; d.mine = {}; d.okd = {}; d.undo = null; d.box = -1;
+    d.allok = false; d.bef = {}; d.unfold = {};
+    d.blocks.forEach(function (b) { if (b.thread) b.thread.done = false; });
+  });
+  var cur = DOCS[4];
+
+  function changes(d) { return d.seen ? [] : d.blocks.filter(function (b) { return b.ch; }); }
+  function okCount(d) {
+    if (d.rewritten && d.allok) return changes(d).length;
+    var n = 0; d.blocks.forEach(function (b, i) { if (b.ch && d.okd[i]) n++; }); return n;
+  }
+  function sign(s) { return "st-" + s; }
+  function listWords(d) {
+    switch (d.state) {
+      case "never": return "never read";
+      case "read": return "read " + d.date;
+      case "ok": return "ok " + d.date;
+      case "rework": return "to rework, waits for Lorisse";
+      case "changed": var n = changes(d).length - okCount(d); return "changed since " + d.date + (n ? " · " + n + " to check" : "");
+      case "answered": return "1 answer · your read";
+      case "note": return "1 note to answer · waits for Lorisse";
+    }
+    return "";
+  }
+  function chipWords(d) {
+    switch (d.state) {
+      case "never": return "never read";
+      case "read": return "read · " + d.date;
+      case "ok": return "ok · " + d.date;
+      case "rework": return "to rework · " + d.date + " — waits for Lorisse";
+      case "changed": var c = changes(d).length, k = okCount(d);
+        return c + " changes since your read of " + d.date + (k ? " · " + k + " okayed" : "");
+      case "answered": return "1 answer · your read";
+      case "note": return "1 note to answer — waits for Lorisse";
+    }
+    return "";
+  }
+
+  function snapshot(d, said) {
+    d.undo = { said: said, state: d.state, date: d.date, seen: d.seen, view: d.view, base: d.base, allok: d.allok,
+      okd: JSON.parse(JSON.stringify(d.okd)), mine: JSON.parse(JSON.stringify(d.mine)),
+      threads: d.blocks.map(function (b) { return b.thread ? b.thread.done : null; }) };
+  }
+  function restore(d) {
+    var u = d.undo; if (!u) return;
+    d.state = u.state; d.date = u.date; d.seen = u.seen; d.view = u.view; d.base = u.base; d.allok = u.allok; d.okd = u.okd; d.mine = u.mine;
+    d.blocks.forEach(function (b, i) { if (b.thread) b.thread.done = u.threads[i]; });
+    d.undo = null;
+  }
+
+  function drawList() {
+    var h = '<div class="dl-title">Documents and notes</div>', grp = "", waits = 0;
+    DOCS.forEach(function (d) {
+      if (d.grp !== grp) { grp = d.grp; h += '<div class="dl-grp">' + esc(grp) + (d.grpNote ? " <small>· " + esc(d.grpNote) + "</small>" : "") + "</div>"; }
+      if (d.state === "never" || d.state === "changed" || d.state === "answered") waits++;
+      h += '<button type="button" data-doc="' + d.id + '"' + (d === cur ? ' class="sel" aria-current="true"' : "") + ">" +
+        '<i class="st ' + sign(d.state) + '"></i><b>' + esc(d.label || d.file) + '</b><span class="w">' + esc(listWords(d)) + "</span></button>";
+    });
+    dl.innerHTML = h;
+    if (wstat) wstat.innerHTML = '<span>main</span><span class="g">gate green</span><span>' + waits + " to read</span><span class=\"grow\"></span><span>Lorisse</span>";
+  }
+
+  function meter(n) { var s = '<span class="meter" aria-hidden="true">'; for (var i = 1; i <= 4; i++) s += '<i' + (i <= n ? ' class="on"' : "") + "></i>"; return s + "</span>"; }
+
+  function margin(d, b, i) {
+    var m = "";
+    if (d.box === i) {
+      m += '<div class="nbox"><textarea id="nbox-text" aria-label="Your note" placeholder="A question, a remark"></textarea>' +
+        '<div class="acts"><button type="button" class="add" data-act="note-add">Add the note</button><button type="button" data-act="note-cancel">Cancel</button></div></div>';
+    }
+    if (d.view !== "text" && b.ch && !d.seen) {
+      m += '<div class="chl" title="' + esc(b.ch.why) + '">' + meter(b.ch.steps) + "<span>" + esc(b.ch.say) + "</span>";
+      if (!d.rewritten) {
+        m += d.okd[i] ? '<span class="ok">okayed</span> <button type="button" data-act="chg-ok" data-i="' + i + '">take back</button>'
+                      : '<button type="button" data-act="chg-ok" data-i="' + i + '">okay</button>';
+      }
+      m += "</div>";
+    }
+    if (b.thread) {
+      m += '<div class="card' + (b.thread.done ? " done" : "") + '"><div class="who">You · 11-19</div><p>' + esc(b.thread.you) + "</p>" +
+        '<div class="who">Lorisse · 11-20</div><p>' + esc(b.thread.lor) + "</p>" +
+        (b.thread.done ? '<div class="acts"><span class="ok">okayed</span></div>'
+                       : '<div class="acts"><button type="button" data-act="thr-ok" data-i="' + i + '">okay</button><button type="button" data-act="open-box" data-i="' + i + '">Reply</button></div>') + "</div>";
+    }
+    if (b.pending) {
+      m += '<div class="card mine"><div class="who">You · ' + esc(b.pending.date) + "</div><p>" + esc(b.pending.t) + '</p><div class="acts"><span class="wait">waits for Lorisse</span></div></div>';
+    }
+    if (d.mine[i]) {
+      d.mine[i].forEach(function (t) { m += '<div class="card mine"><div class="who">You · now</div><p>' + esc(t) + '</p><div class="acts"><span class="wait">waits for Lorisse</span></div></div>'; });
+    }
+    return m;
+  }
+
+  function row(d, b, i) {
+    var cls = "blk " + b.k, shownCh = d.view !== "text" && b.ch && !d.seen;
+    if (shownCh) cls += b.ch.whole ? " new" : " chg";
+    var left = '<div class="' + cls + '" data-blk="' + i + '" title="Click to leave a note">' + b.t + "</div>";
+    if (shownCh && b.ch.before) {
+      left += '<div class="before"><button type="button" data-act="before" data-i="' + i + '" aria-expanded="' + !!d.bef[i] + '">what it said before</button>' +
+        (d.bef[i] ? '<div class="old">' + b.ch.before + "</div>" : "") + "</div>";
+    }
+    return '<div class="row"><div class="cl">' + left + '</div><div class="mg">' + margin(d, b, i) + "</div></div>";
+  }
+
+  function drawReader() {
+    var d = cur, ch = changes(d), n = ch.length, k = okCount(d);
+    if (tabs) tabs.innerHTML = '<div class="ed-tab"><i class="st ' + sign(d.state) + '"></i><span class="nm">' + esc(d.dir + "/" + d.file) + '</span><span class="x" aria-hidden="true">&#215;</span></div>';
+    if (wname) wname.textContent = d.dir + "/" + d.file + " — " + (d.grp === "the method" ? "the method" : "unitconv") + " — VS Code";
+    var h = '<div class="rd-in"><div class="rd-head"><div class="rd-path">' + esc(d.dir + "/" + d.file) + '</div><div class="rd-title">' + esc(d.title) + "</div>" +
+      '<div class="rd-by">' + esc(d.by || "written by Lorisse") + "</div>" +
+      '<div class="rd-state"><span class="chip s-' + d.state + '"><i class="st ' + sign(d.state) + '"></i>' + esc(chipWords(d)) + "</span></div>";
+    if (d.rewritten && n) {
+      h += '<div class="allok">' + (d.allok
+        ? '<span class="ok">all okayed</span><button type="button" class="lk" data-act="all-ok">take back</button>'
+        : '<button type="button" class="big" data-act="all-ok">Okay, all of it</button>') +
+        "<span>" + n + " of the page's " + d.blocks.length + " blocks changed: one okay for all of it</span></div>";
+    }
+    h += '<div class="rd-bar"><span class="seg" role="group" aria-label="The view">' +
+      '<button type="button" data-view="text" aria-pressed="' + (d.view === "text") + '">The text</button>' +
+      '<button type="button" data-view="chg" aria-pressed="' + (d.view === "chg") + '">Changes in the text' + (n ? " · " + (n - k ? '<span class="cnt">' + n + "</span>" : n) : "") + "</button>" +
+      '<button type="button" data-view="only" aria-pressed="' + (d.view === "only") + '">Only the changes</button></span>' + marks(d) + "</div>";
+    if (d.undo) h += '<div class="undo" style="margin-top:8px">' + esc(d.undo.said) + '<button type="button" data-act="undo">Undo</button></div>';
+    h += "</div>";
+
+    h += '<div class="rd-body ' + (d.view === "text" ? "v-text" : "v-chg") + '">';
+    if (d.view !== "text" && !n) h += '<div class="none">No change since your mark.</div>';
+    if (d.view === "only" && n) {
+      var run = [];
+      var flush = function () {
+        if (!run.length) return;
+        var at = run[0].i;
+        if (d.unfold[at]) { run.forEach(function (x) { h += row(d, x.b, x.i); }); run = []; return; }
+        var ids = run.filter(function (x) { return x.b.id; }).map(function (x) { return x.b.id; });
+        var label = ids.length > 1 ? ids[0] + " to " + ids[ids.length - 1] + " did not change" : ids.length ? ids[0] + " did not change" : (run.length === 1 ? "one block" : run.length + " blocks") + " did not change";
+        h += '<div class="fold">' + esc(label) + ' · <button type="button" data-act="unfold" data-i="' + at + '">show</button></div>'; run = [];
+      };
+      d.blocks.forEach(function (b, i) { if (b.ch) { flush(); h += row(d, b, i); } else run.push({ b: b, i: i }); });
+      flush();
+    } else {
+      d.blocks.forEach(function (b, i) { h += row(d, b, i); });
+    }
+    h += '<div class="rd-end"><span>The end of the page.</span>' + marks(d) + "</div></div></div>";
+    rd.innerHTML = h;
+    var t = document.getElementById("nbox-text"); if (t) t.focus();
+  }
+  function marks(d) {
+    var m = d.state === "read" || d.state === "ok" || d.state === "rework" ? d.state : "";
+    return '<span class="marks" role="group" aria-label="Your mark">' +
+      '<button type="button" data-mark="read" aria-pressed="' + (m === "read") + '">Read</button>' +
+      '<button type="button" data-mark="ok" aria-pressed="' + (m === "ok") + '">Ok</button>' +
+      '<button type="button" data-mark="rework" aria-pressed="' + (m === "rework") + '">To rework</button></span>';
+  }
+
+  function draw() { drawList(); drawReader(); }
+
+  function mark(d, m) {
+    var words = { read: "Marked read.", ok: "Marked ok.", rework: "Marked to rework: Lorisse will change it as your notes say." };
+    snapshot(d, words[m] + " ");
+    d.state = m; d.base = m; d.date = "now"; d.seen = true;
+    d.blocks.forEach(function (b) { if (b.thread) b.thread.done = true; });
+    if (d.view !== "text") d.view = "text";
+  }
+
+  dl.addEventListener("click", function (e) {
+    var b = e.target.closest("[data-doc]"); if (!b) return;
+    for (var i = 0; i < DOCS.length; i++) if (DOCS[i].id === b.getAttribute("data-doc")) cur = DOCS[i];
+    cur.box = -1;
+    if (cur.state === "changed" && !cur.seen) cur.view = "chg";
+    draw();
+    rd.scrollTop = 0;
+  });
+
+  rd.addEventListener("click", function (e) {
+    var d = cur, t = e.target, el;
+    if ((el = t.closest("[data-view]"))) { d.view = el.getAttribute("data-view"); d.box = -1; draw(); return; }
+    if ((el = t.closest("[data-mark]"))) { mark(d, el.getAttribute("data-mark")); d.box = -1; draw(); return; }
+    if ((el = t.closest("[data-act]"))) {
+      var act = el.getAttribute("data-act"), i = +el.getAttribute("data-i");
+      if (act === "undo") restore(d);
+      else if (act === "chg-ok") { d.okd[i] = !d.okd[i]; }
+      else if (act === "all-ok") { d.allok = !d.allok; }
+      else if (act === "before") { d.bef[i] = !d.bef[i]; }
+      else if (act === "unfold") { d.unfold[i] = true; }
+      else if (act === "thr-ok") { snapshot(d, "Answer okayed. "); d.blocks[i].thread.done = true; if (d.state === "answered") d.state = d.base || "read"; }
+      else if (act === "open-box") { d.box = i; }
+      else if (act === "note-cancel") { d.box = -1; }
+      else if (act === "note-add") {
+        var ta = document.getElementById("nbox-text"), txt = ta ? ta.value.trim() : "";
+        if (txt) {
+          snapshot(d, "Note written under the block. ");
+          (d.mine[d.box] = d.mine[d.box] || []).push(txt);
+          d.state = "note";
+        }
+        d.box = -1;
+      }
+      draw(); return;
+    }
+    if (t.closest("textarea, .nbox, .before, .fold")) return;
+    if ((el = t.closest("[data-blk]"))) { d.box = +el.getAttribute("data-blk"); draw(); }
+  });
+
+  draw();
+})();
+</script>
+<script>
+/* the colour setting: Auto follows the system; Light and Dark are kept in this browser under the status pages' own key */
+(function () {
+  var g = document.getElementById("theme"); if (!g) return;
+  function set(v, save) {
+    if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v);
+    else { document.documentElement.removeAttribute("data-theme"); v = "auto"; }
+    var bs = g.querySelectorAll("[data-value]");
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-value") === v));
+    if (save) { try { localStorage.setItem("pv-theme", v); } catch (e) { /* storage may be off */ } }
+  }
+  g.addEventListener("click", function (e) { var b = e.target.closest("[data-value]"); if (b) set(b.getAttribute("data-value"), true); });
+  window.addEventListener("storage", function (e) { if (e.key === "pv-theme") set(e.newValue || "auto", false); });
+  var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {}
+  if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) { /* storage may be off */ } }
+  set(v || "auto", false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1529 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lorisse</title>
+<style>
+/* Lorisse's shared stylesheet: the design's tokens (dark on :root, light below) and the components the tools share.
+   Its source copy lives in the owner's Lorisse repository under page/lorisse.css; a tool copies it whole, never edits it.
+   Roles: blue = sure / done, orange = busy / now, pink = trouble, yellow = careful; no web font loaded, the fallbacks show.
+   Every colour is a token of the three blocks below (:root, the light media query, [data-theme="light"]): no colour literal
+   anywhere else in a tool's page, method/gate/check_colours.ps1 fails on one (since 2026-11-09). */
+:root {
+  color-scheme: dark;
+
+  /* surfaces: line-2 is the outline of what is empty or waiting */
+  --cb-bg: #07111a;
+  --cb-surface: #0d1a26;
+  --cb-surface-2: #13222f;
+  --cb-line: #1a2b3b;
+  --cb-line-2: #2f4558;
+
+  /* ink */
+  --cb-ink: #e6f1fa;
+  --cb-ink-2: #9fb4c6;
+  --cb-ink-3: #6a8296;
+  --cb-on-accent: #07111a;
+  --cb-on-accent-dim: rgba(7, 17, 26, .72);
+  --cb-on-accent-faint: rgba(7, 17, 26, .4);
+  --cb-on-yellow: #0f1a00;
+
+  /* the eye's four */
+  --cb-blue: #4cc9f0;
+  --cb-orange: #ffb703;
+  --cb-orange-hi: #ffcb47;
+  --cb-pink: #ff5c8a;
+  --cb-yellow: #b8f35d;
+  --cb-blue-soft: rgba(76, 201, 240, .14);
+  --cb-orange-soft: rgba(255, 183, 3, .14);
+  --cb-pink-soft: rgba(255, 92, 138, .14);
+  --cb-yellow-soft: rgba(184, 243, 93, .14);
+  --cb-blue-glow: rgba(76, 201, 240, .45);
+  --cb-orange-glow: rgba(255, 183, 3, .5);
+  --cb-pink-glow: rgba(255, 92, 138, .45);
+  --cb-blue-edge: rgba(76, 201, 240, .45);
+  --cb-orange-edge: rgba(255, 183, 3, .5);
+  --cb-pink-edge: rgba(255, 92, 138, .5);
+  --cb-yellow-edge: rgba(184, 243, 93, .5);
+
+  /* the verdict green: OK as a pass / fail word to a person (the owner, 2026-11-05); blue stays selection and primary, the yellow-green a warning */
+  --cb-green: #3ddc97;
+  --cb-green-soft: rgba(61, 220, 151, .14);
+  --cb-green-edge: rgba(61, 220, 151, .5);
+
+  /* commit bands */
+  --cb-band-ok: #3fa9d0;
+  --cb-band-late: #e0b000;
+  --cb-band-very-late: #e2621a;
+  --cb-band-too-much: #d9529a;
+  --cb-band-weekend: #1f2d3a;
+
+  /* chart tiers: colour in a spend chart means the tier only */
+  --cb-tier-1: #bb8100;
+  --cb-tier-2: #1fa2cc;
+  --cb-tier-3: #f0507f;
+
+  /* fonts */
+  --cb-font-app: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --cb-font-note: "Literata", Georgia, "Times New Roman", serif;
+  --cb-font-mono: "B612 Mono", ui-monospace, Consolas, "Courier New", monospace;
+
+  /* type scale */
+  --cb-fs-xs: 0.75rem;
+  --cb-fs-sm: 0.875rem;
+  --cb-fs-md: 1rem;
+  --cb-fs-lg: 1.25rem;
+  --cb-fs-xl: 1.75rem;
+  --cb-fs-readout: 2.875rem;
+  --cb-fs-note: 1.0625rem;
+
+  /* weights */
+  --cb-fw-regular: 400;
+  --cb-fw-medium: 500;
+  --cb-fw-semibold: 600;
+  --cb-fw-bold: 700;
+  --cb-fw-heavy: 800;
+
+  /* line heights */
+  --cb-lh-tight: 1.05;
+  --cb-lh-snug: 1.2;
+  --cb-lh-body: 1.45;
+  --cb-lh-note: 1.5;
+
+  /* tracking */
+  --cb-track-tight: -0.01em;
+  --cb-track-readout: -0.02em;
+  --cb-track-caps: 0.09em;
+
+  /* spacing, 4 px steps */
+  --cb-space-1: 4px;
+  --cb-space-2: 8px;
+  --cb-space-3: 12px;
+  --cb-space-4: 16px;
+  --cb-space-5: 20px;
+  --cb-space-6: 24px;
+  --cb-space-7: 28px;
+  --cb-space-8: 32px;
+
+  /* radii */
+  --cb-radius-sm: 8px;
+  --cb-radius-md: 12px;
+  --cb-radius-card: 14px;
+  --cb-radius-pill: 999px;
+
+  /* borders */
+  --cb-border: 1px;
+  --cb-border-chip: 1.5px;
+
+  /* shadows: flat; a card is its line, a pop keeps one shadow to lift it off the page */
+  --cb-shadow-card: 0 0 0 1px var(--cb-line);
+  --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(0, 0, 0, .9);
+  --cb-shadow-go: none;
+  --cb-scrim: rgba(0, 0, 0, .6);
+  --cb-shadow-knob: 0 1px 3px rgba(0, 0, 0, .25);
+  --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(0, 0, 0, .5);
+
+  /* no glow at rest; agent-mark and quarter are the caption glyphs' fills */
+  --cb-glow: none;
+  --cb-agent-mark: conic-gradient(from 200deg, var(--cb-blue), var(--cb-orange), var(--cb-blue));
+  --cb-go-fill: var(--cb-orange);
+  --cb-quarter: conic-gradient(from -45deg, var(--cb-orange) 0 90deg, var(--cb-line-2) 0);
+
+  /* the eye: a dark core in both themes, its inner light, an unused quarter's outline */
+  --cb-eye-core: #03080d;
+  --cb-eye-light: rgba(255, 255, 255, .75);
+  --cb-eye-rim: rgba(255, 255, 255, .45);
+  --cb-eye-off: var(--cb-line-2);
+
+  /* print: the paper, in both themes */
+  --cb-print-bg: #ffffff;
+
+  /* motion */
+  --cb-dur-fast: 150ms;
+  --cb-dur-normal: 250ms;
+  --cb-ease: cubic-bezier(.2, .7, .2, 1);
+
+  /* focus */
+  --cb-focus-ring: 2px solid var(--cb-blue);
+  --cb-focus-offset: 2px;
+  --cb-focus-soft: 0 0 0 3px var(--cb-blue-soft);
+
+  /* z-index */
+  --cb-z-sticky: 100;
+  --cb-z-overlay: 200;
+  --cb-z-modal: 300;
+  --cb-z-toast: 400;
+  --cb-z-tooltip: 500;
+
+  /* touch */
+  --cb-touch: 44px;
+}
+
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --cb-bg: #ebe7e0;
+    --cb-surface: #e3dfd7;
+    --cb-surface-2: #d9d4cb;
+    --cb-line: #d0cabf;
+    --cb-line-2: #9a9488;
+    --cb-ink: #1c2733;
+    --cb-ink-2: #46525e;
+    --cb-ink-3: #525c67;
+    --cb-on-accent: #ffffff;
+    --cb-on-accent-dim: rgba(255, 255, 255, .72);
+    --cb-on-accent-faint: rgba(255, 255, 255, .4);
+    --cb-blue: #006488;
+    --cb-orange: #824e00;
+    --cb-orange-hi: #9a5c00;
+    --cb-pink: #b5124f;
+    --cb-yellow: #3e6300;
+    --cb-blue-soft: rgba(0, 100, 136, .10);
+    --cb-orange-soft: rgba(130, 78, 0, .10);
+    --cb-pink-soft: rgba(181, 18, 79, .09);
+    --cb-yellow-soft: rgba(62, 99, 0, .10);
+    --cb-blue-glow: rgba(0, 100, 136, .45);
+    --cb-orange-glow: rgba(130, 78, 0, .5);
+    --cb-pink-glow: rgba(181, 18, 79, .45);
+    --cb-blue-edge: rgba(0, 100, 136, .5);
+    --cb-orange-edge: rgba(130, 78, 0, .5);
+    --cb-pink-edge: rgba(181, 18, 79, .5);
+    --cb-yellow-edge: rgba(62, 99, 0, .55);
+    --cb-green: #00704a;
+    --cb-green-soft: rgba(0, 112, 74, .10);
+    --cb-green-edge: rgba(0, 112, 74, .5);
+    --cb-band-ok: #1f86b0;
+    --cb-band-late: #c49a00;
+    --cb-band-very-late: #d2520a;
+    --cb-band-too-much: #b8186a;
+    --cb-band-weekend: #cfc9be;
+    --cb-tier-1: #9a5c00;
+    --cb-tier-2: #00739e;
+    --cb-tier-3: #c2185b;
+    --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(28, 39, 51, .28);
+    --cb-scrim: rgba(28, 39, 51, .38);
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --cb-bg: #ebe7e0;
+  --cb-surface: #e3dfd7;
+  --cb-surface-2: #d9d4cb;
+  --cb-line: #d0cabf;
+  --cb-line-2: #9a9488;
+  --cb-ink: #1c2733;
+  --cb-ink-2: #46525e;
+  --cb-ink-3: #525c67;
+  --cb-on-accent: #ffffff;
+  --cb-on-accent-dim: rgba(255, 255, 255, .72);
+  --cb-on-accent-faint: rgba(255, 255, 255, .4);
+  --cb-blue: #006488;
+  --cb-orange: #824e00;
+  --cb-orange-hi: #9a5c00;
+  --cb-pink: #b5124f;
+  --cb-yellow: #3e6300;
+  --cb-blue-soft: rgba(0, 100, 136, .10);
+  --cb-orange-soft: rgba(130, 78, 0, .10);
+  --cb-pink-soft: rgba(181, 18, 79, .09);
+  --cb-yellow-soft: rgba(62, 99, 0, .10);
+  --cb-blue-glow: rgba(0, 100, 136, .45);
+  --cb-orange-glow: rgba(130, 78, 0, .5);
+  --cb-pink-glow: rgba(181, 18, 79, .45);
+  --cb-blue-edge: rgba(0, 100, 136, .5);
+  --cb-orange-edge: rgba(130, 78, 0, .5);
+  --cb-pink-edge: rgba(181, 18, 79, .5);
+  --cb-yellow-edge: rgba(62, 99, 0, .55);
+  --cb-green: #00704a;
+  --cb-green-soft: rgba(0, 112, 74, .10);
+  --cb-green-edge: rgba(0, 112, 74, .5);
+  --cb-band-ok: #1f86b0;
+  --cb-band-late: #c49a00;
+  --cb-band-very-late: #d2520a;
+  --cb-band-too-much: #b8186a;
+  --cb-band-weekend: #cfc9be;
+  --cb-tier-1: #9a5c00;
+  --cb-tier-2: #00739e;
+  --cb-tier-3: #c2185b;
+  --cb-shadow-pop: 0 0 0 1px var(--cb-line-2), 0 24px 48px -16px rgba(28, 39, 51, .28);
+  --cb-scrim: rgba(28, 39, 51, .38);
+  --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+}
+
+/* base */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--cb-bg);
+  color: var(--cb-ink);
+  font: var(--cb-fw-regular) var(--cb-fs-md)/var(--cb-lh-body) var(--cb-font-app);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* typography roles */
+.cb-t-title { margin: 0; font: var(--cb-fw-heavy) var(--cb-fs-xl)/var(--cb-lh-snug) var(--cb-font-app); letter-spacing: var(--cb-track-tight); }
+.cb-t-title--sm { font-size: var(--cb-fs-lg); }
+.cb-t-section { margin: 0; font: var(--cb-fw-semibold) var(--cb-fs-xs)/1 var(--cb-font-app); letter-spacing: var(--cb-track-caps); text-transform: uppercase; color: var(--cb-ink-3); }
+.cb-t-body { margin: 0; font: var(--cb-fw-regular) var(--cb-fs-md)/var(--cb-lh-body) var(--cb-font-app); color: var(--cb-ink); }
+.cb-t-hint { margin: 0; font: var(--cb-fw-regular) var(--cb-fs-sm)/var(--cb-lh-body) var(--cb-font-app); color: var(--cb-ink-3); }
+.cb-t-mono { font: var(--cb-fw-regular) var(--cb-fs-sm)/var(--cb-lh-body) var(--cb-font-mono); color: var(--cb-ink-2); }
+
+/* chips */
+.cb-chip {
+  position: relative; display: inline-flex; align-items: center; gap: 6px; min-height: 28px; padding: 2px 10px;
+  border: var(--cb-border-chip) solid var(--cb-line-2); border-radius: var(--cb-radius-pill); background: transparent;
+  color: var(--cb-ink-2); font: var(--cb-fw-bold) var(--cb-fs-xs)/1.6 var(--cb-font-app); letter-spacing: .06em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.cb-chip--done { color: var(--cb-blue); border-color: var(--cb-blue); }
+.cb-chip--next { color: var(--cb-orange); border-color: var(--cb-orange); }
+.cb-chip--orange { color: var(--cb-orange); border-color: var(--cb-orange); background: var(--cb-orange-soft); }
+.cb-chip--quiet { color: var(--cb-ink-2); border-color: transparent; background: var(--cb-surface-2); }
+
+/* count */
+.cb-count {
+  display: inline-flex; align-items: center; justify-content: center; min-width: 20px; height: 20px; padding: 0 6px;
+  box-sizing: border-box; border: var(--cb-border-chip) solid var(--cb-line-2); border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2);
+  font: var(--cb-fw-bold) 0.6875rem/1 var(--cb-font-mono);
+}
+.cb-count--next { border-color: var(--cb-orange); color: var(--cb-orange); }
+.cb-count--quiet { border-color: var(--cb-line); color: var(--cb-ink-3); }
+
+/* progress */
+.cb-bar { display: grid; gap: 6px; }
+.cb-bar-head { display: flex; justify-content: space-between; gap: var(--cb-space-3); font-size: var(--cb-fs-sm); color: var(--cb-ink-2); }
+.cb-bar-head b { font: var(--cb-fw-regular) var(--cb-fs-sm)/1.4 var(--cb-font-mono); color: var(--cb-ink); }
+.cb-bar-track { height: 8px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); overflow: hidden; }
+.cb-bar-fill { height: 100%; width: var(--value, 0%); border-radius: inherit; background: var(--cb-blue); transition: width var(--cb-dur-normal) var(--cb-ease); }
+.cb-bar--next .cb-bar-fill { background: var(--cb-go-fill); }
+.cb-bar--stack .cb-bar-track { display: flex; gap: 2px; height: 12px; }
+.cb-bar-part { height: 100%; width: var(--value, 0%); flex: none; background: var(--cb-key, var(--cb-ink-3)); }
+
+/* cards */
+.cb-card { position: relative; padding: 22px; border: var(--cb-border) solid var(--cb-line); border-radius: var(--cb-radius-card); background: var(--cb-surface); color: var(--cb-ink); box-shadow: var(--cb-shadow-card); }
+.cb-card--hot { border-color: var(--cb-orange-edge); box-shadow: none; }
+.cb-card--quiet { background: transparent; box-shadow: none; border-style: dashed; border-color: var(--cb-line-2); }
+
+/* group: a heading with a count over its cards */
+.cb-group { display: grid; gap: var(--cb-space-3); min-width: 0; }
+.cb-group-h { display: flex; align-items: center; gap: var(--cb-space-2); min-height: 28px; margin: 0; font: var(--cb-fw-semibold) var(--cb-fs-xs)/1 var(--cb-font-app); letter-spacing: var(--cb-track-caps); text-transform: uppercase; color: var(--cb-ink-3); }
+.cb-group-h .cb-count { letter-spacing: 0; }
+
+/* stat tile */
+.cb-stat { display: grid; align-content: start; gap: 4px; min-width: 0; padding: 14px 16px; border: var(--cb-border) solid var(--cb-line); border-radius: var(--cb-radius-md); background: var(--cb-surface); }
+.cb-stat-value { font: var(--cb-fw-bold) var(--cb-fs-xl)/var(--cb-lh-tight) var(--cb-font-mono); letter-spacing: var(--cb-track-readout); color: var(--cb-ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cb-stat-label { font-size: var(--cb-fs-sm); color: var(--cb-ink-2); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* chart (svg) */
+.cb-chart { display: block; width: 100%; height: auto; overflow: visible; }
+.cb-chart text { font: 10.5px var(--cb-font-mono); fill: var(--cb-ink-3); }
+.cb-chart-grid { stroke: var(--cb-line); stroke-width: 1; }
+.cb-chart-base { stroke: var(--cb-line-2); stroke-width: 1; }
+.cb-chart-seg { fill: var(--cb-key, var(--cb-ink-3)); }
+.cb-chart .cb-chart-last { font: var(--cb-fw-bold) 13px var(--cb-font-app); fill: var(--cb-ink); }
+
+/* table, the non-visual view */
+.cb-more { margin-top: var(--cb-space-4); font-size: var(--cb-fs-sm); }
+.cb-more > summary { min-height: var(--cb-touch); display: flex; align-items: center; color: var(--cb-ink-2); font-weight: var(--cb-fw-semibold); cursor: pointer; }
+.cb-table-wrap { max-width: 100%; overflow-x: auto; }
+.cb-table { width: 100%; border-collapse: collapse; font: var(--cb-fs-sm)/1.4 var(--cb-font-mono); color: var(--cb-ink); }
+.cb-table th { position: sticky; top: 0; padding: 6px 8px; background: var(--cb-surface); border-bottom: 1px solid var(--cb-line-2); font: var(--cb-fw-semibold) var(--cb-fs-xs)/1.2 var(--cb-font-app); color: var(--cb-ink-2); text-align: left; white-space: nowrap; }
+.cb-table td { padding: 5px 8px; border-bottom: 1px solid var(--cb-line); white-space: nowrap; }
+.cb-table .is-num { text-align: right; font-variant-numeric: tabular-nums; }
+.cb-table tbody tr:hover { background: var(--cb-surface-2); }
+
+/* tooltip, floating */
+.cb-tip {
+  position: absolute; left: 50%; bottom: calc(100% + 8px); z-index: var(--cb-z-tooltip); padding: 6px 10px; border-radius: var(--cb-radius-sm);
+  background: var(--cb-ink); color: var(--cb-bg); font: var(--cb-fw-semibold) var(--cb-fs-xs)/1.3 var(--cb-font-app); white-space: nowrap;
+  opacity: 0; pointer-events: none; transform: translate(-50%, 4px); transition: opacity var(--cb-dur-fast), transform var(--cb-dur-fast);
+}
+.cb-tip--float { position: fixed; left: 0; top: 0; bottom: auto; max-width: 280px; white-space: pre-line; opacity: 1; transform: none; transition: none; }
+.cb-tip--float[hidden] { display: none; }
+</style>
+<style>
+/* The project page as a dashboard (2026-11-19, the owner's canvas): the classes this page adds over the shared
+   stylesheet (pv-). Tokens are used as they are; no colour is written here. */
+.pv { max-width: 1180px; margin: 0 auto; padding: var(--cb-space-6) var(--cb-space-6) var(--cb-space-8); display: grid; gap: var(--cb-space-3); }
+.pv h2, .pv h3 { margin: 0; }
+[data-lx-path] { cursor: pointer; }
+[data-lx-path]:hover { text-decoration: underline; text-underline-offset: 2px; }
+.pv-mono { font-family: var(--cb-font-mono); }
+
+/* the head: the project's name and the gate in one line, the branch and the hour at the right */
+.pv-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--cb-space-1) 14px; }
+.pv-top h1 { font: var(--cb-fw-semibold) 1.375rem/1.2 var(--cb-font-app); color: var(--cb-ink); }
+/* Lorisse's eye before the name, the extension's mark drawn inline: its two lit quarters and its pupil in the ink, its
+   two unused quarters in the eye's own token; both follow the theme */
+.pv-eye { flex: none; align-self: center; width: 1.05rem; height: 1.05rem; margin-right: -6px; color: var(--cb-ink); }
+.pv-eye .pv-eye-on { stroke: currentColor; }
+.pv-eye .pv-eye-off { stroke: var(--cb-eye-off); }
+.pv-eye .pv-eye-pupil { fill: currentColor; }
+.pv-gate { font-size: 13px; color: var(--cb-ink-2); }
+.pv-gate.is-green { color: var(--cb-green); }
+.pv-gate.is-red { color: var(--cb-pink); }
+.pv-grow { flex: 1; }
+.pv-meta { font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-refresh { align-self: center; display: inline-flex; margin-left: -6px; padding: 3px; border: 0; border-radius: 4px; background: transparent; color: var(--cb-ink-2); cursor: pointer; }
+.pv-refresh[hidden] { display: none; }
+.pv-refresh:hover { color: var(--cb-ink); background: var(--cb-surface-2); }
+.pv-refresh:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+.pv-refresh svg { display: block; width: 14px; height: 14px; }
+
+/* the tabs: Dashboard, Parts, Growth and tokens; the chosen one in the page's URL */
+.pv-tabs { display: flex; gap: 22px; border-bottom: 1px solid var(--cb-line); overflow-x: auto; }
+.pv-tab { min-height: 36px; padding: 8px 2px; border: 0; border-bottom: 2px solid transparent; background: transparent; color: var(--cb-ink-2); font: var(--cb-fw-regular) 13.5px/1.4 var(--cb-font-app); white-space: nowrap; cursor: pointer; }
+.pv-tab:hover { color: var(--cb-ink); }
+.pv-tab[aria-selected="true"] { color: var(--cb-ink); border-bottom-color: var(--cb-blue); font-weight: var(--cb-fw-semibold); }
+.pv-tab:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+.pv-panel { display: grid; gap: var(--cb-space-3); min-width: 0; }
+.pv-panel[hidden] { display: none; }
+
+/* a box of the dashboard and its caption */
+.pv-box { min-width: 0; padding: var(--cb-space-3) 0; border: 1px solid var(--cb-line); border-radius: 6px; background: var(--cb-surface); display: flex; flex-direction: column; }
+.pv-cap { margin: 0; padding: 0 var(--cb-space-4) var(--cb-space-2); font: var(--cb-fw-regular) 11px/1.3 var(--cb-font-app); letter-spacing: .08em; text-transform: uppercase; color: var(--cb-ink-2); }
+.pv-cap--next { padding-top: var(--cb-space-3); }
+.pv-list { list-style: none; margin: 0; padding: 0; }
+.pv-row2 { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: var(--cb-space-3); align-items: stretch; }
+.pv-hint { margin: 0; font-size: var(--cb-fs-xs); color: var(--cb-ink-3); }
+
+/* your move: a verb, the line and its detail, the time */
+.pv-mv { display: flex; align-items: center; gap: var(--cb-space-3); min-height: 44px; padding: var(--cb-space-1) var(--cb-space-4); font-size: var(--cb-fs-sm); color: var(--cb-ink); }
+.pv-verb { flex: none; width: 58px; padding: 3px 0; border-radius: 4px; background: var(--cb-blue-soft); color: var(--cb-blue); font: var(--cb-fw-semibold) var(--cb-fs-xs)/1.3 var(--cb-font-app); text-align: center; }
+.pv-verb--other { background: var(--cb-surface-2); color: var(--cb-ink-2); }
+.pv-verb--none { background: transparent; }
+.pv-nm { flex: 1; min-width: 0; }
+.pv-sub { display: block; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-t { flex: none; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); white-space: nowrap; }
+
+/* in flight, last merged */
+.pv-fl { display: flex; align-items: baseline; gap: var(--cb-space-2); padding: var(--cb-space-1) var(--cb-space-4); font-size: 13px; color: var(--cb-ink); }
+.pv-d { flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--cb-orange); align-self: center; }
+.pv-d--green { background: var(--cb-green); }
+.pv-d--pink { background: var(--cb-pink); }
+.pv-d--blue { background: var(--cb-blue); }
+.pv-q { color: var(--cb-ink-2); font-size: 12.5px; }
+
+/* the pages to read: one line */
+.pv-read { flex-direction: row; flex-wrap: wrap; align-items: center; gap: var(--cb-space-2) 14px; padding: 10px var(--cb-space-4); }
+.pv-read-n { font: var(--cb-fw-semibold) 1.25rem/1.2 var(--cb-font-app); color: var(--cb-ink); }
+.pv-read-w { font-size: 13px; color: var(--cb-ink); }
+.pv-read-bar { flex: 1 1 120px; height: 10px; border-radius: 5px; background: var(--cb-line); overflow: hidden; display: flex; }
+.pv-read-fill { width: 0; background: var(--cb-orange); }
+.pv-o { font-size: 12.5px; color: var(--cb-orange); }
+
+/* the pick: the road file's pages, in its order, one line each; five left shown, the rest behind "n more" */
+.pv-pick { padding: 10px 0 8px; }
+.pv-pk { display: flex; align-items: center; gap: 10px; min-height: 24px; padding: 0 var(--cb-space-4); font-size: 13px; color: var(--cb-ink); }
+.pv-pk .pv-k, .pv-pk .pv-ic { flex: none; }
+.pv-pk-f { flex: none; max-width: 48%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-pk-w { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-pk-w.is-o { color: var(--cb-orange); }
+.pv-pk.is-done .pv-pk-f, .pv-pk.is-done .pv-pk-w { color: var(--cb-ink-3); }
+.pv-pick-end { display: flex; gap: 14px; align-items: baseline; padding: 4px var(--cb-space-4) 0; }
+/* the pick as one list (the canvas): a move or a page a line, its verb in the small box */
+.pv-pick .pv-pk { min-height: 30px; }
+.pv-pk-l { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-readline { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; padding: 8px var(--cb-space-4) 0; font-size: 12.5px; color: var(--cb-ink); }
+
+/* the parts, where each one stands */
+.pv-gridwrap { max-width: 100%; overflow-x: auto; }
+.pv-grid { width: 100%; min-width: 640px; border-collapse: collapse; font-size: 13px; color: var(--cb-ink); }
+.pv-grid th { padding: 0 var(--cb-space-1) 6px; font: var(--cb-fw-regular) 11px/1.3 var(--cb-font-app); color: var(--cb-ink-2); text-align: center; white-space: nowrap; }
+.pv-grid td { height: 26px; padding: 0 var(--cb-space-1); border-top: 1px solid var(--cb-surface-2); text-align: center; white-space: nowrap; }
+.pv-grid .l { text-align: left; padding-left: var(--cb-space-4); }
+.pv-grid td.s { color: var(--cb-ink-2); font-size: var(--cb-fs-xs); text-align: left; }
+.pv-grid td.n { font-variant-numeric: tabular-nums; }
+.pv-grid td.z { color: var(--cb-ink-3); }
+.pv-grid .sep { border-left: 1px solid var(--cb-line); }
+.pv-grid tr.is-kid .l { padding-left: 34px; }
+.pv-grid tr.is-quiet td { color: var(--cb-ink-3); }
+.pv-grid tr:hover td { background: var(--cb-surface-2); }
+.pv-pbtn { padding: 0; border: 0; background: transparent; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.pv-pbtn:hover { text-decoration: underline; text-underline-offset: 2px; }
+.pv-pbtn:focus-visible, .pv-link:focus-visible, .pv-more:focus-visible, .pv-chip:focus-visible, .pv-kind:focus-visible, .pv-pr:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+
+/* the side bar's looks: a dot in its state's colour, its icons, a ring for a stage */
+.c-ok { --pv-c: var(--cb-green); }
+.c-read { --pv-c: var(--cb-blue); }
+.c-changed { --pv-c: var(--cb-orange); }
+.c-never { --pv-c: var(--cb-ink-3); }
+.c-rework { --pv-c: var(--cb-pink); }
+.c-none { --pv-c: var(--cb-line-2); }
+.pv-k { display: inline-block; width: 10px; height: 10px; border-radius: 50%; vertical-align: middle; background: var(--pv-c, var(--cb-ink-3)); }
+.pv-k--ring { background: transparent; border: 1.5px solid var(--cb-line-2); }
+.pv-k--fill { background: var(--cb-blue); }
+.pv-k--dash { height: 0; border-radius: 0; background: none; border-top: 1.5px solid var(--cb-line-2); }
+.pv-k--none { background: transparent; border: 1.5px solid var(--pv-c); }
+.pv-ic { display: inline-block; width: 14px; height: 14px; vertical-align: middle; color: var(--pv-c, var(--cb-ink-2)); }
+.pv-ic svg { display: block; width: 14px; height: 14px; }
+.pv-ic .pv-ic-cut { stroke: var(--cb-surface); }
+.pv-key { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 14px; padding: var(--cb-space-2) var(--cb-space-4) 0; font-size: 11.5px; color: var(--cb-ink-2); }
+.pv-key > span { display: inline-flex; align-items: center; gap: 5px; }
+.pv-key-end { margin-left: auto; }
+
+/* parts: a list on the left, the one part on the right */
+.pv-split { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: var(--cb-space-3); align-items: start; }
+.pv-plist { padding: var(--cb-space-1) 0; }
+.pv-grp { margin: 0; padding: 10px 14px 2px; font: var(--cb-fw-regular) 11px/1.3 var(--cb-font-app); color: var(--cb-ink-2); }
+.pv-pr { display: flex; width: 100%; align-items: center; gap: var(--cb-space-2); min-height: 30px; padding: 0 14px; border: 0; background: transparent; color: var(--cb-ink); font: 13px/1.3 var(--cb-font-app); text-align: left; cursor: pointer; }
+.pv-pr:hover { background: var(--cb-surface-2); }
+.pv-pr[aria-current="true"] { background: var(--cb-surface-2); box-shadow: inset 2px 0 0 var(--cb-blue); }
+.pv-pr .pv-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-c { flex: none; font-size: 11.5px; color: var(--cb-ink-2); }
+.pv-c.is-o { color: var(--cb-orange); }
+.pv-pr.is-quiet { color: var(--cb-ink-3); }
+.pv-yd { flex: none; width: 6px; height: 6px; border-radius: 50%; background: transparent; }
+.pv-yd.is-on { background: var(--cb-orange); }
+/* the one next thing for him, first in the part chosen */
+.pv-you { margin: 0 0 var(--cb-space-3); padding: 8px 12px; border-radius: 6px; background: var(--cb-surface-2); font-size: 14px; line-height: 1.4; color: var(--cb-ink); }
+.pv-you b { font-weight: var(--cb-fw-semibold); }
+.pv-you.is-none { color: var(--cb-ink-2); }
+.pv-you-w { font-size: 12.5px; color: var(--cb-ink-2); }
+.pv-one { padding: var(--cb-space-4) var(--cb-space-5); }
+.pv-one-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--cb-space-1) var(--cb-space-3); }
+.pv-one-h h2 { font: var(--cb-fw-semibold) 1.1875rem/1.2 var(--cb-font-app); color: var(--cb-ink); }
+.pv-what { margin: 2px 0 0; font-size: 13px; color: var(--cb-ink-2); }
+.pv-six { list-style: none; margin: 0; padding: var(--cb-space-4) 0 var(--cb-space-1); display: flex; }
+.pv-six li { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-six .pv-k { width: 14px; height: 14px; }
+.pv-six .pv-ic, .pv-six .pv-ic svg { width: 16px; height: 16px; }
+.pv-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr); gap: var(--cb-space-7); }
+.pv-two > div { min-width: 0; }
+.pv-cap2 { margin: 0; padding: var(--cb-space-3) 0 6px; font: var(--cb-fw-regular) 11px/1.3 var(--cb-font-app); letter-spacing: .08em; text-transform: uppercase; color: var(--cb-ink-2); }
+.pv-ln { display: flex; align-items: baseline; gap: 10px; min-height: 26px; font-size: 13px; color: var(--cb-ink); }
+.pv-ln .pv-nm { overflow-wrap: anywhere; }
+.pv-m { font-size: var(--cb-fs-xs); color: var(--cb-ink-2); white-space: nowrap; }
+.pv-m.is-ok { color: var(--cb-green); }
+.pv-m.is-read { color: var(--cb-blue); }
+.pv-m.is-o { color: var(--cb-orange); }
+.pv-m.is-pink { color: var(--cb-pink); }
+.pv-m.is-grey { color: var(--cb-ink-3); }
+.pv-m.pv-sub { white-space: normal; }
+.pv-id { flex: none; width: 38px; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-para { margin: 0; font-size: 12.5px; line-height: 1.45; color: var(--cb-ink-2); }
+.pv-link, .pv-more { padding: 0; border: 0; background: transparent; color: var(--cb-blue); font: 12px/1.4 var(--cb-font-app); cursor: pointer; }
+.pv-link:hover, .pv-more:hover { text-decoration: underline; }
+.pv-grey { margin: var(--cb-space-3) 0 0; font-size: var(--cb-fs-xs); color: var(--cb-ink-3); }
+
+/* growth and tokens: a side with the figures and the legend, the chart beside it */
+.pv-gt { flex-direction: row; gap: 22px; padding: 14px 18px; }
+.pv-side { flex: none; width: 250px; display: flex; flex-direction: column; gap: var(--cb-space-2); }
+.pv-side .pv-cap { padding: 0; }
+.pv-fig { display: flex; align-items: baseline; gap: var(--cb-space-2); }
+.pv-big { font: var(--cb-fw-semibold) 1.5rem/1.1 var(--cb-font-app); color: var(--cb-ink); font-variant-numeric: tabular-nums; }
+.pv-big--s { font-size: 1.125rem; }
+.pv-lbl { font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-kinds { list-style: none; margin: 0; padding: 6px 0 0; display: grid; gap: 3px; }
+.pv-kind { display: flex; width: 100%; align-items: center; gap: 7px; min-height: 24px; padding: 0 4px; border: 1px solid transparent; border-radius: 4px; background: transparent; color: var(--cb-ink); font: 12.5px/1.3 var(--cb-font-app); text-align: left; cursor: pointer; }
+.pv-kind:hover { border-color: var(--cb-line-2); }
+.pv-kind b { margin-left: auto; font-weight: var(--cb-fw-regular); color: var(--cb-ink-2); font-variant-numeric: tabular-nums; }
+.pv-kind[aria-pressed="false"] { color: var(--cb-ink-3); text-decoration: line-through; }
+.pv-kind[aria-pressed="false"] .pv-sw { background: transparent; border: 1px solid var(--cb-line-2); }
+.pv-kind--static { cursor: default; }
+.pv-kind--static:hover { border-color: transparent; }
+.pv-sw { flex: none; width: 10px; height: 10px; border-radius: 2px; background: var(--cb-key, var(--cb-ink-3)); }
+.pv-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.pv-chips--end { justify-content: flex-end; }
+.pv-chip { min-height: 22px; padding: 1px 9px; border: 1px solid var(--cb-line); border-radius: 10px; background: transparent; color: var(--cb-ink-2); font: 12px/1.4 var(--cb-font-app); white-space: nowrap; cursor: pointer; }
+.pv-chip[aria-pressed="true"] { color: var(--cb-ink); border-color: var(--cb-blue); }
+.pv-plot { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: var(--cb-space-1); }
+.pv-chart { position: relative; width: 100%; min-width: 0; }
+.pv-chart .cb-chart text.pv-ink { fill: var(--cb-ink-2); }
+.pv-cross { stroke: var(--cb-ink-3); stroke-width: 1; stroke-dasharray: 3 3; }
+.pv-proj { stroke: var(--cb-ink-3); stroke-width: 2; stroke-dasharray: 6 4; fill: none; }
+.pv-chart .cb-chart text.pv-halo { paint-order: stroke; stroke: var(--cb-surface); stroke-width: 3px; stroke-linejoin: round; fill: var(--cb-ink-2); }
+/* the target's label: readable whatever is under it, a halo in the box's background colour, in both themes */
+.pv-chart .cb-chart text.pv-tlabel { paint-order: stroke; stroke: var(--cb-surface); stroke-width: 5px; stroke-linejoin: round; fill: var(--cb-ink); font-weight: var(--cb-fw-semibold); }
+.pv-bar-hit { fill: transparent; }
+.pv-bar-hit:hover { fill: var(--cb-ink); fill-opacity: .07; }
+.pv-flag { margin: 0; padding: 4px 10px; border-radius: var(--cb-radius-sm); background: var(--cb-yellow-soft); color: var(--cb-yellow); font-size: var(--cb-fs-xs); font-weight: var(--cb-fw-semibold); }
+.pv-empty { padding: var(--cb-space-4); border: 1px dashed var(--cb-line-2); border-radius: var(--cb-radius-md); color: var(--cb-ink-2); font-size: var(--cb-fs-sm); margin: 0; }
+.pv-fold { margin: 0; padding: 0 var(--cb-space-1); }
+.pv-fold > summary { min-height: 36px; }
+.pv-fold-body { display: grid; gap: var(--cb-space-3); padding: 0 0 var(--cb-space-3); }
+.pv-made-bar { display: flex; gap: 2px; height: 6px; border-radius: 3px; overflow: hidden; }
+.pv-seg { flex: 0 1 0; min-width: 3px; background: var(--cb-key); }
+.pv-made-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: var(--cb-space-1) var(--cb-space-4); font-size: var(--cb-fs-xs); color: var(--cb-ink-2); }
+.pv-made-legend li { display: inline-flex; align-items: center; gap: 6px; }
+.pv-passes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--cb-space-2); }
+.pv-passes li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px var(--cb-space-3); padding-bottom: var(--cb-space-2); border-bottom: 1px solid var(--cb-line); font-size: 13px; }
+.pv-passes li b { font-weight: var(--cb-fw-semibold); overflow-wrap: anywhere; }
+.pv-passes .pv-sub { grid-column: 1 / -1; }
+
+/* the road, beside the pick on the Dashboard: one line a step, done in one line */
+.pv-road { padding: 10px 0 8px; }
+.pv-road .pv-r { min-height: 30px; padding: 4px var(--cb-space-4); font-size: 13px; }
+.pv-road .pv-r .pv-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-road .pv-done { padding: 6px var(--cb-space-4) 0; }
+.pv-road-note { padding: 4px var(--cb-space-4) 0; }
+/* the tree's bar, in view under the code chart */
+.pv-made { display: grid; gap: var(--cb-space-2); padding-top: var(--cb-space-3); }
+/* the sessions: a row a session, a click unfolds its passes */
+.pv-sess { padding: var(--cb-space-3) 0; }
+.pv-ses { display: grid; grid-template-columns: 150px minmax(0, 1fr) repeat(4, auto); align-items: baseline; gap: 2px 14px; width: 100%; min-height: 30px; padding: 4px var(--cb-space-4); border: 0; border-top: 1px solid var(--cb-surface-2); background: transparent; color: var(--cb-ink); font: 13px/1.35 var(--cb-font-app); text-align: left; cursor: pointer; }
+.pv-ses:hover { background: var(--cb-surface-2); }
+.pv-ses:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+.pv-ses .pv-nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pv-ses .pv-n { font-variant-numeric: tabular-nums; font-size: var(--cb-fs-xs); color: var(--cb-ink-2); white-space: nowrap; text-align: right; }
+.pv-ses .pv-n b { font-weight: var(--cb-fw-semibold); color: var(--cb-ink); }
+.pv-ses-head { cursor: default; }
+.pv-ses-head:hover { background: transparent; }
+.pv-ses-head > span { font-size: 11px; color: var(--cb-ink-2); }
+.pv-ses-kids { padding: 4px var(--cb-space-4) var(--cb-space-3) 180px; }
+.pv-sess-end { margin: 6px var(--cb-space-4) 0; }
+/* the three figures: the same gap as the code box's between "lines today" and "+n this week" */
+.pv-figs { display: flex; flex-direction: column; gap: var(--cb-space-2); }
+.pv-fig-k { margin: 0 0 var(--cb-space-1); font-size: var(--cb-fs-xs); color: var(--cb-ink-3); }
+.pv-r { display: flex; align-items: baseline; gap: 14px; min-height: 46px; padding: 6px 18px; border-top: 1px solid var(--cb-surface-2); font-size: var(--cb-fs-sm); color: var(--cb-ink); }
+.pv-r:first-child { border-top: 0; }
+.pv-r--quiet { color: var(--cb-ink-2); }
+.pv-w { flex: none; width: 52px; font: var(--cb-fw-semibold) var(--cb-fs-xs)/1.4 var(--cb-font-app); color: var(--cb-ink-2); }
+.pv-w--now { color: var(--cb-blue); }
+.pv-yours { display: block; font-size: var(--cb-fs-xs); color: var(--cb-orange); }
+.pv-done { margin: 0; padding: 0 var(--cb-space-1); font-size: 12.5px; color: var(--cb-ink-2); }
+.pv-done .pv-more { color: var(--cb-ink-2); font-size: 12.5px; }
+.pv-done-list { list-style: none; margin: var(--cb-space-2) 0 0; padding: 0; display: grid; gap: var(--cb-space-1); }
+
+/* the footer, the theme */
+.pv-foot { margin-top: var(--cb-space-5); display: flex; flex-wrap: wrap; align-items: center; gap: var(--cb-space-2) var(--cb-space-4); padding: var(--cb-space-3) var(--cb-space-4); border: 1px dashed var(--cb-line-2); border-radius: var(--cb-radius-md); color: var(--cb-ink-2); font-size: var(--cb-fs-xs); }
+.pv-foot p { margin: 0; flex: 1 1 320px; }
+.cb-seg { display: inline-flex; padding: 2px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); box-shadow: var(--cb-shadow-seg); }
+.cb-seg-item { min-height: 26px; padding: 2px 10px; border: 0; border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2); font: var(--cb-fw-semibold) var(--cb-fs-xs)/1.4 var(--cb-font-app); cursor: pointer; }
+.cb-seg-item[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+.cb-seg-item:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+
+@media (max-width: 900px) {
+  .pv { padding: var(--cb-space-5) var(--cb-space-4) var(--cb-space-8); }
+  .pv-row2, .pv-split, .pv-two { grid-template-columns: minmax(0, 1fr); }
+  .pv-gt { flex-direction: column; }
+  .pv-side { width: auto; }
+  .pv-ses { grid-template-columns: minmax(0, 1fr) auto; }
+  .pv-ses-kids { padding-left: var(--cb-space-4); }
+}
+@media print {
+  .cb-tip { display: none !important; }
+  body { background: var(--cb-print-bg); }
+}
+</style>
+</head>
+<body>
+<main class="pv">
+  <!-- The head, above the tabs: the project's name and the gate in one line; the branch and when the page was made; the
+       refresh icon, hidden unless a host (the extension's tab) gives window.lorisseHost.refresh.
+       Fills from: project, gate, branch, pushed, generated -->
+  <header class="pv-top">
+    <svg class="pv-eye" id="eye" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><g fill="none" stroke-width="7"><circle class="pv-eye-on" cx="32" cy="32" r="26" stroke-dasharray="37 126.4" transform="rotate(-135 32 32)"/><circle class="pv-eye-on" cx="32" cy="32" r="26" stroke-dasharray="37 126.4" transform="rotate(-45 32 32)"/><circle class="pv-eye-off" cx="32" cy="32" r="26" stroke-dasharray="37 126.4" transform="rotate(45 32 32)"/><circle class="pv-eye-off" cx="32" cy="32" r="26" stroke-dasharray="37 126.4" transform="rotate(135 32 32)"/></g><circle class="pv-eye-pupil" cx="32" cy="32" r="11"/></svg>
+    <h1 id="title"></h1>
+    <span class="pv-gate" id="gate"></span>
+    <span class="pv-grow"></span>
+    <span class="pv-meta" id="meta"></span>
+    <button class="pv-refresh" id="refresh" type="button" title="Refresh the page" aria-label="Refresh the page" hidden><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3.5V9H15"/></svg></button>
+  </header>
+
+  <!-- The tabs (2026-11-19, the owner's canvas): the chosen one is the URL's #name; the part chosen on Parts follows it -->
+  <div class="pv-tabs" id="tabs" role="tablist" aria-label="The page">
+    <button class="pv-tab" type="button" role="tab" id="tab-dashboard" data-tab="dashboard" aria-controls="panel-dashboard" aria-selected="true">Dashboard</button>
+    <button class="pv-tab" type="button" role="tab" id="tab-parts" data-tab="parts" aria-controls="panel-parts" aria-selected="false" tabindex="-1">Parts</button>
+    <button class="pv-tab" type="button" role="tab" id="tab-growth" data-tab="growth" aria-controls="panel-growth" aria-selected="false" tabindex="-1">Growth and tokens</button>
+  </div>
+
+  <!-- Dashboard (the canvas, 2026-11-20): the parts where each one stands; under it, side by side, the agent's pick (the
+       road file's moves, then the pages to read) and the road.
+       Fills from: parts (looks, validation, waits, path, stage, steps, quiet, family), families, now, pick, summary,
+       documents.check, road, road_note, warnings -->
+  <div class="pv-panel" id="panel-dashboard" role="tabpanel" aria-labelledby="tab-dashboard" tabindex="0">
+    <section class="pv-box" aria-labelledby="grid-h">
+      <h2 class="pv-cap" id="grid-h">The parts · where each one stands</h2>
+      <div class="pv-gridwrap"><table class="pv-grid" id="grid"></table></div>
+      <p class="pv-key" id="grid-key"></p>
+      <div id="warnings"></div>
+    </section>
+    <div class="pv-row2">
+      <section class="pv-box pv-pick" id="pick" aria-label="The agent's pick"></section>
+      <section class="pv-box pv-road" aria-labelledby="road-h"><h2 class="pv-cap" id="road-h">The road</h2><ol class="pv-list" id="road"></ol><p class="pv-done" id="done"></p><p class="pv-hint pv-road-note" id="road-note"></p></section>
+    </div>
+  </div>
+
+  <!-- Parts: every part grouped by stage with what it owes; the one part chosen, and only that. Fills from: parts, documents -->
+  <div class="pv-panel" id="panel-parts" role="tabpanel" aria-labelledby="tab-parts" tabindex="0" hidden>
+    <div class="pv-split">
+      <nav class="pv-box pv-plist" id="plist" aria-label="The parts"></nav>
+      <section class="pv-box pv-one" id="pone" aria-label="The part chosen"></section>
+    </div>
+  </div>
+
+  <!-- Growth and tokens: the code over time with what the tree is made of under it, in view; the tokens over time; the
+       sessions. Fills from: tree, growth, code_pace, target, areas, not_ours, hidden, tokens -->
+  <div class="pv-panel" id="panel-growth" role="tabpanel" aria-labelledby="tab-growth" tabindex="0" hidden>
+    <section class="pv-box pv-gt" aria-labelledby="code-h">
+      <div class="pv-side">
+        <h2 class="pv-cap" id="code-h">The code, over time</h2>
+        <div class="pv-fig"><span class="pv-big" id="code-now"></span><span class="pv-lbl">lines today</span></div>
+        <div class="pv-lbl" id="code-week"></div>
+        <div class="pv-lbl" id="code-mean"></div>
+        <div class="pv-hint" id="code-since"></div>
+        <ul class="pv-kinds" id="kinds" aria-label="The kinds: a click switches one off or on"></ul>
+        <p class="pv-hint" id="kinds-off"></p>
+      </div>
+      <div class="pv-plot">
+        <div class="pv-chips pv-chips--end" id="from" role="group" aria-label="The chart's first week"></div>
+        <div class="pv-chart" id="area"></div>
+        <p class="pv-hint" id="pace"></p>
+        <div class="pv-made"><div class="pv-made-bar" id="made-bar"></div><ul class="pv-made-legend" id="made-legend"></ul><p class="pv-hint" id="made-apart"></p><p class="pv-hint" id="made-note"></p></div>
+      </div>
+    </section>
+    <section class="pv-box pv-gt" aria-labelledby="tok-h">
+      <div class="pv-side">
+        <h2 class="pv-cap" id="tok-h">The tokens you consume</h2>
+        <div class="pv-figs" id="tok-figs"></div>
+        <ul class="pv-kinds" id="tok-legend" aria-label="The layers"></ul>
+        <div class="pv-chips" id="tok-view" role="group" aria-label="The layers"></div>
+        <div class="pv-chips" id="tok-unit" role="group" aria-label="The unit"></div>
+      </div>
+      <div class="pv-plot">
+        <div class="pv-chips pv-chips--end" id="tok-range" role="group" aria-label="The range"></div>
+        <div class="pv-chart" id="tok-chart"></div>
+        <div id="tok-notes"></div>
+      </div>
+    </section>
+    <section class="pv-box pv-sess" aria-labelledby="sess-h">
+      <h2 class="pv-cap" id="sess-h">The sessions</h2>
+      <div id="sessions"></div>
+    </section>
+  </div>
+
+  <footer class="pv-foot"><p><span id="foot-1"></span> <span id="foot-2"></span></p><div class="cb-seg" id="theme" role="group" aria-label="Theme"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Light</button><button class="cb-seg-item" type="button" data-value="dark">Dark</button></div></footer>
+</main>
+<div class="cb-tip cb-tip--float" id="tip" hidden></div>
+
+<!-- The data: one JSON object, written by page/project_view.ps1 (its header names every key). The sample below lets the
+     template open by itself; the generator replaces it. -->
+<script id="data" type="application/json">{"project":{"name":"lorisse-vscode","line":""},"generated":"2026-11-24 19:00","by":"Lorisse","agent":"Lorisse","public":true,"branch":"main","pushed":true,"gate":null,"branches":[{"name":"agent/ui-walk","state":"running","seconds":null,"tests":"","decision":"","parts":[],"since":null,"minutes":7072}],"merges":[{"date":"2026-11-23","branch":"agent/crate-page","line":"the engine\u0027s first crate in Rust"},{"date":"2026-11-22","branch":"agent/ext-split","line":"the status bar coloured only on a red gate"}],"road_note":"","road":[],"now":[],"pick":null,"parts":[{"name":"documents","what":"the list in the side bar: what waits for him, every document with its state, the status bar","path":"documents","folder":"documents","lines":2963,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"documents/CONTRACT.md","label":"CONTRACT","why":"never read; answers your note","kind":"never","first":true,"answer":true},{"doc":"documents/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"documents/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"documents/CONTRACT.md","readme":"documents/README.md","validation":"documents/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":7,"tests":null,"hand":3,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-23","stale":true,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"The Documents view shows both repositories, each page\u0027s state, and what waits on top.","waits":"","run":"","date":""},{"id":"H-2","title":"The status bar sums both repositories, and its click opens the project page.","waits":"","run":"","date":""},{"id":"H-3","title":"A folder hidden counts nowhere, comes back for a look, and its eye writes the road file with an Undo.","waits":"","run":"","date":""}],"owed":3,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"answer","doc":"documents/CONTRACT.md","why":"answers your note","step":"","title":"","date":""},"family_word":"","last":["its own folder and pages since the split of 2026-11-22","the status bar coloured only on a red gate"],"next":["Open containing folder on a row\u0027s right click (his word of 2026-11-23: \u0027on right click we should have open containing folder\u0027)","his read of its three pages, its walk of three steps on the sample"],"family":null},{"name":"reader","what":"the tab where a page is read: rendered, three views, what changed, his notes in the margin; it never writes","path":"reader","folder":"reader","lines":3489,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"reader/CONTRACT.md","label":"CONTRACT","why":"never read","kind":"never","first":false,"answer":false},{"doc":"reader/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"reader/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"reader/CONTRACT.md","readme":"reader/README.md","validation":"reader/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":14,"tests":null,"hand":3,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-24","stale":true,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"A page opens rendered, with one header, three views, a command to copy, the kit\u0027s tag, and a link out of the repository left as text.","waits":"","run":"","date":""},{"id":"H-2","title":"A page changed since your read opens on its changes, each said in words in the margin, each with one okay.","waits":"","run":"","date":""},{"id":"H-3","title":"A page rewritten by more than half has one okay for all of it, and its old words fold under each block.","waits":"","run":"","date":""}],"owed":3,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"A page opens rendered, with one header, three views, a command to copy, the kit\u0027s tag, and a link out of the repository left as text.","date":""},"family_word":"","last":["its own folder and pages since the split","its layout rebuilt to the canvas and held by the robot\u0027s checks at three widths"],"next":["promised, not built, waiting with his other feedbacks for the pass he will call: a changed page opens on the changes in the text at its top (C-4.3), a click on that view jumps to the first change (C-5.7)","the budget\u0027s plan limits never showed a figure: the status line gives none in the panel","his eye on the margin after the two rounds by pictures: a change\u0027s signs under a tall card, the card\u0027s strip above the open note box, a sliver under the pinned header","his read of its three pages, its walk of three steps"],"family":null},{"name":"notes-and-marks","what":"everything he writes into a page: a note, a reply, an okay, a mark","path":"notes-and-marks","folder":"notes-and-marks","lines":338,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"notes-and-marks/CONTRACT.md","label":"CONTRACT","why":"never read","kind":"never","first":false,"answer":false},{"doc":"notes-and-marks/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"notes-and-marks/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"notes-and-marks/CONTRACT.md","readme":"notes-and-marks/README.md","validation":"notes-and-marks/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":11,"tests":null,"hand":2,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-22","stale":false,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"A note written by a click on a block, and Lorisse\u0027s answer okayed in one click.","waits":"","run":"","date":""},{"id":"H-2","title":"The three marks, each with an Undo, and Next to the page that waits.","waits":"","run":"","date":""}],"owed":2,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"A note written by a click on a block, and Lorisse\u0027s answer okayed in one click.","date":""},"family_word":"","last":["its own contract since the split: every write with its Undo, only its own lines, refused on unsaved changes"],"next":["its code still lives in the root\u0027s start file: cut it out into this folder","his read of its three pages, its walk of two steps"],"family":null},{"name":"project-page","what":"the project page in a tab, made by the extension\u0027s own copy of the page\u0027s scripts","path":"project-page","folder":"project-page","lines":211,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"project-page/CONTRACT.md","label":"CONTRACT","why":"never read","kind":"never","first":false,"answer":false},{"doc":"project-page/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"project-page/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"project-page/CONTRACT.md","readme":"project-page/README.md","validation":"project-page/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":3,"tests":null,"hand":1,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-22","stale":false,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"The project page opens in a tab of its own for each repository, made by the extension.","waits":"","run":"","date":""}],"owed":1,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"The project page opens in a tab of its own for each repository, made by the extension.","date":""},"family_word":"","last":["its own folder and pages since the split"],"next":["his read of its three pages, its walk of one step"],"family":null},{"name":"budget","what":"what this machine spent with Claude Code, and how far the plan\u0027s limits are","path":"budget","folder":"budget","lines":1051,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"budget/CONTRACT.md","label":"CONTRACT","why":"never read","kind":"never","first":false,"answer":false},{"doc":"budget/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"budget/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"budget/CONTRACT.md","readme":"budget/README.md","validation":"budget/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":5,"tests":null,"hand":1,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-22","stale":false,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"The Budget says this project\u0027s tokens, or the machine\u0027s, and the plan\u0027s two limits in words.","waits":"","run":"","date":""}],"owed":1,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"The Budget says this project\u0027s tokens, or the machine\u0027s, and the plan\u0027s two limits in words.","date":""},"family_word":"","last":["its own folder and pages since the split","three periods by model, the plan\u0027s two limits"],"next":["to remove in the pass he will call, on his word of 2026-11-23: the plan\u0027s limits and the status line\u0027s row of Settings (no figure ever comes in the panel)","his read of its three pages, its walk of one step","the status line set on his click, to try"],"family":null},{"name":"feedback-key","what":"the feedback key: a picture of the window and his words, kept as the method\u0027s note","path":"feedback-key","folder":"feedback-key","lines":430,"stage":"design","edits":"open","method":"","needs":"","waits":[{"doc":"feedback-key/CONTRACT.md","label":"CONTRACT","why":"never read","kind":"never","first":false,"answer":false},{"doc":"feedback-key/README.md","label":"README","why":"never read","kind":"never","first":false,"answer":false},{"doc":"feedback-key/VALIDATION.md","label":"VALIDATION","why":"never read","kind":"never","first":false,"answer":false}],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"feedback-key/CONTRACT.md","readme":"feedback-key/README.md","validation":"feedback-key/VALIDATION.md"},"marks":{"contract":"never","readme":"never","validation":"never"},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"written"},"planned_marks":{},"clauses":2,"tests":null,"hand":1,"docs":3,"unread":3,"changed":"2026-11-22","code":"2026-11-22","stale":false,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"F8 opens the feedback box over the page; Capture writes a picture and a note in the repository.","waits":"","run":"","date":""}],"owed":1,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"never","readme":"never","validation":"never"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"F8 opens the feedback box over the page; Capture writes a picture and a note in the repository.","date":""},"family_word":"","last":["its own folder and pages since the split"],"next":["his read of its three pages, its walk of one step"],"family":null},{"name":"vscode","what":"the md reader as a VS Code extension: the page in a tab, the review tree, the reader, the feedback key, the budget, the settings","path":".","folder":".","lines":0,"stage":"design","edits":"open","method":"r4","needs":"his own note\u0027s box at the side of the text in The text view, not under the line (his note 20261121-165151, read so: \u0027Make the you on the side\u0027, to confirm with him)","waits":[],"steps":{"contract":0,"readme":0,"validation":0,"desk":0,"bench":0,"locked":0},"files":{"contract":"./CONTRACT.md","readme":"./README.md","validation":"./VALIDATION.md"},"marks":{},"run":{"date":"2026-11-22","who":"a pass (Opus)","steps":"—","verdict":"cut to the root"},"planned_marks":{},"clauses":12,"tests":null,"hand":1,"docs":0,"unread":0,"changed":"2026-11-22","code":"2026-11-24","stale":true,"quiet":"","validation":{"state":"ok","word":"nothing run","steps":[{"id":"H-1","title":"Settings shows the version that runs and switches the colours; Lorisse: Look tries the knobs one after the other.","waits":"","run":"","date":""}],"owed":1,"failed":0,"good":0,"unknown":0,"look":"run-none"},"looks":{"contract":"none","readme":"none","validation":"none"},"yours":{"kind":"step","doc":"","why":"","step":"H-1","title":"Settings shows the version that runs and switches the colours; Lorisse: Look tries the knobs one after the other.","date":""},"family_word":"","last":["0.31.1, a repository without the method\u0027s check lists its documents, and the three pages rewritten whole","0.31.0, every repository of the window a group of its own, one count of changes everywhere","0.30.0, what he saw on 0.29.0: the Budget by period, the plan\u0027s two gauges, the changes since the mark from a kept text, their signs in the margin, no Timeline","0.29.0, safe to open on a repository someone else made","0.28.1, Lorisse\u0027s page template copied again: her eye in the page\u0027s head, the link to what changed shown only where the extension opens it","0.28.0, merged on his word after his look (no road page, no Add a note, Reply beside each okay), the canvas he okayed on 2026-11-21: the reader\u0027s three views on one switch, the notes as cards in the margin, a change by its size, one okay a change, the message after a mark with Next, the road as a page to consult (§ 42, § 43), the review report\u0027s answered rows read","0.27.1, the canvas page carried (Lorisse\u0027s page/ copied again: the Dashboard as the parts\u0027 table, three tabs, the sessions), nothing else changed","0.24.0, the side bar\u0027s three small views (his words of 2026-11-19 on 0.22.0): the Budget priced per model id with the dollars of out and a card for one model","the Timeline every merge reachable from main, in colour, following the repository in view","Settings in three rows, Colours and What the icons mean","the check whole in a worktree","§ 34, § 35, § 37, the walk of § 4.6 rewritten, dist/lorisse-0.24.0.vsix"],"next":["his read of the three pages rewritten whole on 2026-11-22 (71 promises by screen, a walk of twelve steps on a sample of two made-up repositories, the README by theme), the contract first","his first walk, H-1 to H-12, the proof that the screen shows what the page says: no step was tried on a real screen, and the pass is least sure of H-3, H-7, H-9, H-10, H-11 and H-12","the extension\u0027s own record a folder (okays, answers seen, how far a page was read) is not cleared when the sample is made again: the walk goes round it, a reset is owed","a collapse-all control in the Documents view\u0027s title bar, beside Refresh and the hidden folders\u0027 eye (his word of 2026-11-22: \u0027a collapse all in the documents and notes\u0027);this row\u0027s own tail, everything after this clause, is from before the rewrite and is cleaned at the next pass: what it names as to build in 0.29.0, 0.30.0 and 0.31.0 is built","0.29.0, its promises written first: nothing of a repository trusted and nothing written unasked (§ 44, the review of 2026-11-20: its four to fix first, then 7, 5, 8, 6), a command copied by one click (C-42.10, his ask of 2026-11-21), his words on the small views and the version said in Settings (§ 45)","then 0.30.0, his look on 0.29.0 the evening of 2026-11-21, its promises written first: the Timeline at the bottom of the side bar out (\u0027useless\u0027)","Today opening onto its models, each with its share of the dollars and of the tokens","the cache-read share to judge with him (always near 98 %, his question whether to keep it)","last week and last month said beside today","his plan\u0027s usage seen in the side bar, so he need not go to Claude Code\u0027s own screen (found 2026-11-21: the one documented source is the status line command\u0027s input, rate_limits.five_hour and rate_limits.seven_day, each with used_percentage and resets_at, for a subscriber, after a session\u0027s first answer","a status line command of ours writes them to a file the side bar reads","the top model\u0027s weekly gauge has no documented source: his reading by hand, or left out)","a validation changed since his mark still wears the green tick of its run in the side bar (\u00274 of 4 run · changed since 11-20\u0027 under an orange folder, his note 20261121-203534): a document changed since his mark wears the changed sign whatever its run, the run said in words","the Changes view after a mark compares with the page\u0027s text as it was at that mark, kept by the extension, not with what git held (his rework of the spec marked on an uncommitted rewrite showed the whole change again, his word \u0027I should have seen the diffs since the rework\u0027)","when most of a page changed, no okay and Reply pair under every block: one for the page, the pair kept where a note of his stands (his note 20261121-201555, 41 changes, \u0027we changed everything\u0027)","his own note\u0027s box at the side of the text in The text view, not under the line (his note 20261121-165151, read so: \u0027Make the you on the side\u0027, to confirm with him)","his walk of H-123, the three views","a page never read counts no change on The text and one on Changes in the text","a mark from the side bar keeps its old message without Next","then the extension to pass the method\u0027s shared review cases (review_cases.json)","the host\u0027s part of the page\u0027s walk written into this VALIDATION, naming the page\u0027s promise (the refresh icon, a click that opens the reader, the page under the policy): it left the page\u0027s own validation on his word of 2026-11-21, a validation walks its part alone","0.27.2, from the review of 2026-11-20 (the Lorisse repository, me/next/extension_code_review_2026-11-20.md): a repository\u0027s own stylesheet never pasted raw into a tab, a page file found on disk never trusted before the extension made it, git started in an untrusted workspace with every run-a-program setting off, no file written into a repository without his click (the page at start, the token logs, the reading record), a // line inside any code block never a note","his words of 2026-11-20 on 0.27.0: the Budget\u0027s scope (this project or everything on this machine) beside its refresh, the row \u0027Tokens on the project page\u0027 gone, the Timeline\u0027s passes dated as \u0027n ago\u0027","the Settings view says the version installed and the newest package found beside it, so no page has to name a version (his word of 2026-11-21 on the page\u0027s validation: \u0027Should we show it here ? What happen if we update ?\u0027)","built in 0.27.0, to strike at the next rewrite of this line: the page view and its changes view in one layout, the head in the same place, the same paddings (his feedback 20261120-191512 and 20261120-191545: \u0027Why is there a format change between the two pages\u0027, \u0027The padding should stay the same\u0027)","Changes one button that goes to the changes and back where it stands, the \u0027…\u0027 gone (20261120-191714)","the kit\u0027s markers hidden in the reader behind a small \u0027yours only\u0027 tag (his \u0027Why this everywhere sometimes ?\u0027)","the page\u0027s files copied again with the review check beside them, a repository\u0027s own page script never run (the review of 2026-11-20), the 5-minute cache write read by the Budget and the Timeline","then:a thread added or removed and a run log row never turn an okayed page to changed since (his \u0027everything has been okayed and it does not show green\u0027), the Fable 5.2 rate shipped","your two feedback notes of 2026-11-10 on 0.15.0: a thread\u0027s card in the Changes view drawn level with its clause, not at the top (20261110-191522: \u0027should be way below next to the clause we are discussing\u0027)","okay on a thread no longer closes a reply box open under it, okay and reply in one go (20261110-191757: \u0027the pop up that is okayed remove the reply window as I was typing\u0027)","three contradictions in CONTRACT.md found by the history pass and left alone (C-21.2 against C-39.7, the Behaviour row \u0027No review line\u0027, C-17.3\u0027s \u0027the tree lists it\u0027): settled at the next pass","the walks by feature wait for your word (VALIDATION § 4, with the newest package installed, on this repository","each starting with Run the checks: green): the reader (H-11 …, H-72, H-73, H-89: the head\u0027s chip and the four marks as buttons), the changes (H-52 …, H-70, H-71, H-79 to H-81, H-87 and H-88: the rework check\u0027s two columns in VS Code\u0027s colours, ✓ done and ok, clean), the side bar (H-16 …, H-65 to H-67, H-74 to H-78, H-82 to H-84, H-85 and H-86: the colours to the hour and the tree\u0027s words, Your notes gone and the tooltip\u0027s counts), the project page (H-2 …, H-90: made when missing), the feedback key (H-26 …), the settings as lists for a person (H-64, H-68), the install and Run the checks (H-69, H-1, H-30)","the table and the road as tables you edit in the extension (a cell changed written to the YAML on your confirm: your notes of 2026-11-06 on README.md and agents.md)","the settings file managed from its lists view (a rule moved between allow, ask and deny, one added, the lint run before the install: your word of 2026-11-08 \u0027I should be able to manage the JSON for the settings\u0027)","wanted: the share of the Claude Code plan\u0027s limit (Claude Code\u0027s own /usage, in no file the extension reads: nothing built)","any change of Lorisse\u0027s page/ needs the copies in media/ made again (check.ps1 names the copy command when a Lorisse stands beside this repository) and a repackage"],"family":null}],"families":[],"documents":{"items":[{"name":"budget/CONTRACT.md","state":"never"},{"name":"budget/README.md","state":"never"},{"name":"budget/VALIDATION.md","state":"never"},{"name":"CONTRACT.md","state":"changed","mark":"to rework","date":"2026-11-23","change":"2026-11-23","hour":"19:58","since":"hour","promise":true,"answer":true},{"name":"crates/coding_conventions.md","state":"reviewed","mark":"ok","date":"2026-11-23","hour":"23:55","since":"hour"},{"name":"crates/engine/CONTRACT.md","state":"reviewed","mark":"ok","date":"2026-11-23","hour":"21:55","since":"hour"},{"name":"crates/engine/README.md","state":"changed","mark":"to rework","date":"2026-11-24","change":"2026-11-24","hour":"00:02","since":"hour"},{"name":"crates/page/CONTRACT.md","state":"never","answer":true},{"name":"crates/page/README.md","state":"changed","mark":"to rework","date":"2026-11-24","change":"2026-11-24","hour":"00:06","since":"hour","answer":true},{"name":"crates/page/VALIDATION.md","state":"never"},{"name":"documents/CONTRACT.md","state":"never","answer":true},{"name":"documents/README.md","state":"never"},{"name":"documents/VALIDATION.md","state":"never"},{"name":"feedback-key/CONTRACT.md","state":"never"},{"name":"feedback-key/README.md","state":"never"},{"name":"feedback-key/VALIDATION.md","state":"never"},{"name":"notes-and-marks/CONTRACT.md","state":"never"},{"name":"notes-and-marks/README.md","state":"never"},{"name":"notes-and-marks/VALIDATION.md","state":"never"},{"name":"project-page/CONTRACT.md","state":"never"},{"name":"project-page/README.md","state":"never"},{"name":"project-page/VALIDATION.md","state":"never"},{"name":"reader/CONTRACT.md","state":"never"},{"name":"reader/README.md","state":"never"},{"name":"reader/VALIDATION.md","state":"never"},{"name":"README.md","state":"changed","mark":"to rework","date":"2026-11-23","change":"2026-11-23","hour":"19:52","since":"hour","answer":true},{"name":"tests/ui/workspace/cli/CONTRACT.md","state":"never"},{"name":"tests/ui/workspace/cli/README.md","state":"reviewed","mark":"to rework","date":"2026-11-17","since":"day"},{"name":"tests/ui/workspace/cli/VALIDATION.md","state":"reviewed","mark":"ok","date":"2026-11-18","since":"day"},{"name":"tests/ui/workspace/convert/CONTRACT.md","state":"reviewed","mark":"ok","date":"2026-11-16","since":"day","answer":true},{"name":"tests/ui/workspace/convert/README.md","state":"reviewed","mark":"ok","date":"2026-11-15","since":"day"},{"name":"tests/ui/workspace/convert/VALIDATION.md","state":"never"},{"name":"VALIDATION.md","state":"never"}],"check":{"state":"ok","why":""}},"summary":{"needs_you":6,"rows_to_refresh":3,"pages_waiting":18,"parts_waiting":6,"steps_owed":12,"parts_owed":7,"running":1,"to_merge":0,"pages_first":1,"pages_rest":17},"warnings":[],"areas":["rust","c","front","docs","yaml","scripts","other"],"areas_from":"the default","areas_note":[],"tree":{"rust":4547,"c":0,"front":30629,"docs":1549,"yaml":736,"scripts":3727,"other":485,"total":41673,"other_top":[["tests/fixtures/",399],["(the root)",48],["tests/ui/",38]]},"not_ours":{"lines":0,"paths":[]},"hidden":{"from":"","kinds":[],"paths":[]},"growth":[{"week":"2026-11-09","rust":0,"c":0,"front":18984,"docs":1579,"yaml":591,"scripts":1630,"other":36,"total":22820,"delta":22820,"commits":7},{"week":"2026-11-16","rust":0,"c":0,"front":30370,"docs":1472,"yaml":716,"scripts":3706,"other":88,"total":36352,"delta":13532,"commits":54},{"week":"2026-11-23","rust":4547,"c":0,"front":30629,"docs":1549,"yaml":736,"scripts":3727,"other":485,"total":41673,"delta":5321,"commits":14}],"code_pace":{"since":"2026-11-09","days":16,"weeks":3,"per_week":18232,"per_month":79276},"target":null,"tokens":{"transcripts":false},"sources":"the table, the gate\u0027s record, the review check, the road, git"}</script>
+<script>
+"use strict";
+// The project page's drawing. It reads one JSON object (script#data) and knows nothing else.
+// Every function names, in its first comment, the keys it reads; a missing key degrades to "not known yet".
+// Under VS Code's policy: no inline handler, no style attribute set by markup; styles go through the style object.
+let D;
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const MONTHS_LONG = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+// The tree's kinds are the project's own, read by the generator (`areas`, other last); this list is the fallback of an
+// older data block. A colour is always a token: a known kind keeps its own, another takes the next free one.
+const AREAS_DEFAULT = ["front", "docs", "yaml", "scripts", "other"];
+const AREA_KNOWN = { rust: "--cb-blue", c: "--cb-tier-2", front: "--cb-pink", docs: "--cb-orange", yaml: "--cb-ink-2", scripts: "--cb-green", other: "--cb-ink-3" };
+const AREA_SPARE = ["--cb-blue", "--cb-pink", "--cb-orange", "--cb-green", "--cb-tier-2", "--cb-tier-3", "--cb-tier-1", "--cb-band-very-late", "--cb-yellow", "--cb-ink-2", "--cb-ink-3"];
+let AREAS = AREAS_DEFAULT, AREA_COLOR = {};
+function setAreas() {
+  AREAS = Array.isArray(D.areas) && D.areas.length ? D.areas.map(String) : AREAS_DEFAULT.slice();
+  const used = new Set(AREAS.map((a) => AREA_KNOWN[a]).filter(Boolean)), spare = AREA_SPARE.filter((c) => !used.has(c));
+  let k = 0; AREA_COLOR = {};
+  for (const a of AREAS) AREA_COLOR[a] = AREA_KNOWN[a] || (spare.length ? spare[k++ % spare.length] : "--cb-ink-3");
+}
+const SVG = "http://www.w3.org/2000/svg";
+const fmt = (n) => Math.round(n).toLocaleString("en-US");
+const mega = (n) => (n >= 1e9 ? `${(n / 1e9).toFixed(2)} G` : n >= 1e6 ? `${(n / 1e6).toFixed(n >= 1e8 ? 0 : 1)} M` : n >= 1e3 ? `${Math.round(n / 1e3)} k` : `${Math.round(n)}`);
+const usd = (n) => `$${n >= 100 ? fmt(n) : n.toFixed(n >= 10 ? 0 : 2)}`;
+const $ = (id) => document.getElementById(id);
+const tip = $("tip");
+const WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+const inWords = (n) => WORDS[n] || String(n);
+const plural = (n, w) => `${n} ${n === 1 ? w : /(ch|ss)$/.test(w) ? w + "es" : w + "s"}`;
+
+function el(tag, cls, text) { const e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; }
+/** An SVG element; a `style` key goes through the style object (the panel's policy refuses a style attribute). */
+function sv(tag, attrs, parent) { const e = document.createElementNS(SVG, tag); for (const k in attrs) { if (k === "style") e.style.cssText = attrs[k]; else e.setAttribute(k, attrs[k]); } if (parent) parent.appendChild(e); return e; }
+function day(s) { const [y, m, d] = String(s).slice(0, 10).split("-").map(Number); return new Date(y, m - 1, d); }
+const addDays = (d, n) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const monday = (d) => addDays(d, -((d.getDay() + 6) % 7));
+const dm = (d) => `${d.getDate()} ${MONTHS[d.getMonth()]}`;
+const dmy = (s) => (/^\d{4}-\d{2}-\d{2}/.test(String(s || "")) ? dm(day(s)) : String(s || ""));
+const dmLong = (s) => { const d = day(s); return `${d.getDate()} ${MONTHS_LONG[d.getMonth()]}`; };
+/** "2026-11-19 21:10" said "19 Nov 21:10". */
+const when = (s) => { const t = String(s || ""); return /^\d{4}-\d{2}-\d{2}/.test(t) ? `${dmy(t)}${t.length > 11 ? " " + t.slice(11, 16) : ""}` : t; };
+/** The day the page was made, the "today" of every figure. */
+const today = () => (/^\d{4}-\d{2}-\d{2}/.test(D.generated || "") ? day(D.generated) : new Date());
+function showTip(ev, text, left) {
+  tip.textContent = text; tip.hidden = false;
+  const w = tip.offsetWidth, h = tip.offsetHeight;
+  const x = left ? ev.clientX - w - 14 : Math.min(ev.clientX + 14, window.innerWidth - w - 8);
+  const y = ev.clientY + 14 + h > window.innerHeight ? ev.clientY - h - 10 : ev.clientY + 14;
+  tip.style.transform = `translate(${Math.max(8, x)}px, ${y}px)`;
+}
+const hideTip = () => { tip.hidden = true; };
+const hover = (e, text, left) => { e.addEventListener("pointermove", (ev) => showTip(ev, typeof text === "function" ? text() : text, left)); e.addEventListener("pointerleave", hideTip); };
+function clear(id) { const e = $(id); e.textContent = ""; return e; }
+function swatch(key) { const s = el("span", "pv-sw"); s.style.setProperty("--cb-key", `var(${key})`); return s; }
+function store(key, v) { try { localStorage.setItem(`${key}:${(D.project && D.project.name) || ""}`, v); } catch (e) { /* storage may be off */ } }
+function stored(key) { try { return localStorage.getItem(`${key}:${(D.project && D.project.name) || ""}`); } catch (e) { return null; } }
+
+// ── the side bar's looks (the extension's LOOKS): a page's dot, a validation page's run, a stage's ring ──
+const ICON = {
+  wrench: '<path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18l3 3 6.3-6.3a4 4 0 0 0 5.4-5.4l-2.6 2.6-2.4-.6-.6-2.4z"/>',
+  eye: '<path d="M2 12s3.5-6.5 10-6.5S22 12 22 12s-3.5 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+  beaker: '<path d="M9 3h6M10 3v6l-5.5 9.5A1.6 1.6 0 0 0 5.9 21h12.2a1.6 1.6 0 0 0 1.4-2.5L14 9V3"/><path d="M7.5 15h9"/>',
+  pass: '<circle cx="12" cy="12" r="9.5" fill="currentColor" stroke="none"/><path class="pv-ic-cut" d="M7.5 12.5l3 3 6-6.5"/>',
+  sync: '<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8"/><path d="M4 3.5V8h4.5"/><path d="M4 13a8 8 0 0 0 14.3 4.9L20 16"/><path d="M20 20.5V16h-4.5"/>',
+  error: '<circle cx="12" cy="12" r="9.5"/><path d="M9 9l6 6M15 9l-6 6"/>'
+};
+// Each look: its colour class, its icon (none: the dot) and its words, as the side bar's "What the icons mean" says them.
+const LOOK = {
+  ok: ["c-ok", "", "ok"], read: ["c-read", "", "read"], changed: ["c-changed", "", "changed since your mark"], never: ["c-never", "", "never read"],
+  rework: ["c-rework", "wrench", "to rework, waits for the agent"], reworked: ["c-changed", "eye", "reworked, waits for your read"], none: ["c-none", "", "no review line"],
+  "run-none": ["c-never", "beaker", "nothing run"], "run-some": ["c-read", "beaker", "some steps run"], "run-green": ["c-ok", "pass", "every step run"],
+  "run-rerun": ["c-changed", "sync", "a step to run again"], "run-failed": ["c-rework", "error", "a step failed"],
+  // without the review check a page's state is not known; a verdict word the page does not know is not guessed
+  unknown: ["c-none", "", "state unknown: the review check did not run"], "run-unknown": ["c-changed", "beaker", "a verdict the page cannot read"]
+};
+const LOOK_ORDER = ["ok", "read", "changed", "never", "rework", "reworked", "none", "unknown", "run-none", "run-some", "run-green", "run-rerun", "run-unknown", "run-failed"];
+function lookMark(key, what) {
+  const l = LOOK[key];
+  if (!l) return dash();
+  const s = el("span", `${l[1] ? "pv-ic" : key === "none" || key === "unknown" ? "pv-k pv-k--none" : "pv-k"} ${l[0]}`);
+  if (l[1]) s.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICON[l[1]]}</svg>`;
+  s.setAttribute("role", "img"); s.setAttribute("aria-label", `${what ? what + ": " : ""}${l[2]}`); s.title = `${what ? what + ": " : ""}${l[2]}`;
+  return s;
+}
+function dash() { const s = el("span", "pv-k pv-k--dash"); s.setAttribute("role", "img"); s.setAttribute("aria-label", "no such page"); s.title = "does not apply"; return s; }
+/** A stage's ring: filled when reached, hollow when not, a dash when it does not apply. */
+function ringMark(v, what) {
+  if (v === "-" || v === undefined || v === null) return dash();
+  const on = v === 1, s = el("span", `pv-k ${on ? "pv-k--fill" : "pv-k--ring"}`);
+  s.setAttribute("role", "img"); s.setAttribute("aria-label", `${what}: ${on ? "reached" : "not reached"}`); s.title = `${what}: ${on ? "reached" : "not reached"}`;
+  return s;
+}
+/** The validation cell: the page's run when it has steps and a run log, else its own dot, as the side bar does. */
+const valLook = (p) => (p.validation && p.validation.look) || (p.looks && p.looks.validation) || "";
+
+// ── the head: project.name, gate {state, at, steps, tests}, branch, pushed, generated ──
+function renderHead() {
+  const p = D.project || {}, g = D.gate, gate = $("gate");
+  document.title = p.name || "A project";
+  $("title").textContent = p.name || "[project name]";
+  gate.className = "pv-gate";
+  if (!g) gate.textContent = "the gate never ran";
+  else if (g.state === "red") {
+    // red names the check that failed, and its reason when the record holds one
+    const red = (g.steps || []).filter((s) => s.state === "red").map((s) => (s.why || s.note ? `${s.name}: ${s.why || s.note}` : s.name));
+    gate.textContent = `gate red · ${red.join(", ") || "a step"} failed`; gate.classList.add("is-red");
+  } else { gate.textContent = `gate ${g.state} · ${when(g.at)}`; if (g.state === "green") gate.classList.add("is-green"); }
+  if (g) gate.title = (g.steps || []).map((s) => `${s.name} ${s.state}${s.seconds != null ? ` ${s.seconds} s` : ""}`).concat(g.tests ? [g.tests] : []).join("\n");
+  $("meta").textContent = [D.branch ? `${D.branch}${D.pushed === true ? " pushed" : D.pushed === false ? " not pushed" : ""}` : "", D.generated ? `made ${when(D.generated)}` : ""].filter(Boolean).join(" · ");
+  $("foot-1").textContent = "Made with AI, read as such: the agents are the authors, the owner is the reader.";
+  $("foot-2").textContent = `Generated by ${D.by || "the generator"} on ${D.generated} from the repository's files (${D.sources || "the table, the gate's record, the review check, the road, git"}). A generated page can be stale: check a figure against its file before acting on it.`;
+}
+
+// ── the refresh icon: shown only when a host gives the page a refresh (the extension's tab); a browser has none, so no
+//    icon and no error; a click calls the host's refresh and nothing else ──
+function hostRefresh() { try { const h = window.lorisseHost; return h && typeof h.refresh === "function" ? h : null; } catch (e) { return null; } }
+let refreshWired = false;
+function renderRefresh() {
+  const b = $("refresh"); if (!b) return;
+  b.hidden = !hostRefresh();
+  if (!b.hidden && !refreshWired) { refreshWired = true; b.addEventListener("click", () => { const h = hostRefresh(); if (h) h.refresh(); }); }
+}
+
+// ── the agent's pick (C-9.2, the canvas): one list of what is yours to do. First the road file's moves, now[{line, since,
+//    verb, detail, time}] as written, never computed, but a move whose verb is Read (the pick is the reads): its verb in
+//    the small box, the line, the time at the right; then the pick's pages, pick {items[{file, why, look, done, top}]},
+//    the verb box saying Read, the page as a link, its why in grey, the done ones last and greyed. The count is the moves
+//    plus the pages left; seven lines shown, the rest behind "n more". Without a pick: the moves, then the pages to read
+//    counted in one line, summary {pages_waiting, pages_first, pages_rest} (C-5.4); documents.check {state, why} ──
+const VERBS = ["Read", "Merge", "Walk", "Decide"];
+const PICK_SHOWN = 7;
+let pickOpen = false;
+/** Whether the review check ran: without it every page's state is unknown, and the page says so, never "nothing to read". */
+const reviewCheck = () => (D.documents && D.documents.check) || { state: "ok", why: "" };
+/** The moves the pick shows: the road file's now: lines whose verb is not Read, three at most as the road file holds. */
+const pickMoves = () => (D.now || []).slice(0, 3).filter((n) => String(n.verb || "").trim().toLowerCase() !== "read");
+function verbBox(v) { return el("span", `pv-verb${!v ? " pv-verb--none" : VERBS.includes(v) ? "" : " pv-verb--other"}`, v); }
+function renderPick() {
+  const box = clear("pick"), moves = pickMoves(), pk = D.pick && Array.isArray(D.pick.items) ? D.pick : null;
+  const items = pk ? pk.items : [], left = items.filter((x) => !x.done), done = items.filter((x) => x.done);
+  const count = moves.length + left.length;
+  box.appendChild(el("h2", "pv-cap", `${D.agent || "the agent"}'s pick · ${count} left`));
+  const ck = reviewCheck();
+  if (ck.state !== "ok") box.appendChild(el("p", "pv-pick-end pv-o", `The pages' states are unknown: ${ck.why || "the review check did not run"}.`));
+  const lines = [];
+  for (const n of moves) {
+    const li = el("li", "pv-pk"), v = String(n.verb || "").trim();
+    li.appendChild(verbBox(v));
+    const t = el("span", "pv-pk-l", n.line || ""); t.title = [n.line, n.detail, n.since ? `since ${dmy(n.since)}` : ""].filter(Boolean).join("\n");
+    li.appendChild(t);
+    if (n.time) li.appendChild(el("span", "pv-t", n.time));
+    lines.push(li);
+  }
+  for (const it of left.concat(done)) {
+    const li = el("li", `pv-pk${it.done ? " is-done" : ""}`);
+    li.appendChild(verbBox("Read"));
+    const a = el("span", "pv-pk-f", it.file); a.dataset.lxPath = it.file; a.title = it.file;
+    const w = el("span", `pv-pk-w${it.top ? " is-o" : ""}`, it.why || ""); w.title = it.why || "";
+    li.append(a, w);
+    if (it.done) li.appendChild(el("span", "pv-t", "done"));
+    lines.push(li);
+  }
+  const ul = el("ul", "pv-list"), folds = lines.length > PICK_SHOWN;
+  for (const li of folds && !pickOpen ? lines.slice(0, PICK_SHOWN) : lines) ul.appendChild(li);
+  box.appendChild(ul);
+  const end = el("div", "pv-pick-end");
+  if (!lines.length) end.appendChild(el("span", "pv-q", pk ? "Nothing picked: the road file's now: and pick: hold no line." : "Nothing written: the road file's now: holds three lines at most."));
+  else if (pk && items.length && !left.length) end.appendChild(el("span", "pv-q", "Every page of the pick read since your mark."));
+  if (folds) {
+    const b = el("button", "pv-more", pickOpen ? "fewer" : `${lines.length - PICK_SHOWN} more`); b.type = "button"; b.setAttribute("aria-expanded", String(pickOpen));
+    b.addEventListener("click", () => { pickOpen = !pickOpen; renderPick(); });
+    end.appendChild(b);
+  }
+  if (end.childNodes.length) box.appendChild(end);
+  if (!pk) box.appendChild(toReadLine());
+}
+/** Without a pick, the pages to read in one line: how many, those that answer you or change a promise, the rest. */
+function toReadLine() {
+  const s = D.summary || {}, n = Number(s.pages_waiting || 0), first = Number(s.pages_first || 0), rest = Math.max(0, n - first), ck = reviewCheck();
+  const p = el("p", "pv-readline");
+  if (ck.state !== "ok") return p;
+  if (!n) { p.textContent = "Nothing to read: every page read and unchanged since your mark."; return p; }
+  const bar = el("span", "pv-read-bar"), fill = el("span", "pv-read-fill"); fill.style.width = `${(100 * first) / n}%`; bar.appendChild(fill);
+  bar.setAttribute("role", "img"); bar.setAttribute("aria-label", `${first} of ${n} answer you or change a promise`);
+  p.append(`${fmt(n)} ${n === 1 ? "page waits for your read" : "pages wait for your read"} `, bar, " ",
+    el("span", "pv-o", `${first} ${first === 1 ? "answers you or changes a promise" : "answer you or change a promise"}`), " · ", el("span", "pv-q", `${rest} wording or never read`));
+  return p;
+}
+
+// ── the parts, one row each: parts[{name, path, stage, looks, validation, steps, waits, quiet}] ──
+const STAGE_LIFE = ["design", "desk", "validated", "released"];
+const loud = () => (D.parts || []).filter((p) => !p.quiet);
+const toRead = (p) => (p.waits || []).length;
+const owed = (p) => (p.validation && p.validation.state === "ok" ? Number(p.validation.owed || 0) : 0);
+/** The parts in the dashboard's order: by stage as a part lives through them, a part with a contract first, then the table's. */
+function ordered(parts) {
+  const rank = (p) => { const i = STAGE_LIFE.indexOf(p.stage); return i < 0 ? 99 : i; };
+  return parts.map((p, i) => ({ p, i })).sort((a, b) => rank(a.p) - rank(b.p) || (b.p.files && b.p.files.contract ? 1 : 0) - (a.p.files && a.p.files.contract ? 1 : 0) || a.i - b.i).map((x) => x.p);
+}
+const parentOf = (p) => { const s = String(p.path || ""); const i = s.lastIndexOf("/"); return i > 0 ? s.slice(0, i) : ""; };
+/** The families (C-6.7), as the generator found them: a part's family {key, name, why}, guessed from the folder or the
+ *  names' start, or its row's own family: word. A data block from before the families: three or more parts under one
+ *  parent folder, named after the folder ("the five skills"). Each {folder: its key, name, why, parts}, by part name. */
+function families(parts) {
+  const out = {}, by = {};
+  if (Array.isArray(D.families)) {
+    for (const p of parts) if (p.family && p.family.key) { const k = p.family.key; (out[k] = out[k] || { folder: k, name: p.family.name, why: p.family.why || "", parts: [] }).parts.push(p); by[p.name] = out[k]; }
+    return by;
+  }
+  const fold = {};
+  for (const p of parts) { const f = parentOf(p); if (f) (fold[f] = fold[f] || []).push(p); }
+  for (const f in fold) if (fold[f].length >= 3) { const e = { folder: f, name: `the ${inWords(fold[f].length)} ${f.split("/").pop().replace(/^\./, "")}`, why: `${inWords(fold[f].length)} parts under ${f}/`, parts: fold[f] }; for (const p of fold[f]) by[p.name] = e; }
+  return by;
+}
+const PAGE_RANK = { rework: 0, reworked: 0, unknown: 1, changed: 1, never: 2, read: 3, ok: 4, none: 5 };
+const RUN_RANK = { "run-failed": 0, "run-unknown": 1, "run-rerun": 1, "run-none": 2, "run-some": 3, "run-green": 4 };
+/** The worst look of a family's members for a column: what waits for him shows first. */
+function worst(keys, rank) { const k = keys.filter((x) => x && x in rank); return k.length ? k.sort((a, b) => rank[a] - rank[b])[0] : ""; }
+function famLooks(f) {
+  const ps = f.parts, look = (k) => worst(ps.map((p) => p.looks && p.looks[k]), PAGE_RANK);
+  const runs = ps.map((p) => p.validation && p.validation.look).filter(Boolean);
+  // a family whose members are all run green and some of them are not: some steps run
+  let val = runs.length ? worst(runs, RUN_RANK) : look("validation");
+  if (runs.length && val === "run-green" && runs.length < ps.filter((p) => p.files && p.files.validation).length) val = "run-some";
+  const ring = (k) => { const v = ps.map((p) => p.steps && p.steps[k]); return v.every((x) => x === "-") ? "-" : v.every((x) => x === 1 || x === "-") ? 1 : 0; };
+  const stages = [...new Set(ps.map((p) => p.stage))];
+  return { contract: look("contract"), readme: look("readme"), validation: val, desk: ring("desk"), bench: ring("bench"), locked: ring("locked"), stage: stages.length === 1 ? stages[0] : "mixed",
+    read: ps.reduce((s, p) => s + toRead(p), 0), owed: ps.reduce((s, p) => s + owed(p), 0) };
+}
+let famOpen = new Set(), quietOpen = new Set();
+function gridRow(tb, cells, o) {
+  const tr = el("tr", o.cls || "");
+  const c1 = el("td", "l");
+  if (o.onName) { const b = el("button", "pv-pbtn", o.name); b.type = "button"; if (o.expanded != null) b.setAttribute("aria-expanded", String(o.expanded)); b.title = o.title || ""; b.addEventListener("click", o.onName); c1.appendChild(b); }
+  else c1.textContent = o.name;
+  tr.append(c1, el("td", "s", cells.stage || ""));
+  const k = (key, what, sep) => { const td = el("td", sep ? "sep" : ""); td.appendChild(key ? lookMark(key, what) : dash()); return td; };
+  tr.append(k(cells.contract, "CONTRACT"), k(cells.readme, "README"), k(cells.validation, "VALIDATION"));
+  const r = (v, what, sep) => { const td = el("td", sep ? "sep" : ""); td.appendChild(ringMark(v, what)); return td; };
+  tr.append(r(cells.desk, "desk", true), r(cells.bench, "bench"), r(cells.locked, "locked"));
+  tr.append(el("td", `sep n${cells.read ? "" : " z"}`, String(cells.read || 0)), el("td", `n${cells.owed ? "" : " z"}`, String(cells.owed || 0)));
+  tb.appendChild(tr);
+  return tr;
+}
+const partCells = (p) => ({ stage: p.stage, contract: p.looks && p.looks.contract, readme: p.looks && p.looks.readme, validation: valLook(p),
+  desk: p.steps && p.steps.desk, bench: p.steps && p.steps.bench, locked: p.steps && p.steps.locked, read: toRead(p), owed: owed(p) });
+function renderGrid() {
+  const t = clear("grid"), parts = ordered(loud()), fam = families(parts), seen = new Set(), used = new Set();
+  const head = el("thead"), hr = el("tr");
+  [["part", "l"], ["stage", ""], ["contract", ""], ["readme", ""], ["validation", ""], ["desk", "sep"], ["bench", ""], ["locked", ""], ["to read", "sep"], ["steps owed", ""]].forEach(([w, c]) => { const th = el("th", c, w); th.scope = "col"; hr.appendChild(th); });
+  head.appendChild(hr); t.appendChild(head);
+  const tb = el("tbody"); t.appendChild(tb);
+  if (!(D.parts || []).length) { const tr = el("tr"), td = el("td", "l", "No part has a row in the status table yet."); td.colSpan = 10; tr.appendChild(td); tb.appendChild(tr); }
+  // every sign a row draws is noted, for the legend: the looks, a dash, a ring reached or not
+  const note = (c) => { for (const k of ["contract", "readme", "validation"]) used.add(c[k] && LOOK[c[k]] ? c[k] : "dash"); for (const k of ["desk", "bench", "locked"]) used.add(c[k] === 1 ? "ring1" : c[k] === "-" || c[k] == null ? "dash" : "ring0"); };
+  const add = (p, kid, quiet) => { const c = partCells(p); if (quiet) { c.read = 0; c.owed = 0; } note(c); gridRow(tb, c, { name: p.name, cls: `${kid ? "is-kid" : ""}${quiet ? " is-quiet" : ""}`, onName: () => openPart(p.name), title: `${p.name} on the Parts tab` }); };
+  for (const p of parts) {
+    const f = fam[p.name];
+    if (!f) { add(p, false); continue; }
+    if (seen.has(f.folder)) continue;
+    seen.add(f.folder); used.add("family");
+    const open = famOpen.has(f.folder), c = famLooks(f);
+    note(c);
+    // resting on the row says why it folded, and the word that changes it
+    const why = `${f.why ? f.why.charAt(0).toUpperCase() + f.why.slice(1) : "These parts live together"}: one row (${f.parts.map((x) => x.name).join(", ")}). A click ${open ? "folds" : "unfolds"} them. A row's family: in status.yaml changes it: another name, or none to stay out.`;
+    gridRow(tb, c, { name: `${open ? "▾" : "▸"} ${f.name}`, expanded: open, title: why,
+      onName: () => { if (famOpen.has(f.folder)) famOpen.delete(f.folder); else famOpen.add(f.folder); store("pv-fam", JSON.stringify([...famOpen])); renderGrid(); } });
+    if (open) for (const m of f.parts) add(m, true);
+  }
+  // parked parts and the rows not ours: one grey row each, counted in nothing, shown on a click
+  for (const key of ["parked", "not ours"]) {
+    const mine = (D.parts || []).filter((p) => p.quiet === key);
+    if (!mine.length) continue;
+    const open = quietOpen.has(key), tr = el("tr", "is-quiet"), td = el("td", "l"); td.colSpan = 10;
+    const b = el("button", "pv-pbtn", `${key} · ${mine.length} · ${open ? "hide" : "show"}`); b.type = "button"; b.setAttribute("aria-expanded", String(open));
+    b.addEventListener("click", () => { if (quietOpen.has(key)) quietOpen.delete(key); else quietOpen.add(key); renderGrid(); });
+    td.append(b, ` · ${mine.map((p) => p.name).join(", ")} · counted in nothing`); tr.appendChild(td); tb.appendChild(tr);
+    if (open) for (const p of mine) add(p, true, true);
+  }
+  // one legend line naming every sign the table draws: each look (the side bar's dots and icons, the eye of a page
+  // reworked and waiting among them), the dash, the rings, the family's arrow
+  const key = clear("grid-key");
+  for (const k of LOOK_ORDER) if (used.has(k)) { const s = el("span"); s.append(lookMark(k), LOOK[k][2]); key.appendChild(s); }
+  if (used.has("dash")) { const s = el("span"); s.append(dash(), "no such page, or does not apply"); key.appendChild(s); }
+  if (used.has("ring1")) { const s = el("span"); s.append(ringMark(1, "a stage"), "stage reached"); key.appendChild(s); }
+  if (used.has("ring0")) { const s = el("span"); s.append(ringMark(0, "a stage"), "not reached"); key.appendChild(s); }
+  if (used.has("family")) key.appendChild(el("span", "", "▸ a family: parts that live together, a click unfolds them"));
+  key.appendChild(el("span", "pv-key-end", "the side bar's own icons · a part opens on Parts"));
+  renderWarnings();
+}
+// ── what the generator could not read: warnings[], one grey line each (a row of the table, the review check, the token
+//    logs, a path outside the repository), so a figure is never drawn over a failure in silence ──
+function renderWarnings() {
+  const box = clear("warnings");
+  for (const w of D.warnings || []) box.appendChild(el("p", "pv-hint", String(w)));
+}
+
+// ── Parts: the list by stage with what each owes; the one part chosen ──
+let chosen = "";
+const owesWords = (p) => { const r = toRead(p), o = owed(p); const bits = []; if (r) bits.push(`${r} to read`); if (o) bits.push(plural(o, "step")); return bits.length ? bits.join(" · ") : "nothing"; };
+function defaultPart() { const ps = ordered(loud()); const o = ps.find((p) => toRead(p) || owed(p)); return (o || ps[0] || (D.parts || [])[0] || {}).name || ""; }
+function renderPartList() {
+  const nav = clear("plist"), parts = ordered(loud());
+  const groups = [];
+  for (const p of parts) { const g = STAGE_LIFE.includes(p.stage) ? p.stage : p.stage || "no stage"; let e = groups.find((x) => x.g === g); if (!e) groups.push(e = { g, ps: [] }); e.ps.push(p); }
+  for (const key of ["parked", "not ours"]) { const ps = (D.parts || []).filter((p) => p.quiet === key); if (ps.length) groups.push({ g: key, ps, quiet: true }); }
+  for (const e of groups) {
+    nav.appendChild(el("h2", "pv-grp", e.g));
+    for (const p of e.ps) {
+      const b = el("button", `pv-pr${e.quiet ? " is-quiet" : ""}`); b.type = "button"; b.dataset.part = p.name;
+      b.setAttribute("aria-current", String(p.name === chosen));
+      const w = e.quiet ? "counted in nothing" : owesWords(p);
+      // a dot before the name: this part has a next thing for him (yours, C-9.3)
+      const on = !e.quiet && hasYours(p), yd = el("span", `pv-yd${on ? " is-on" : ""}`);
+      if (on) { yd.setAttribute("role", "img"); yd.setAttribute("aria-label", "a next thing for you"); yd.title = "a next thing for you"; } else yd.setAttribute("aria-hidden", "true");
+      b.append(yd, el("span", "pv-nm", p.name), el("span", `pv-c${w !== "nothing" && !e.quiet ? " is-o" : ""}`, w));
+      b.addEventListener("click", () => { choose(p.name, true); const f = document.querySelector(`.pv-pr[data-part="${p.name}"]`); if (f) f.focus(); });
+      nav.appendChild(b);
+    }
+  }
+}
+const hasYours = (p) => !!(p.yours && p.yours.kind && p.yours.kind !== "none");
+/** The one next thing for him, first in the part chosen: yours {kind, doc, why, step, title}, as the generator chose it. */
+function yoursLine(p) {
+  const y = p.yours || {}, on = hasYours(p), ln = el("p", `pv-you${on ? "" : " is-none"}`);
+  ln.appendChild(el("b", "", "Next for you: "));
+  if (!on) { ln.append("nothing waits for you here"); return ln; }
+  if (y.kind === "step") { ln.append(`walk ${y.step}: ${y.title || ""}`); return ln; }
+  // a step to walk again, after a picked page and an answer, before a step never run
+  if (y.kind === "again") { ln.append(`walk ${y.step} again: ${y.why === "failed" ? `it failed ${dmy(y.date)}` : "its words changed since its run"}`); if (y.title) ln.appendChild(el("span", "pv-you-w", ` · ${y.title}`)); return ln; }
+  const a = el("span", "", y.doc || ""); a.dataset.lxPath = y.doc || "";
+  ln.append(y.kind === "pick" ? "read " : "", a);
+  if (y.why) ln.appendChild(el("span", "pv-you-w", ` · ${y.why}`));
+  return ln;
+}
+const docOf = (name) => ((D.documents && D.documents.items) || []).find((d) => d.name === name) || null;
+/** A page's mark in words and its colour: "ok · 19 Nov", "changed since your ok of 11 Nov", "never read". */
+function markWords(p, k) {
+  const f = p.files && p.files[k], look = p.looks && p.looks[k], d = f ? docOf(f) : null, w = (p.waits || []).find((x) => x.doc === f);
+  const at = d && d.date ? dmy(d.date) : "";
+  if (w && w.kind !== "never") return { text: w.why.replace(/(\d{4})-(\d{2})-(\d{2})/g, (m) => dmy(m)), cls: "is-o" };
+  switch (look) {
+    case "ok": return { text: `ok${at ? ` · ${at}` : ""}`, cls: "is-ok" };
+    case "read": return { text: `read${at ? ` · ${at}` : ""}`, cls: "is-read" };
+    case "rework": return { text: `to rework${at ? ` · ${at}` : ""}, waits for the agent`, cls: "is-pink" };
+    case "never": return { text: "never read", cls: "is-grey" };
+    case "none": return { text: "no review line", cls: "is-grey" };
+    case "unknown": return { text: "state unknown: the review check did not run", cls: "is-o" };
+    default: return { text: look || "", cls: "is-grey" };
+  }
+}
+const SIX = [["contract", "contract"], ["readme", "readme"], ["validation", "validation"], ["desk", "desk"], ["bench", "bench"], ["locked", "locked"]];
+let nextOpen = false;
+function renderPart() {
+  const box = clear("pone"), p = (D.parts || []).find((x) => x.name === chosen);
+  if (!p) { box.appendChild(el("p", "pv-empty", "No part has a row in the status table yet.")); return; }
+  if (p.yours) box.appendChild(yoursLine(p));
+  const h = el("div", "pv-one-h"); h.appendChild(el("h2", "", p.name));
+  const tests = p.tests != null ? `${p.tests} tests in the gate${D.gate && D.gate.state === "green" ? ", green" : ""}` : p.clauses ? plural(p.clauses, "clause") : "";
+  h.appendChild(el("span", "pv-m", [p.stage || p.quiet || "no stage", `edits ${p.edits || "not said"}`, `${fmt(p.lines || 0)} lines`, tests].filter(Boolean).join(" · ")));
+  box.appendChild(h);
+  if (p.what) box.appendChild(el("p", "pv-what", p.what));
+  // its path in six dots, with their words
+  const six = el("ol", "pv-six"); six.setAttribute("aria-label", "Its path");
+  for (const [k, w] of SIX) {
+    const li = el("li");
+    if (k === "validation") { const v = valLook(p); li.appendChild(v ? lookMark(v, w) : dash()); }
+    else if (k === "contract" || k === "readme") li.appendChild(p.looks && p.looks[k] ? lookMark(p.looks[k], w) : dash());
+    else li.appendChild(ringMark(p.steps && p.steps[k], w));
+    li.append(w); six.appendChild(li);
+  }
+  box.appendChild(six);
+  const two = el("div", "pv-two"), left = el("div"), right = el("div");
+  // its three pages with his marks, each a link to the page; a changed one offers what changed
+  left.appendChild(el("h3", "pv-cap2", "Its three pages"));
+  for (const [k, file] of [["contract", "CONTRACT.md"], ["readme", "README.md"], ["validation", "VALIDATION.md"]]) {
+    const f = p.files && p.files[k], ln = el("div", "pv-ln");
+    if (!f) { ln.append(el("span", "pv-nm pv-q", `no ${file}`)); left.appendChild(ln); continue; }
+    const a = el("span", "pv-nm", file); a.dataset.lxPath = f; ln.appendChild(a);
+    const m = markWords(p, k); ln.appendChild(el("span", `pv-m ${m.cls}`, m.text)); left.appendChild(ln);
+    const lk = p.looks && p.looks[k];
+    // what changed opens only inside a host (C-9.1): the same host object as the refresh; a browser shows no link
+    if ((lk === "changed" || lk === "reworked") && hostRefresh()) { const c = el("div", "pv-ln"), b = el("span", "pv-link", "See what changed →"); b.dataset.lxPath = f; b.dataset.lxChanges = "1"; c.append(el("span", "pv-nm"), b); left.appendChild(c); }
+  }
+  // the part's other pages that wait for him
+  const own = new Set(Object.values(p.files || {}));
+  const others = (p.waits || []).filter((w) => !own.has(w.doc));
+  if (others.length) {
+    left.appendChild(el("h3", "pv-cap2", `And ${plural(others.length, "page")} more to read`));
+    for (const w of others) { const ln = el("div", "pv-ln"), a = el("span", "pv-nm", w.doc); a.dataset.lxPath = w.doc; ln.append(a, el("span", `pv-m ${w.first ? "is-o" : "is-grey"}`, w.why.replace(/(\d{4})-(\d{2})-(\d{2})/g, (m) => dmy(m)))); left.appendChild(ln); }
+  }
+  left.appendChild(el("h3", "pv-cap2", "Last"));
+  left.appendChild(el("p", "pv-para", (p.last || []).join(" · ") || "nothing said"));
+  // by hand: how many steps run and never run, each one owed by its id and title, what it waits on
+  const v = p.validation || { state: "none", word: "no validation page", steps: [] }, steps = v.steps || [];
+  // a verdict the run log words in no known way is "unknown": shown as such, never counted run nor failed
+  const good = steps.filter((s) => s.run === "good").length, failed = steps.filter((s) => s.run === "failed"), unknown = steps.filter((s) => s.run === "unknown"), never = steps.filter((s) => s.run !== "good" && s.run !== "failed" && s.run !== "unknown"), rerun = steps.filter((s) => s.rerun);
+  right.appendChild(el("h3", "pv-cap2", v.state === "ok" ? `By hand · ${good} run, ${never.length} never run${failed.length ? `, ${failed.length} failed` : ""}${unknown.length ? `, ${unknown.length} verdict unknown` : ""}${rerun.length ? `, ${rerun.length} to run again` : ""}` : `By hand · ${v.word}`));
+  for (const s of failed.concat(unknown, rerun, never)) {
+    const ln = el("div", "pv-ln"); ln.append(el("span", "pv-id", s.id));
+    const nm = el("span", "pv-nm", s.title);
+    // under the title: failed (pink), its verdict unknown, to run again or what it waits on (orange)
+    const under = s.run === "failed" ? ["pv-m is-pink", `failed ${dmy(s.date)}`] : s.run === "unknown" ? ["pv-m is-o", `the run log's verdict of ${dmy(s.date)} is a word the page does not know: unknown`] : s.rerun ? ["pv-m is-o", `changed since its run of ${dmy(s.date)}: to run again`] : s.waits ? ["pv-m is-o", `waits on ${s.waits}`] : null;
+    if (under) { const u = el("span", under[0], under[1]); u.classList.add("pv-sub"); nm.appendChild(u); }
+    ln.appendChild(nm); right.appendChild(ln);
+  }
+  if (v.state === "ok" && !failed.length && !unknown.length && !never.length && !rerun.length) right.appendChild(el("p", "pv-para", "Every step run."));
+  // next: two items, then "n more" that unfolds the rest
+  right.appendChild(el("h3", "pv-cap2", "Next"));
+  const nx = p.next || [], para = el("p", "pv-para");
+  if (!nx.length) para.textContent = "nothing next";
+  else {
+    para.textContent = (nextOpen ? nx : nx.slice(0, 2)).join(" · ");
+    if (nx.length > 2) { const b = el("button", "pv-more", nextOpen ? "fewer" : `${nx.length - 2} more`); b.type = "button"; b.setAttribute("aria-expanded", String(nextOpen)); b.addEventListener("click", () => { nextOpen = !nextOpen; renderPart(); }); para.append(" · ", b); }
+  }
+  right.appendChild(para);
+  two.append(left, right); box.appendChild(two);
+  if (p.stale) box.appendChild(el("p", "pv-grey", `The row is older than the code (row ${p.changed}, code ${p.code}): ${D.agent || "the agent"}'s to refresh.`));
+}
+/** Choose a part on Parts: the list, the part, the address. */
+function choose(name, keep) {
+  chosen = name; nextOpen = false;
+  renderPartList(); renderPart();
+  if (keep) setHash(`parts/${name}`);
+}
+function openPart(name) { showTab("parts", false, false); choose(name, true); }
+
+// ── Growth and tokens · the code: tree {<kind>…, total, other_top}, growth[{week, <kind>…, total, delta, commits}] ──
+let offKinds = new Set();
+const kindsOn = () => AREAS.filter((a) => !offKinds.has(a));
+const totalOn = (r) => kindsOn().reduce((s, a) => s + Math.max(0, r[a] || 0), 0);
+const FROM_PICKS = [["1m", "1 month", 1], ["3m", "3 months", 3], ["6m", "6 months", 6], ["all", "Since the start", 0]];
+let from = "all";
+function fromDate() {
+  if (from === "all") return null;
+  const base = today(), pick = FROM_PICKS.find((p) => p[0] === from);
+  return new Date(base.getFullYear(), base.getMonth() - (pick ? pick[2] : 0), base.getDate());
+}
+function weeksShown() {
+  const rows = D.growth || [], d = fromDate();
+  if (!d) return rows;
+  const shown = rows.filter((r) => day(r.week) >= monday(d));
+  return shown.length ? shown : rows.slice(-1);
+}
+function renderCode() {
+  const legend = clear("kinds"), chips = clear("from");
+  if (!D.tree || !(D.growth || []).length) { $("code-now").textContent = "0"; $("code-week").textContent = "nothing counted yet"; $("kinds-off").textContent = ""; clear("area"); $("pace").textContent = ""; return; }
+  const g = D.growth, last = g[g.length - 1], prev = g.length > 1 ? g[g.length - 2] : null;
+  // the lines today are the tree's count (the files as they are), the change this week the weeks' (git's numstat)
+  $("code-now").textContent = fmt(totalOn(D.tree));
+  const wk = totalOn(last) - (prev ? totalOn(prev) : 0);
+  $("code-week").textContent = `${wk >= 0 ? "+" : ""}${fmt(wk)} this week`;
+  // beside it the means since the first week that holds real lines (C-7.4), of the kinds switched on
+  const m = means();
+  $("code-mean").textContent = m ? `${fmt(m.week)} a week · ${fmt(m.month)} a month, on average` : "";
+  $("code-since").textContent = m ? `since ${dmLong(m.since)} ${day(m.since).getFullYear()}` : "";
+  for (const a of AREAS) {
+    const n = D.tree[a] || 0; if (!n) continue;
+    const on = !offKinds.has(a), li = el("li"), b = el("button", "pv-kind"); b.type = "button"; b.dataset.kind = a; b.setAttribute("aria-pressed", String(on));
+    b.append(swatch(AREA_COLOR[a]), a, el("b", "", fmt(n)));
+    b.title = `${on ? "Switch off" : "Switch on"} ${a}`;
+    b.addEventListener("click", () => { if (offKinds.has(a)) offKinds.delete(a); else offKinds.add(a); store("pv-off", JSON.stringify([...offKinds])); renderCode(); drawArea(); const f = document.querySelector(`.pv-kind[data-kind="${a}"]`); if (f) f.focus(); });
+    li.appendChild(b); legend.appendChild(li);
+  }
+  const off = AREAS.filter((a) => offKinds.has(a) && D.tree[a]);
+  $("kinds-off").textContent = off.length ? `off: ${off.join(", ")} (switched off here, a click on the kind brings it back)` : "A click on a kind switches it off, and on again.";
+  for (const [v, w] of FROM_PICKS) {
+    const b = el("button", "pv-chip", w); b.type = "button"; b.setAttribute("aria-pressed", String(v === from));
+    b.addEventListener("click", () => { from = v; store("pv-from", from); renderCode(); drawArea(); });
+    chips.appendChild(b);
+  }
+}
+/** The means since the first week that holds real lines (code_pace.since, else the first week of growth): this week's
+ *  total of the kinds on, spread over the days from that Monday to today, per week and per month of 30.44 days. */
+function means() {
+  const g = D.growth || [];
+  if (!g.length) return null;
+  const since = (D.code_pace && D.code_pace.since) || g[0].week, days = Math.round((today() - day(since)) / 864e5) + 1, total = totalOn(g[g.length - 1]);
+  if (days < 1) return null;
+  return { since, week: (total * 7) / days, month: (total * 30.4375) / days };
+}
+/** The agent's target (C-7.5): target {date, lines, note}, as the road file writes it; null without one, or past. */
+function targetAhead(rows) {
+  const t = D.target;
+  if (!t || !/^\d{4}-\d{2}-\d{2}$/.test(String(t.date || "")) || !(Number(t.lines) > 0) || !rows.length) return null;
+  const weeks = (day(t.date) - day(rows[rows.length - 1].week)) / (7 * 864e5);
+  if (!(weeks > 0)) return null;
+  // on a fifth of the chart's width at most: ahead / (n + ahead) <= 1/5, so ahead <= n / 4 (a week at least)
+  const room = Math.max(1, (rows.length - 1) / 4), cut = weeks > room;
+  return { t, weeks, ahead: cut ? room : weeks, cut };
+}
+function niceStep(max, n) { const raw = max / n, mag = Math.pow(10, Math.floor(Math.log10(raw))); return [1, 2, 2.5, 5, 10].map((m) => m * mag).find((s) => s >= raw); }
+function frame(id, rows, height, yMin, yMax, right, extra, onHover) {
+  const box = clear(id);
+  const W = box.clientWidth, L = 52, T = 10, B = 26, R = right, N = rows.length + extra;
+  const pw = Math.max(40, W - L - R), ph = height - T - B;
+  const svg = sv("svg", { class: "cb-chart", width: W, height, viewBox: `0 0 ${W} ${height}` }, box);
+  const x = (i) => L + (N > 1 ? (i * pw) / (N - 1) : pw / 2);
+  const y = (v) => T + ph - ((v - yMin) * ph) / (yMax - yMin || 1);
+  const step = niceStep(Math.max(yMax - yMin, 1), height > 200 ? 5 : 3);
+  for (let v = Math.ceil(yMin / step) * step; v <= yMax; v += step) {
+    sv("line", { class: v === 0 ? "cb-chart-base" : "cb-chart-grid", x1: L, x2: L + pw, y1: y(v), y2: y(v) }, svg);
+    sv("text", { x: L - 6, y: y(v) + 3, "text-anchor": "end" }, svg).textContent = fmt(v);
+  }
+  const every = Math.max(1, Math.ceil(N / Math.max(2, Math.floor(pw / 70))));
+  let lastYear = null;
+  for (let i = 0; i < N; i += every) {
+    const d = addDays(day(rows[0].week), 7 * i);
+    sv("text", { x: x(i), y: height - 8, "text-anchor": "middle" }, svg).textContent = `${d.getDate()} ${MONTHS[d.getMonth()]}${d.getFullYear() !== lastYear && lastYear !== null ? " " + d.getFullYear() : ""}`;
+    lastYear = d.getFullYear();
+  }
+  const g = sv("g", {}, svg);
+  const cross = sv("line", { class: "pv-cross", y1: T, y2: T + ph, visibility: "hidden" }, svg);
+  const hit = sv("rect", { x: L, y: T, width: pw, height: ph, fill: "transparent" }, svg);
+  hit.addEventListener("pointermove", (ev) => {
+    const px = ev.clientX - svg.getBoundingClientRect().left;
+    const i = Math.max(0, Math.min(rows.length - 1, Math.round(((px - L) / pw) * (N - 1))));
+    cross.setAttribute("x1", x(i)); cross.setAttribute("x2", x(i)); cross.setAttribute("visibility", "visible");
+    showTip(ev, onHover(rows[i]), px > L + pw / 2);
+  });
+  hit.addEventListener("pointerleave", () => { hideTip(); cross.setAttribute("visibility", "hidden"); });
+  return { svg: g, x, y, L, pw, T, ph };
+}
+const weekLine = (r) => `Week of ${dm(day(r.week))} ${day(r.week).getFullYear()}`;
+/** The lines by kind, stacked, one layer a kind shown, from the first week that holds real lines (the generator's
+ *  growth starts there). With a target the axis runs on to its date, on a fifth of the width at most (cut beyond, and
+ *  said), and a dashed line goes from today's total to it; without one the chart ends today, no pace drawn. */
+function drawArea() {
+  if (!(D.growth || []).length || !$("area").clientWidth) return;
+  const rows = weeksShown(), kinds = kindsOn(), tg = targetAhead(rows);
+  const n = rows.length - 1, ahead = tg ? tg.ahead : 0, now = totalOn(rows[n]);
+  // the line's end: the target itself, or where the line crosses the cut edge
+  const endVal = tg ? now + (Number(tg.t.lines) - now) * (tg.ahead / tg.weeks) : 0;
+  const max = Math.max(1, endVal, ...rows.map((r) => totalOn(r)));
+  const f = frame("area", rows, 240, 0, max * 1.08, 16, ahead, (r) => [weekLine(r), `total ${fmt(totalOn(r))} · ${plural(r.commits, "commit")}`]
+    .concat(kinds.slice().reverse().filter((a) => r[a]).map((a) => `${a.padEnd(11)}${fmt(r[a]).padStart(8)}`)).join("\n"));
+  const lower = rows.map(() => 0);
+  for (const a of kinds) {
+    if (!rows.some((r) => r[a])) continue;
+    const upper = rows.map((r, i) => lower[i] + Math.max(0, r[a] || 0));
+    const top = upper.map((v, i) => `${f.x(i)},${f.y(v)}`), bottom = lower.map((v, i) => `${f.x(i)},${f.y(v)}`).reverse();
+    sv("polygon", { points: top.concat(bottom).join(" "), style: `fill: var(${AREA_COLOR[a]}); stroke: var(--cb-surface); stroke-width: 1` }, f.svg);
+    upper.forEach((v, i) => { lower[i] = v; });
+  }
+  const who = D.agent || "the agent";
+  if (tg) {
+    sv("line", { class: "pv-proj", x1: f.x(n), y1: f.y(now), x2: f.x(n + ahead), y2: f.y(endVal) }, f.svg);
+    // the label names the target; past a fifth of the width the axis is cut, and the label says so
+    // above the dashed line (over its higher end), right-aligned to the plot's right edge, on a halo of the box's colour
+    sv("text", { x: f.L + f.pw, y: Math.max(f.T + 10, Math.min(f.y(now), f.y(endVal)) - 8), "text-anchor": "end", class: "pv-tlabel" }, f.svg).textContent =
+      `${who}'s target: ${fmt(Number(tg.t.lines))} on ${dmLong(tg.t.date)}${tg.cut ? ` · axis cut, ${plural(Math.round(tg.weeks), "week")} away` : ""}`;
+  }
+  // its note, one grey line under the chart; nothing without a target
+  $("pace").textContent = tg && tg.t.note ? tg.t.note : "";
+}
+
+// ── what the tree is made of today, one bar by kind in view under the chart (C-7.4): tree, not_ours, hidden, areas_from,
+//    areas_note; the lines not ours, the hidden ones and where the kinds come from as grey lines under the bar ──
+function renderMade() {
+  const bar = clear("made-bar"), legend = clear("made-legend");
+  if (!D.tree) { $("made-note").textContent = "The tree has not been counted."; return; }
+  const total = AREAS.reduce((s, a) => s + (D.tree[a] || 0), 0) || 1;
+  for (const a of AREAS) {
+    const n = D.tree[a] || 0; if (!n) continue;
+    const lines = [`${a}: ${fmt(n)} lines, ${((100 * n) / total).toFixed(1)} %`];
+    if (a === "other" && (D.tree.other_top || []).length) { lines.push("its biggest folders:"); for (const [f, m] of D.tree.other_top) lines.push(`  ${f}  ${fmt(m)}`); }
+    const seg = el("div", "pv-seg"); seg.style.flexGrow = n; seg.style.setProperty("--cb-key", `var(${AREA_COLOR[a]})`); seg.setAttribute("aria-label", lines.join("\n")); hover(seg, lines.join("\n")); bar.appendChild(seg);
+    const li = el("li"); li.append(swatch(AREA_COLOR[a]), `${a} ${fmt(n)} lines`); hover(li, lines.join("\n")); legend.appendChild(li);
+  }
+  const apart = [], no = D.not_ours, hd = D.hidden, list = (pairs) => pairs.map(([k, n]) => `${k} ${fmt(n)}`).join(", ");
+  if (no && no.lines) apart.push(`not ours: ${fmt(no.lines)} lines (${list(no.paths || [])}), the table's rows with no stage and edits on ask, out of every kind`);
+  const hk = (hd && hd.kinds) || [], hp = (hd && hd.paths) || [];
+  if (hk.length || hp.length) apart.push(`hidden: ${list(hk.concat(hp))} lines, by ${hd.from || "the road file"}'s page_hide_kinds and page_hide_paths`);
+  $("made-apart").textContent = apart.join(" · ");
+  $("made-note").textContent = [D.areas_from && D.areas_from !== "the default" ? `The kinds are this project's own, read from ${D.areas_from}'s areas.` : "The kinds are the default list (rust, c, front, docs, yaml, scripts); a key areas: in road.yaml names a project's own.",
+    "Hover other for its biggest folders. Not counted: what git ignores, the worktrees, target, node_modules, dist, the lock files, and pictures, recordings, archives and other data files."].concat(D.areas_note || []).join(" ");
+}
+
+// ── the tokens: tokens {transcripts, scoped, rows[[day, project, model, all, output, usd, here, pass]], passes, unpriced,
+//    rates_read, figures, models, sessions} ──
+// This project's rows (a row's `here`). Two switches (C-8.10): the layers are the thread and the passes it launched (a
+// row's `pass`, read off the sub-agents' own transcripts by usage.ps1; a data block without `pass` draws one layer), or
+// the models in the generator's fixed order (`models`), named as the passes' list names them; and dollars or tokens, a
+// layer then its tokens. Both, and the range, kept for the project by the browser.
+const tok = { unit: "usd", range: "30", view: "who" };
+const TOK_RANGES = [["10", "10 days", 10, false], ["30", "30 days", 30, false], ["6m", "6 months", 182, true], ["all", "All, by week", 0, true]];
+const TOK_VIEWS = [["who", "thread and passes"], ["model", "by model"]];
+const MODEL_COLORS = ["--cb-blue", "--cb-orange", "--cb-pink", "--cb-green", "--cb-tier-2", "--cb-tier-3", "--cb-tier-1", "--cb-yellow", "--cb-band-very-late", "--cb-ink-2", "--cb-ink-3"];
+const modelName = (m) => (m ? String(m)[0].toUpperCase() + String(m).slice(1) : "?");
+const tokRows = () => { const t = D.tokens || {}; const rows = t.rows || []; return t.scoped ? rows.filter((r) => r[6] === true) : rows; };
+/** The models of the rows in their fixed order: the generator's `models`, else by name; a model a colour, kept by its place. */
+function tokModels(rows) {
+  const have = new Set(rows.map((r) => String(r[2])));
+  const order = Array.isArray(D.tokens && D.tokens.models) && D.tokens.models.length ? D.tokens.models.map(String) : [...have].sort();
+  return order.concat([...have].filter((m) => !order.includes(m)).sort());
+}
+function tokLayers(rows) {
+  const who = D.agent || "the agent";
+  if (tok.view === "model") return tokModels(rows).map((m, i) => ({ name: modelName(m), color: MODEL_COLORS[i % MODEL_COLORS.length], has: (r) => String(r[2]) === m }));
+  if (rows.length && rows.every((r) => r[7] === true || r[7] === false))
+    return [{ name: `the passes ${who} launched`, color: "--cb-blue", has: (r) => r[7] === true }, { name: `${who}'s thread`, color: "--cb-orange", has: (r) => r[7] === false }];
+  return [{ name: "this project", color: "--cb-blue", has: () => true }];
+}
+const tokVal = (r) => (tok.unit === "usd" ? r[5] : r[3]);
+const tokSay = (n) => (tok.unit === "usd" ? usd(n) : `${mega(n)} tokens`);
+function renderTokens() {
+  const figs = clear("tok-figs"), legend = clear("tok-legend"), unit = clear("tok-unit"), range = clear("tok-range"), notes = clear("tok-notes"), t = D.tokens;
+  clear("tok-chart"); clear("tok-view");
+  // a token log that failed is said over the figures it leaves, never drawn as if they were today's
+  if (t && t.failed) notes.appendChild(el("p", "pv-flag", `${t.failed[0].toUpperCase()}${t.failed.slice(1)}.`));
+  if (t && !t.transcripts && t.failed) return;
+  if (!t || !t.transcripts) { notes.appendChild(el("p", "pv-empty", "No transcripts here: this machine has no Claude Code transcripts to read (page/usage.ps1 found none).")); return; }
+  const rows = tokRows();
+  if (!rows.length) { notes.appendChild(el("p", "pv-empty", "No transcript of this project on this machine: no Claude Code session was opened in this repository or its worktrees here.")); return; }
+  const sum = (rs) => rs.reduce((s, r) => s + tokVal(r), 0);
+  // the three figures (C-8.9): today, the last seven days, since the first day, in dollars; under each in one grey line
+  // its tokens apart, the input (with the cache written), the output, the cache read. An older data block: the dollars alone.
+  const td = iso(today()), wk = iso(addDays(today(), -6)), first = rows.map((r) => r[0]).sort()[0];
+  const fg = t.figures || { today: { usd: rows.filter((r) => r[0] === td).reduce((s, r) => s + r[5], 0) }, week: { usd: rows.filter((r) => r[0] >= wk).reduce((s, r) => s + r[5], 0) }, all: { usd: rows.reduce((s, r) => s + r[5], 0) }, since: first };
+  const big = (f, label, small) => {
+    const d = el("div", "pv-fig"); d.append(el("span", `pv-big${small ? " pv-big--s" : ""}`, usd(Number((f && f.usd) || 0))), el("span", "pv-lbl", label)); figs.appendChild(d);
+    if (f && f.in != null) figs.appendChild(el("p", "pv-fig-k", `in ${mega(f.in)} · out ${mega(f.out)} · cache read ${mega(f.cache_read)}`));
+  };
+  big(fg.today, "today", false);
+  big(fg.week, "the last seven days", true);
+  big(fg.all, `since ${dmLong(fg.since || first)}`, true);
+  for (const l of tokLayers(rows)) { const li = el("li"), s = el("span", "pv-kind pv-kind--static"); s.append(swatch(l.color), l.name, el("b", "", tokSay(sum(rows.filter(l.has))))); li.appendChild(s); legend.appendChild(li); }
+  const chips = (box, list, key, name) => {
+    for (const [v, w] of list) {
+      const b = el("button", "pv-chip", w); b.type = "button"; b.setAttribute("aria-pressed", String(tok[key] === v));
+      b.addEventListener("click", () => { tok[key] = v; store(name, v); renderTokens(); drawTokens(); }); box.appendChild(b);
+    }
+  };
+  chips(clear("tok-view"), TOK_VIEWS, "view", "pv-tok-view");
+  chips(unit, [["usd", "dollars"], ["tokens", "tokens"]], "unit", "pv-tok-unit");
+  chips(range, TOK_RANGES, "range", "pv-tok-range");
+  notes.appendChild(el("p", "pv-hint", `The dollars are the API's list prices for what the transcripts count (the rates read ${t.rates_read || "in page/rates.ps1"}): the measure, not the invoice.`));
+  // a model without a rate is a warning row of its own, never a silent zero
+  for (const id of t.unpriced || []) notes.appendChild(el("p", "pv-flag", `rates: no rate for ${id}, counted at $0: the totals are low by its tokens`));
+}
+/** The bins of the range shown: days for 10 and 30 days, weeks (from Monday) for 6 months and All; never more than the project has. */
+function tokBins(rows) {
+  const r = TOK_RANGES.find((x) => x[0] === tok.range) || TOK_RANGES[1], td = today(), byWeek = r[3];
+  const first = day(rows.map((x) => x[0]).sort()[0]);
+  let start = r[2] ? addDays(td, -(r[2] - 1)) : first;
+  if (start < first) start = first;
+  const bins = [];
+  if (byWeek) for (let d = monday(start); d <= td; d = addDays(d, 7)) bins.push({ from: d, to: addDays(d, 7), week: true });
+  else for (let d = start; d <= td; d = addDays(d, 1)) bins.push({ from: d, to: addDays(d, 1), week: false });
+  return bins;
+}
+function drawTokens() {
+  const box = $("tok-chart"), rows = D.tokens && D.tokens.transcripts ? tokRows() : [];
+  if (!rows.length || !box.clientWidth) return;
+  box.textContent = "";
+  const layers = tokLayers(rows), bins = tokBins(rows);
+  for (const b of bins) { b.v = layers.map((l) => rows.filter((r) => l.has(r) && day(r[0]) >= b.from && day(r[0]) < b.to).reduce((s, r) => s + tokVal(r), 0)); b.total = b.v.reduce((s, x) => s + x, 0); }
+  const W = box.clientWidth, H = 200, L = 52, T = 16, B = 24, R = 8, pw = Math.max(40, W - L - R), ph = H - T - B;
+  const max = Math.max(tok.unit === "usd" ? 1 : 1000, ...bins.map((b) => b.total));
+  const svg = sv("svg", { class: "cb-chart", width: W, height: H, viewBox: `0 0 ${W} ${H}` }, box);
+  const y = (v) => T + ph - (v * ph) / (max * 1.08);
+  const step = niceStep(max * 1.08, 4);
+  for (let v = 0; v <= max * 1.08; v += step) {
+    sv("line", { class: v === 0 ? "cb-chart-base" : "cb-chart-grid", x1: L, x2: L + pw, y1: y(v), y2: y(v) }, svg);
+    sv("text", { x: L - 6, y: y(v) + 3, "text-anchor": "end" }, svg).textContent = tok.unit === "usd" ? usd(v) : mega(v);
+  }
+  const slot = pw / Math.max(1, bins.length), bw = Math.max(2, Math.min(64, slot * 0.7));
+  const every = Math.max(1, Math.ceil(bins.length / Math.max(2, Math.floor(pw / 64))));
+  bins.forEach((b, i) => {
+    const cx = L + slot * i + slot / 2;
+    let base = 0;
+    b.v.forEach((v, j) => {
+      if (!v) return;
+      sv("rect", { x: cx - bw / 2, y: y(base + v), width: bw, height: Math.max(1, y(base) - y(base + v)), style: `fill: var(${layers[j].color})` }, svg);
+      base += v;
+    });
+    if (bins.length <= 14 && b.total) sv("text", { x: cx, y: y(b.total) - 4, "text-anchor": "middle", class: "pv-ink" }, svg).textContent = tok.unit === "usd" ? usd(b.total) : mega(b.total);
+    if (i % every === 0) sv("text", { x: cx, y: H - 6, "text-anchor": "middle" }, svg).textContent = dm(b.from);
+    const hit = sv("rect", { class: "pv-bar-hit", x: L + slot * i, y: T, width: slot, height: ph }, svg);
+    const text = [b.week ? `Week of ${dm(b.from)}` : `${WEEKDAYS[b.from.getDay()]} ${dm(b.from)}`, `${tokSay(b.total)} in all`].concat(layers.map((l, j) => `${l.name}: ${tokSay(b.v[j])}`)).join("\n");
+    hover(hit, text, i > bins.length / 2);
+  });
+}
+// ── the sessions (C-8.11): tokens.sessions[{start, end, day, part, subject, from, passes, pass_usd, thread_usd, usd,
+//    items[[ended, pass, model, minutes, tokens, in, out, usd, here]]}], newest first, as the generator cut them at an
+//    hour's pause; twenty shown, then "older sessions"; a click unfolds a session's passes, each drawn as a pass ──
+const SESSIONS_SHOWN = 20;
+let sessAll = false;
+const sessOpen = new Set();
+/** A pass, one line: its name, its minutes, then when, its model, its tokens and dollars, or "no record". */
+function passLi([ended, name, model, minutes, , pin, pout, pusd]) {
+  const cost = pusd == null ? "no record" : `in ${mega(pin)} · out ${mega(pout)} · ${usd(pusd)}`;
+  const li = el("li"); li.append(el("b", "", name), el("span", "pv-m", `${minutes} min`), el("span", "pv-sub", `${when(ended)} · ${modelName(model)} · ${cost}`));
+  return li;
+}
+function renderSessions() {
+  const box = clear("sessions"), t = D.tokens;
+  if (!t || !t.transcripts) { box.appendChild(el("p", "pv-hint pv-sess-end", t && t.failed ? "The token logs could not be read." : "No transcripts here.")); return; }
+  const ss = t.sessions;
+  if (!Array.isArray(ss)) { box.appendChild(el("p", "pv-hint pv-sess-end", "The sessions need the hour of each message: this token log is older and has none; page/usage.ps1 run again writes it.")); return; }
+  if (!ss.length) { box.appendChild(el("p", "pv-hint pv-sess-end", "No session recorded for this project.")); return; }
+  const head = el("div", "pv-ses pv-ses-head");
+  head.append(el("span", "", "when"), el("span", "", "subject"), el("span", "pv-n", "passes"), el("span", "pv-n", "the passes"), el("span", "pv-n", "the thread"), el("span", "pv-n", "together"));
+  box.appendChild(head);
+  for (const s of sessAll ? ss : ss.slice(0, SESSIONS_SHOWN)) {
+    const open = sessOpen.has(s.start), b = el("button", "pv-ses"); b.type = "button"; b.setAttribute("aria-expanded", String(open));
+    const subj = el("span", `pv-nm${s.subject ? "" : " pv-q"}`, s.subject || "the thread alone, no pass"); subj.title = `${s.subject || ""}${s.from === "passes" ? "\n(its passes' names: no subject in the road file's sessions:)" : ""}\n${when(s.start)} to ${String(s.end || "").slice(11, 16)}`;
+    const tot = el("span", "pv-n"); tot.appendChild(el("b", "", usd(Number(s.usd || 0))));
+    b.append(el("span", "", `${open ? "▾" : "▸"} ${dmy(s.day)} · ${s.part}`), subj, el("span", "pv-n", plural(Number(s.passes || 0), "pass")), el("span", "pv-n", usd(Number(s.pass_usd || 0))), el("span", "pv-n", usd(Number(s.thread_usd || 0))), tot);
+    b.addEventListener("click", () => { if (sessOpen.has(s.start)) sessOpen.delete(s.start); else sessOpen.add(s.start); renderSessions(); });
+    box.appendChild(b);
+    if (open) {
+      const kid = el("div", "pv-ses-kids"), items = (s.items || []).slice().sort((a, c) => (a[0] < c[0] ? 1 : -1));
+      if (!items.length) kid.appendChild(el("p", "pv-hint", "No pass in this session: the thread alone."));
+      else { const ul = el("ul", "pv-passes"); for (const p of items) ul.appendChild(passLi(p)); kid.appendChild(ul); }
+      box.appendChild(kid);
+    }
+  }
+  if (!sessAll && ss.length > SESSIONS_SHOWN) { const m = el("button", "pv-more pv-sess-end", `older sessions · ${ss.length - SESSIONS_SHOWN}`); m.type = "button"; m.addEventListener("click", () => { sessAll = true; renderSessions(); }); box.appendChild(m); }
+  box.appendChild(el("p", "pv-hint pv-sess-end", "A session is a stretch of work with no pause over an hour, the thread's messages and its passes' together; its subject is the one the road file's sessions: gives it, else its passes' names."));
+}
+
+// ── the road, on the Dashboard beside the pick (C-9.5): road[{state, step, when, yours}], road_note, as the road file
+//    writes it: the step under way with "since <date>", two next, two later, one line each; then everything done on one
+//    line, "Done · n steps, <first> to <last>", nothing unfolding ──
+const ROAD_GROUPS = [["now", "Now", 1], ["next", "Next", 2], ["later", "Later", 2]];
+const datesIn = (s) => (String(s || "").match(/\d{4}-\d{2}-\d{2}/g) || []);
+function renderRoad() {
+  const ol = clear("road"), road = D.road || [], done = clear("done");
+  $("road-note").textContent = D.road_note || "";
+  if (!road.length) { ol.appendChild(el("li", "pv-r pv-q", "No road written yet: road.yaml holds the steps, in order.")); return; }
+  for (const [state, word, n] of ROAD_GROUPS) {
+    for (const s of road.filter((x) => x.state === state).slice(0, n)) {
+      const li = el("li", `pv-r${state === "later" ? " pv-r--quiet" : ""}`);
+      li.appendChild(el("span", `pv-w${state === "now" ? " pv-w--now" : ""}`, word));
+      const nm = el("span", "pv-nm", s.step); nm.title = `${s.step}${s.yours ? `\nyours: ${s.yours}` : ""}`; li.appendChild(nm);
+      const ds = datesIn(s.when);
+      if (ds.length) li.appendChild(el("span", "pv-t", state === "now" ? `since ${dmy(ds[0])}` : ds.map(dmy).join(" – ")));
+      ol.appendChild(li);
+    }
+  }
+  const ds = road.filter((s) => s.state === "done"), dd = ds.flatMap((s) => datesIn(s.when)).sort();
+  if (ds.length) done.textContent = `Done · ${plural(ds.length, "step")}${dd.length ? `, ${dmLong(dd[0])}${dd.length > 1 && dd[dd.length - 1] !== dd[0] ? ` to ${dmLong(dd[dd.length - 1])}` : ""}` : ""}`;
+}
+
+// ── the tabs: Dashboard, Parts, Growth and tokens; the chosen one is the URL's #name (#parts/<part> keeps the part); an
+//    address of a tab the page no longer has (#road, #next, #now) opens the Dashboard ──
+const TABS = ["dashboard", "parts", "growth"];
+const OLD_TAB = { now: "dashboard", next: "dashboard", road: "dashboard" };
+let tabShown = "dashboard";
+const tabOf = (h) => { const t = String(h || "").replace(/^#/, "").split("/")[0]; const n = OLD_TAB[t] || t; return TABS.includes(n) ? n : "dashboard"; };
+const partOf = (h) => { const m = /^#?parts\/(.+)$/.exec(String(h || "")); return m ? decodeURIComponent(m[1]) : ""; };
+function setHash(h) {
+  if (location.hash === `#${h}`) return;
+  // replaceState keeps the place without a jump; where it is refused, the hash itself
+  try { history.replaceState(null, "", `#${h}`); } catch (e) { try { location.hash = h; } catch (e2) { /* a view without a URL */ } }
+}
+/** Show one tab: its button selected and in the Tab order, its panel shown, the others hidden; the hash follows. */
+function showTab(name, focus, keep) {
+  tabShown = tabOf(name);
+  for (const t of TABS) {
+    const b = $(`tab-${t}`), p = $(`panel-${t}`), on = t === tabShown;
+    b.setAttribute("aria-selected", String(on)); b.tabIndex = on ? 0 : -1; p.hidden = !on;
+  }
+  if (focus) $(`tab-${tabShown}`).focus();
+  if (keep) setHash(tabShown === "parts" && chosen ? `parts/${chosen}` : tabShown);
+  // a chart is sized on show, never in a hidden panel (its width is 0 there)
+  drawCharts();
+}
+$("tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-tab]"); if (b) showTab(b.dataset.tab, false, true); });
+$("tabs").addEventListener("keydown", (e) => {
+  const i = TABS.indexOf(tabShown), k = e.key;
+  const j = k === "ArrowRight" ? (i + 1) % TABS.length : k === "ArrowLeft" ? (i + TABS.length - 1) % TABS.length : k === "Home" ? 0 : k === "End" ? TABS.length - 1 : -1;
+  if (j < 0) return;
+  e.preventDefault(); showTab(TABS[j], true, true);
+});
+window.addEventListener("hashchange", () => {
+  const p = partOf(location.hash);
+  if (p && p !== chosen && (D.parts || []).some((x) => x.name === p)) choose(p, false);
+  if (tabOf(location.hash) !== tabShown) showTab(location.hash, false, false);
+});
+
+function drawCharts() { if (!D || tabShown !== "growth") return; drawArea(); drawTokens(); }
+function render() {
+  renderHead(); renderRefresh(); renderGrid(); renderPick(); renderRoad();
+  const p = partOf(location.hash);
+  chosen = p && (D.parts || []).some((x) => x.name === p) ? p : defaultPart();
+  renderPartList(); renderPart();
+  renderCode(); renderMade(); renderTokens(); renderSessions();
+  showTab(location.hash, false, false);
+}
+function load() {
+  try { D = JSON.parse($("data").textContent); } catch (e) { D = { project: { name: "Cannot read the data" }, generated: "", road: [], parts: [], sources: String(e.message || e) }; }
+  setAreas();
+  try { const v = JSON.parse(stored("pv-off") || "[]"); offKinds = new Set(Array.isArray(v) ? v.map(String).filter((a) => AREAS.includes(a)) : []); } catch (e) { offKinds = new Set(); }
+  try { const v = JSON.parse(stored("pv-fam") || "[]"); famOpen = new Set(Array.isArray(v) ? v.map(String) : []); } catch (e) { famOpen = new Set(); }
+  from = stored("pv-from") || "all"; if (!FROM_PICKS.some((p) => p[0] === from)) from = "all";
+  // the tokens' two switches and range, kept for the project as the code's range is (C-8.10)
+  const tv = stored("pv-tok-view"), tu = stored("pv-tok-unit"), tr = stored("pv-tok-range");
+  if (TOK_VIEWS.some((x) => x[0] === tv)) tok.view = tv;
+  if (tu === "usd" || tu === "tokens") tok.unit = tu;
+  if (TOK_RANGES.some((x) => x[0] === tr)) tok.range = tr;
+  render();
+}
+// The theme: Auto follows the system; Light and Dark are remembered in this browser only.
+const theme = $("theme");
+function setTheme(v, save) {
+  if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v); else document.documentElement.removeAttribute("data-theme");
+  theme.querySelectorAll("[data-value]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.value === v)));
+  if (save) { try { localStorage.setItem("pv-theme", v); } catch (e) { /* storage may be off */ } }
+  if (D) drawCharts();
+}
+theme.addEventListener("click", (e) => { const b = e.target.closest("[data-value]"); if (b) setTheme(b.dataset.value, true); });
+let saved = "auto"; try { saved = localStorage.getItem("pv-theme") || "auto"; } catch (e) { /* storage may be off */ }
+setTheme(new URLSearchParams(location.search).get("theme") || saved, false);
+load();
+// a host may set its object after the script ran: look again once the page has loaded
+window.addEventListener("load", () => { renderRefresh(); renderPart(); });
+let pending = 0;
+window.addEventListener("resize", () => { cancelAnimationFrame(pending); pending = requestAnimationFrame(drawCharts); });
+</script>
+</body>
+</html>
