@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>La méthode</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Construire du logiciel avec une IA, sans lire le code et sans perdre la main.">
+<meta name="theme-color" content="#07111a" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ebe7e0" media="(prefers-color-scheme: light)">
+<script>/* the colour setting, before the first paint: the status pages' key "pv-theme", "light" or "dark" on data-theme; Auto or nothing stored follows the system */
+(function () { var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {} if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) {} }
+  if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v); })();</script>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='25' fill='%2303080d'/%3E%3Cg fill='none' stroke-width='5'%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%234cc9f0' stroke-dasharray='40 139' transform='rotate(-135 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%23ffb703' stroke-dasharray='40 139' transform='rotate(-45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(45 32 32)'/%3E%3Ccircle cx='32' cy='32' r='28.5' stroke='%239fb2c2' stroke-opacity='.45' stroke-dasharray='40 139' transform='rotate(135 32 32)'/%3E%3C/g%3E%3Ccircle cx='32' cy='32' r='10' fill='%234cc9f0'/%3E%3Ccircle cx='29' cy='29' r='3.5' fill='%23fff' fill-opacity='.45'/%3E%3C/svg%3E">
+<style>
+  /* Lorisse's look: the tokens of the site's French pages (fr/, fr/method/), copied as they are.
+     Dark on :root, light below; no colour is written outside these three blocks. */
+  :root {
+    color-scheme: dark;
+    --cb-bg: #07111a; --cb-surface: #0d1a26; --cb-surface-2: #13222f;
+    --cb-line: #1a2b3b; --cb-line-2: #2f4558;
+    --cb-ink: #e6f1fa; --cb-ink-2: #9fb4c6; --cb-ink-3: #6a8296; --cb-on-accent: #07111a;
+    --cb-blue: #4cc9f0; --cb-orange: #ffb703; --cb-orange-hi: #ffcb47; --cb-pink: #ff5c8a; --cb-green: #3ddc97;
+    --cb-blue-soft: rgba(76, 201, 240, .14); --cb-orange-soft: rgba(255, 183, 3, .14);
+    --cb-pink-soft: rgba(255, 92, 138, .14); --cb-green-soft: rgba(61, 220, 151, .14);
+    --cb-eye-core: #03080d; --cb-eye-light: rgba(255, 255, 255, .75); --cb-eye-rim: rgba(255, 255, 255, .45); --cb-eye-off: var(--cb-line-2);
+    --cb-font-app: "Manrope", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --cb-font-mono: "B612 Mono", ui-monospace, Consolas, "Courier New", monospace;
+    --cb-radius-sm: 8px; --cb-radius-md: 12px; --cb-radius-card: 14px; --cb-radius-pill: 999px;
+    --cb-shadow-card: 0 0 0 1px var(--cb-line);
+    --cb-focus-ring: 2px solid var(--cb-blue); --cb-focus-offset: 2px;
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(0, 0, 0, .5);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      color-scheme: light;
+      --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+      --cb-line: #d0cabf; --cb-line-2: #9a9488;
+      --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+      --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+      --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+      --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+      --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+    }
+  }
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --cb-bg: #ebe7e0; --cb-surface: #e3dfd7; --cb-surface-2: #d9d4cb;
+    --cb-line: #d0cabf; --cb-line-2: #9a9488;
+    --cb-ink: #1c2733; --cb-ink-2: #46525e; --cb-ink-3: #525c67; --cb-on-accent: #ffffff;
+    --cb-blue: #006488; --cb-orange: #824e00; --cb-orange-hi: #9a5c00; --cb-pink: #b5124f; --cb-green: #00704a;
+    --cb-blue-soft: rgba(0, 100, 136, .10); --cb-orange-soft: rgba(130, 78, 0, .10);
+    --cb-pink-soft: rgba(181, 18, 79, .09); --cb-green-soft: rgba(0, 112, 74, .10);
+    --cb-shadow-seg: 0 0 0 1px var(--cb-line), 0 2px 6px -2px rgba(28, 39, 51, .18);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cb-bg); color: var(--cb-ink); font-family: var(--cb-font-app);
+    font-size: 17px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-wrap: anywhere; }
+  a { color: var(--cb-blue); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 2px; }
+  a:focus-visible { outline: var(--cb-focus-ring); outline-offset: 2px; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 0 16px; }
+
+  /* the header of the French pages: the brand, the pages, the colour setting */
+  header { position: sticky; top: 0; z-index: 5; backdrop-filter: blur(10px);
+    background: color-mix(in srgb, var(--cb-bg) 86%, transparent); border-bottom: 1px solid var(--cb-line); }
+  .nav { display: flex; align-items: center; justify-content: space-between; min-height: 60px; gap: 10px 16px; flex-wrap: wrap; padding: 8px 16px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; letter-spacing: .2px; color: var(--cb-ink); }
+  .brand:hover { text-decoration: none; }
+  .brand small { color: var(--cb-ink-3); font-weight: 400; font-size: inherit; }
+  .nav nav { display: flex; align-items: center; gap: 8px 18px; font-size: 15px; flex-wrap: wrap; }
+  .nav nav a { color: var(--cb-ink-2); white-space: nowrap; padding: 2px 0; border-bottom: 2px solid transparent; }
+  .nav nav a:hover { color: var(--cb-ink); text-decoration: none; }
+  .nav nav a[aria-current="page"] { color: var(--cb-ink); font-weight: 600; border-bottom-color: var(--cb-blue); }
+  .nav nav a.eye-item { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; }
+  .nav nav a.eye-item .cb-eye { width: 16px; height: 16px; }
+  .nav-r { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 20px; }
+  @media (max-width: 640px) { .nav-r { width: 100%; justify-content: space-between; } .nav nav { font-size: 14px; gap: 6px 14px; } }
+  .cb-seg { display: inline-flex; padding: 2px; border-radius: var(--cb-radius-pill); background: var(--cb-surface-2); box-shadow: var(--cb-shadow-seg); }
+  .cb-seg-item { min-height: 26px; padding: 2px 10px; border: 0; border-radius: var(--cb-radius-pill); background: transparent; color: var(--cb-ink-2); font: 600 12px/1.4 var(--cb-font-app); cursor: pointer; }
+  .cb-seg-item[aria-pressed="true"] { background: var(--cb-ink); color: var(--cb-bg); }
+  .cb-seg-item:focus-visible { outline: var(--cb-focus-ring); outline-offset: var(--cb-focus-offset); }
+  .ctl { display: flex; align-items: center; gap: 10px; }
+
+  /* the eye, small: a presence */
+  .cb-eye { position: relative; display: inline-block; flex: none; width: 28px; height: 28px; border-radius: 50%; vertical-align: middle; }
+  .cb-eye-off, .cb-eye-off-in, .cb-eye-q { position: absolute; inset: 0; border-radius: 50%; }
+  .cb-eye-off { background: var(--cb-eye-off); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0 90deg, currentColor 0 177deg, transparent 0 180deg, currentColor 0 267deg, transparent 0 270deg, currentColor 0 357deg, transparent 0); }
+  .cb-eye-off-in { inset: 1px; background: var(--cb-eye-core); -webkit-mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 1.5deg, currentColor 0 85.5deg, transparent 0 91.5deg, currentColor 0 175.5deg, transparent 0 181.5deg, currentColor 0 265.5deg, transparent 0 271.5deg, currentColor 0 355.5deg, transparent 0); }
+  .cb-eye-q--1 { background: var(--cb-blue); -webkit-mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); mask: conic-gradient(from -45deg, currentColor 0 87deg, transparent 0); animation: cb-eye-lead 2.4s ease-in-out infinite; }
+  .cb-eye-q--2 { background: var(--cb-orange); opacity: .45; -webkit-mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); mask: conic-gradient(from -45deg, transparent 0 90deg, currentColor 0 177deg, transparent 0); }
+  .cb-eye-core { position: absolute; inset: 9%; display: flex; align-items: center; justify-content: center; overflow: hidden; border-radius: 50%; background: var(--cb-eye-core); }
+  .cb-eye-pupil { position: relative; overflow: hidden; border-radius: 50%; width: 46%; height: 46%; background: var(--cb-blue); box-shadow: inset 1.5px 1.5px 0 -.5px var(--cb-eye-rim); animation: cb-eye-blink 5s infinite; }
+  .cb-eye-inner { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, var(--cb-eye-light) 0 14%, transparent 64%); opacity: .35; }
+  @keyframes cb-eye-blink { 0%, 93%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.08); } }
+  @keyframes cb-eye-lead { 0%, 100% { filter: brightness(1); } 50% { filter: brightness(1.4); } }
+  @media (prefers-reduced-motion: reduce) { .cb-eye-pupil, .cb-eye-q--1 { animation: none; } }
+
+  /* the hero, as on fr/method/ */
+  .hero { padding: 72px 0 40px; max-width: 780px; }
+  @media (max-width: 820px) { .hero { padding-top: 40px; } }
+  h1 { font-size: clamp(38px, 6vw, 64px); line-height: 1.02; margin: 0 0 18px; letter-spacing: -.02em; font-weight: 800; }
+  .lede { font-size: 20px; color: var(--cb-ink-2); max-width: 38ch; margin: 0; }
+
+  /* this page's own: the opening, a little larger than the body, one idea a paragraph */
+  .open { padding: 0 0 48px; max-width: 62ch; }
+  .open p { font-size: 19px; color: var(--cb-ink-2); margin: 0 0 16px; }
+  .open p:first-child { color: var(--cb-ink); }
+
+  section { padding: 48px 0; border-top: 1px solid var(--cb-line); }
+  h2 { font-size: clamp(26px, 3.6vw, 34px); letter-spacing: -.01em; margin: 0 0 14px; font-weight: 800; }
+  p.body { color: var(--cb-ink-2); margin: 0 0 12px; max-width: 62ch; }
+  p.body b { color: var(--cb-ink); }
+
+  /* the three pages, drawn as on fr/method/: a coloured edge each */
+  .docs { list-style: none; margin: 18px 0 18px; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 820px) { .docs { grid-template-columns: minmax(0, 1fr); } }
+  .doc { border: 1px solid var(--cb-line-2); border-radius: var(--cb-radius-md); padding: 14px 16px; background: var(--cb-surface); color: var(--cb-ink-2); font-size: 16px; }
+  .doc b { display: block; color: var(--cb-ink); font-size: 17px; margin-bottom: 2px; }
+  .doc.r { border-left: 3px solid var(--cb-blue); }
+  .doc.c { border-left: 3px solid var(--cb-orange); }
+  .doc.v { border-left: 3px solid var(--cb-green); }
+  .aside { color: var(--cb-ink); font-weight: 600; margin: 0; max-width: 62ch; }
+
+  /* two short sections side by side on a wide screen, as the tiles of fr/ */
+  .pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 720px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+  .tile { background: var(--cb-surface); border-radius: var(--cb-radius-card); box-shadow: var(--cb-shadow-card); padding: 18px 20px; }
+  .tile h2 { font-size: clamp(22px, 3vw, 26px); margin-bottom: 8px; }
+  .tile p { margin: 0; color: var(--cb-ink-2); font-size: 16px; }
+  .tile.blue { border-top: 3px solid var(--cb-blue); } .tile.green { border-top: 3px solid var(--cb-green); }
+
+  /* the way on: the large button of fr/ */
+  a.lead { display: flex; flex-direction: column; gap: 6px; max-width: 520px; min-height: 120px; padding: 22px 24px; border-radius: var(--cb-radius-card); background: var(--cb-surface); box-shadow: var(--cb-shadow-card); border-top: 3px solid var(--cb-orange); color: var(--cb-ink); }
+  a.lead:hover { text-decoration: none; background: var(--cb-surface-2); }
+  a.lead:focus-visible { outline: var(--cb-focus-ring); outline-offset: 3px; }
+  a.lead span { font-size: 19px; font-weight: 700; }
+  a.lead i { margin-top: auto; font-style: normal; color: var(--cb-blue); font-weight: 600; font-size: 15px; }
+  .soon { color: var(--cb-ink-2); margin: 18px 0 0; }
+
+  footer { padding: 36px 0 56px; border-top: 1px solid var(--cb-line); color: var(--cb-ink-3); font-size: 14px; }
+  footer .row { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+  footer a { color: var(--cb-ink-2); }
+  footer .made { font-family: var(--cb-font-mono); font-size: 13px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="/fr/"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span> whysoserious.wtf <small>/method</small></a>
+    <div class="nav-r">
+    <nav aria-label="Les pages">
+      <a href="/dev/lorisse/">Lorisse</a>
+      <a href="/dev/method/" aria-current="page">La méthode</a>
+      <a href="/fr/extension/">L'extension</a>
+      <a href="/method/status/project_page.html">Avancement</a>
+      <a class="eye-item" href="/fr/lorisse/" title="L'œil de Lorisse, ses humeurs et ses couleurs"><span class="cb-eye" aria-hidden="true"><span class="cb-eye-off"></span><span class="cb-eye-off-in"></span><span class="cb-eye-q cb-eye-q--1"></span><span class="cb-eye-q cb-eye-q--2"></span><span class="cb-eye-core"><span class="cb-eye-pupil"><span class="cb-eye-inner"></span></span></span></span>L'œil</a>
+    </nav>
+    <div class="ctl">
+    <div class="cb-seg" id="theme" role="group" aria-label="Thème"><button class="cb-seg-item" type="button" data-value="auto">Auto</button><button class="cb-seg-item" type="button" data-value="light">Clair</button><button class="cb-seg-item" type="button" data-value="dark">Sombre</button></div>
+    </div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="hero">
+    <h1>La méthode</h1>
+    <p class="lede">Construire du logiciel avec une IA, sans lire le code et sans perdre la main.</p>
+  </div>
+
+  <div class="open">
+    <p>Une IA écrit du code plus vite que vous ne pouvez le lire. Le code n'est donc plus ce qui compte. Ce qui compte, c'est ce qu'on a décidé, ce qu'on a promis, et ce qu'on a vérifié.</p>
+    <p>La méthode tient en quelques fichiers texte posés dans votre projet. Ils disent à l'IA ce qu'elle a le droit de faire, et à vous où en est chaque chose. Vous dirigez&nbsp;; elle construit.</p>
+  </div>
+
+  <section id="pages">
+    <h2>Trois pages par morceau</h2>
+    <p class="body">Chaque morceau du projet a trois pages, et vous ne lisez que celles-là.</p>
+    <ul class="docs">
+      <li class="doc r"><b>Le README</b>Ce que c'est, en clair.</li>
+      <li class="doc c"><b>Le contrat</b>Ce que le morceau promet. Chaque promesse a son numéro.</li>
+      <li class="doc v"><b>La validation</b>Comment chaque promesse est vérifiée, par la machine et par vous, en quelques gestes.</li>
+    </ul>
+    <p class="aside">Si une page ne se comprend pas, c'est la page qui est fausse, pas vous.</p>
+  </section>
+
+  <section id="table">
+    <h2>Une table, une seule</h2>
+    <p class="body">Un fichier liste tous les morceaux&nbsp;: où chacun en est, ce qui vient ensuite, et ce que l'IA a le droit d'y toucher. <b>Ouvert</b>, elle travaille. <b>À demander</b>, elle demande une fois. <b>Verrouillé</b>, elle n'y touche plus, quoi qu'on lui dise.</p>
+    <p class="body">Ce n'est pas une consigne qu'elle peut oublier&nbsp;: un programme la lit avant chaque modification.</p>
+  </section>
+
+  <section id="pass">
+    <h2>Une passe à la fois</h2>
+    <p class="body">Le travail avance par passes. Une passe, c'est une page de brief, un agent qui construit dans son coin, un contrôle automatique, et un rapport. Vous dites «&nbsp;go&nbsp;», vous revenez quand c'est fini, vous relisez trois pages.</p>
+    <p class="body">Construire et relire sont deux boucles séparées. L'IA tourne vite dans la première. Vous prenez votre temps dans la seconde.</p>
+  </section>
+
+  <section id="guards">
+    <h2>Des garde-fous, pas des fenêtres</h2>
+    <p class="body">Passer ses soirées à cliquer sur «&nbsp;oui&nbsp;» n'est pas diriger. Ce qui est permis passe sans vous déranger. Le reste est refusé, et noté.</p>
+    <p class="body">On décide avant, pas pendant&nbsp;: un téléchargement, une suppression, un envoi se demandent au lancement, jamais au milieu.</p>
+  </section>
+
+  <section id="yours">
+    <div class="pair">
+      <div class="tile blue">
+        <h2>À vous, et à n'importe quelle IA</h2>
+        <p>Ce sont des fichiers texte dans votre dépôt. Ils marchent aujourd'hui avec Claude, demain avec un autre. La méthode ne dit pas comment coder&nbsp;: vos conventions restent les vôtres.</p>
+      </div>
+      <div class="tile green">
+        <h2>Pour qui</h2>
+        <p>Pour une personne, ou une petite équipe, qui construit pour de bon avec une IA et veut pouvoir dire, à tout moment&nbsp;: voilà ce que ça fait, voilà ce qui est vérifié, voilà ce qui reste.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="next" aria-label="Où aller ensuite">
+    <a class="lead" href="/dev/lorisse/"><span>La méthode est née en construisant Lorisse.</span><i>Voir Lorisse →</i></a>
+    <p class="soon">Le dépôt arrive&nbsp;: une page à lire, un dossier à copier.</p>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span><a href="/fr/">whysoserious.wtf</a> · La méthode</span>
+    <span class="made">Fait avec l'IA, à lire comme tel.</span>
+  </div>
+</footer>
+<script>
+/* the colour setting: Auto follows the system; Light and Dark are kept in this browser under the status pages' own key */
+(function () {
+  var g = document.getElementById("theme"); if (!g) return;
+  function set(v, save) {
+    if (v === "light" || v === "dark") document.documentElement.setAttribute("data-theme", v);
+    else { document.documentElement.removeAttribute("data-theme"); v = "auto"; }
+    var bs = g.querySelectorAll("[data-value]");
+    for (var i = 0; i < bs.length; i++) bs[i].setAttribute("aria-pressed", String(bs[i].getAttribute("data-value") === v));
+    if (save) { try { localStorage.setItem("pv-theme", v); } catch (e) { /* storage may be off */ } }
+  }
+  g.addEventListener("click", function (e) { var b = e.target.closest("[data-value]"); if (b) set(b.getAttribute("data-value"), true); });
+  window.addEventListener("storage", function (e) { if (e.key === "pv-theme") set(e.newValue || "auto", false); });
+  var v = null; try { v = new URLSearchParams(location.search).get("theme"); } catch (e) {}
+  if (!v) { try { v = localStorage.getItem("pv-theme"); } catch (e) { /* storage may be off */ } }
+  set(v || "auto", false);
+})();
+</script>
+</body>
+</html>
